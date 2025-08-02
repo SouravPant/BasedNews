@@ -39,10 +39,5 @@
       "src": "/(.*)",
       "dest": "/dist/public/index.html"
     }
-  ],
-  "functions": {
-    "api/*.ts": {
-      "includeFiles": "server/**"
-    }
-  }
+  ]
 }
