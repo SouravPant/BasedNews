@@ -3,9 +3,10 @@ import { Cryptocurrency } from "@shared/schema";
 
 interface CryptoPriceCardProps {
   cryptocurrency: Cryptocurrency;
+  onClick?: () => void;
 }
 
-export function CryptoPriceCard({ cryptocurrency }: CryptoPriceCardProps) {
+export function CryptoPriceCard({ cryptocurrency, onClick }: CryptoPriceCardProps) {
   const formatPrice = (price?: string | null) => {
     if (!price) return "$0.00";
     const num = parseFloat(price);
@@ -46,7 +47,10 @@ export function CryptoPriceCard({ cryptocurrency }: CryptoPriceCardProps) {
   const isPositive = cryptocurrency.priceChangePercentage24h && parseFloat(cryptocurrency.priceChangePercentage24h) >= 0;
 
   return (
-    <Card className="bg-crypto-surface rounded-xl border border-slate-700 p-4 hover:border-slate-600 transition-colors font-semibold">
+    <Card 
+      className="bg-crypto-surface rounded-xl border border-slate-700 p-4 hover:border-slate-600 transition-colors font-semibold cursor-pointer hover:bg-slate-800/50"
+      onClick={onClick}
+    >
       <div className="flex items-center space-x-3 mb-3">
         {cryptocurrency.image ? (
           <img 

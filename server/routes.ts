@@ -6,6 +6,40 @@ import { insertNewsArticleSchema, insertRedditPostSchema } from "@shared/schema"
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Get historical price data for a specific cryptocurrency
+  app.get("/api/cryptocurrencies/:id/chart", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { days = "7" } = req.query; // Default to 7 days
+      
+      const response = await axios.get(
+        `https://api.coingecko.com/api/v3/coins/${id}/market_chart`,
+        {
+          params: {
+            vs_currency: "usd",
+            days: days,
+            interval: days === "1" ? "hourly" : "daily"
+          }
+        }
+      );
+
+      // Format the data for the chart
+      const chartData = response.data.prices.map(([timestamp, price]: [number, number]) => ({
+        time: new Date(timestamp).toISOString(),
+        price: price
+      }));
+
+      res.json({
+        coinId: id,
+        days: parseInt(days as string),
+        data: chartData
+      });
+    } catch (error) {
+      console.error(`Error fetching chart data for ${req.params.id}:`, error);
+      res.status(500).json({ message: "Failed to fetch chart data" });
+    }
+  });
+
   // Get top 10 cryptocurrencies with real-time prices from CoinGecko (excluding stablecoins and wrapped tokens)
   app.get("/api/cryptocurrencies", async (req, res) => {
     try {

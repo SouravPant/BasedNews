@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/header";
 import { CryptoPriceCard } from "@/components/crypto-price-card";
+import { CryptoChartModal } from "@/components/crypto-chart-modal";
 import { NewsArticle } from "@/components/news-article";
 import { RedditPost } from "@/components/reddit-post";
 import { StatusBar } from "@/components/status-bar";
@@ -8,9 +10,11 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Cryptocurrency, NewsArticle as NewsArticleType, RedditPost as RedditPostType } from "@shared/schema";
-import { useEffect } from "react";
 
 export default function Dashboard() {
+  const [selectedCrypto, setSelectedCrypto] = useState<Cryptocurrency | null>(null);
+  const [isChartModalOpen, setIsChartModalOpen] = useState(false);
+
   const { data: cryptocurrencies, isLoading: cryptoLoading, refetch: refetchCrypto } = useQuery<Cryptocurrency[]>({
     queryKey: ["/api/cryptocurrencies"],
     refetchInterval: 30000, // Refetch every 30 seconds
@@ -41,6 +45,16 @@ export default function Dashboard() {
 
     return () => clearInterval(interval);
   }, [refetchCrypto, refetchNews, refetchReddit]);
+
+  const handleCryptoClick = (crypto: Cryptocurrency) => {
+    setSelectedCrypto(crypto);
+    setIsChartModalOpen(true);
+  };
+
+  const handleCloseChartModal = () => {
+    setIsChartModalOpen(false);
+    setSelectedCrypto(null);
+  };
 
   return (
     <div className="min-h-screen bg-crypto-dark text-slate-100">
@@ -79,7 +93,11 @@ export default function Dashboard() {
               ))
             ) : cryptocurrencies?.length ? (
               cryptocurrencies.slice(0, 10).map((crypto) => (
-                <CryptoPriceCard key={crypto.id} cryptocurrency={crypto} />
+                <CryptoPriceCard 
+                  key={crypto.id} 
+                  cryptocurrency={crypto} 
+                  onClick={() => handleCryptoClick(crypto)}
+                />
               ))
             ) : (
               <div className="col-span-full text-center py-8">
@@ -185,6 +203,15 @@ export default function Dashboard() {
       </main>
 
       <StatusBar />
+
+      {/* Chart Modal */}
+      {selectedCrypto && (
+        <CryptoChartModal 
+          isOpen={isChartModalOpen}
+          onClose={handleCloseChartModal}
+          cryptocurrency={selectedCrypto}
+        />
+      )}
     </div>
   );
 }
