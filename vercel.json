@@ -1,19 +1,7 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "buildCommand": "vite build",
-        "outputDirectory": "dist/public"
-      }
-    },
-    {
-      "src": "api/*.ts",
-      "use": "@vercel/node"
-    }
-  ],
+  "buildCommand": "vite build",
+  "outputDirectory": "dist/public",
   "routes": [
     {
       "src": "/api/cryptocurrencies",
