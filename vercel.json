@@ -41,7 +41,16 @@
     }
   ],
   "functions": {
-    "api/*.ts": {
+    "api/cryptocurrencies.ts": {
+      "includeFiles": ["server/**", "shared/**"]
+    },
+    "api/news.ts": {
+      "includeFiles": ["server/**", "shared/**"]
+    },
+    "api/reddit.ts": {
+      "includeFiles": ["server/**", "shared/**"]
+    },
+    "api/status.ts": {
       "includeFiles": ["server/**", "shared/**"]
     }
   }
