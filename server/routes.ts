@@ -28,6 +28,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'tether',           // USDT
         'usd-coin',         // USDC
         'staked-ether',     // stETH (Lido Staked Ether)
+        'wrapped-steth',    // wstETH (Wrapped Staked Ether)
         'binance-usd',      // BUSD
         'dai',              // DAI
         'true-usd',         // TUSD
