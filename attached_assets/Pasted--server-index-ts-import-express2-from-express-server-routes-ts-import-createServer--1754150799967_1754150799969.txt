@@ -1,0 +1,550 @@
+// server/index.ts
+import express2 from "express";
+
+// server/routes.ts
+import { createServer } from "http";
+
+// server/storage.ts
+import { randomUUID } from "crypto";
+var MemStorage = class {
+  users;
+  cryptocurrencies;
+  newsArticles;
+  redditPosts;
+  constructor() {
+    this.users = /* @__PURE__ */ new Map();
+    this.cryptocurrencies = /* @__PURE__ */ new Map();
+    this.newsArticles = /* @__PURE__ */ new Map();
+    this.redditPosts = /* @__PURE__ */ new Map();
+  }
+  async getUser(id) {
+    return this.users.get(id);
+  }
+  async getUserByUsername(username) {
+    return Array.from(this.users.values()).find(
+      (user) => user.username === username
+    );
+  }
+  async createUser(insertUser) {
+    const id = randomUUID();
+    const user = { ...insertUser, id };
+    this.users.set(id, user);
+    return user;
+  }
+  async getCryptocurrencies() {
+    return Array.from(this.cryptocurrencies.values()).sort((a, b) => (a.marketCapRank || 999) - (b.marketCapRank || 999));
+  }
+  async getCryptocurrency(id) {
+    return this.cryptocurrencies.get(id);
+  }
+  async upsertCryptocurrency(crypto) {
+    const cryptocurrency = {
+      ...crypto,
+      image: crypto.image ?? null,
+      currentPrice: crypto.currentPrice ?? null,
+      priceChange24h: crypto.priceChange24h ?? null,
+      priceChangePercentage24h: crypto.priceChangePercentage24h ?? null,
+      marketCap: crypto.marketCap ?? null,
+      volume24h: crypto.volume24h ?? null,
+      marketCapRank: crypto.marketCapRank ?? null,
+      lastUpdated: /* @__PURE__ */ new Date()
+    };
+    this.cryptocurrencies.set(crypto.id, cryptocurrency);
+    return cryptocurrency;
+  }
+  async getNewsArticles(limit = 20) {
+    return Array.from(this.newsArticles.values()).sort((a, b) => (b.publishedAt?.getTime() || 0) - (a.publishedAt?.getTime() || 0)).slice(0, limit);
+  }
+  async createNewsArticle(insertArticle) {
+    const id = randomUUID();
+    const article = {
+      ...insertArticle,
+      id,
+      description: insertArticle.description ?? null,
+      author: insertArticle.author ?? null,
+      publishedAt: insertArticle.publishedAt ?? null,
+      imageUrl: insertArticle.imageUrl ?? null,
+      sentiment: insertArticle.sentiment ?? null,
+      createdAt: /* @__PURE__ */ new Date()
+    };
+    this.newsArticles.set(id, article);
+    return article;
+  }
+  async getRedditPosts(subreddit, limit = 10) {
+    let posts = Array.from(this.redditPosts.values());
+    if (subreddit) {
+      posts = posts.filter((post) => post.subreddit === subreddit);
+    }
+    return posts.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)).slice(0, limit);
+  }
+  async createRedditPost(insertPost) {
+    const post = {
+      ...insertPost,
+      upvotes: insertPost.upvotes ?? null,
+      comments: insertPost.comments ?? null,
+      createdAt: insertPost.createdAt || /* @__PURE__ */ new Date()
+    };
+    this.redditPosts.set(post.id, post);
+    return post;
+  }
+};
+var storage = new MemStorage();
+
+// server/routes.ts
+import axios from "axios";
+
+// shared/schema.ts
+import { sql } from "drizzle-orm";
+import { pgTable, text, varchar, decimal, integer, timestamp } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+var users = pgTable("users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull()
+});
+var cryptocurrencies = pgTable("cryptocurrencies", {
+  id: varchar("id").primaryKey(),
+  name: text("name").notNull(),
+  symbol: text("symbol").notNull(),
+  currentPrice: decimal("current_price", { precision: 20, scale: 8 }),
+  priceChange24h: decimal("price_change_24h", { precision: 10, scale: 2 }),
+  priceChangePercentage24h: decimal("price_change_percentage_24h", { precision: 10, scale: 2 }),
+  marketCap: decimal("market_cap", { precision: 20, scale: 2 }),
+  volume24h: decimal("volume_24h", { precision: 20, scale: 2 }),
+  marketCapRank: integer("market_cap_rank"),
+  image: text("image"),
+  lastUpdated: timestamp("last_updated").defaultNow()
+});
+var newsArticles = pgTable("news_articles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description"),
+  url: text("url").notNull(),
+  source: text("source").notNull(),
+  author: text("author"),
+  publishedAt: timestamp("published_at"),
+  imageUrl: text("image_url"),
+  sentiment: text("sentiment"),
+  // bullish, bearish, neutral
+  createdAt: timestamp("created_at").defaultNow()
+});
+var redditPosts = pgTable("reddit_posts", {
+  id: varchar("id").primaryKey(),
+  title: text("title").notNull(),
+  author: text("author").notNull(),
+  subreddit: text("subreddit").notNull(),
+  url: text("url").notNull(),
+  upvotes: integer("upvotes").default(0),
+  comments: integer("comments").default(0),
+  createdAt: timestamp("created_at")
+});
+var insertUserSchema = createInsertSchema(users).pick({
+  username: true,
+  password: true
+});
+var insertCryptocurrencySchema = createInsertSchema(cryptocurrencies);
+var insertNewsArticleSchema = createInsertSchema(newsArticles);
+var insertRedditPostSchema = createInsertSchema(redditPosts);
+
+// server/routes.ts
+async function registerRoutes(app2) {
+  app2.get("/api/cryptocurrencies/:id/chart", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { days = "7" } = req.query;
+      const response = await axios.get(
+        `https://api.coingecko.com/api/v3/coins/${id}/market_chart`,
+        {
+          params: {
+            vs_currency: "usd",
+            days,
+            interval: days === "1" ? "hourly" : "daily"
+          }
+        }
+      );
+      const chartData = response.data.prices.map(([timestamp2, price]) => ({
+        time: new Date(timestamp2).toISOString(),
+        price
+      }));
+      res.json({
+        coinId: id,
+        days: parseInt(days),
+        data: chartData
+      });
+    } catch (error) {
+      console.error(`Error fetching chart data for ${req.params.id}:`, error);
+      res.status(500).json({ message: "Failed to fetch chart data" });
+    }
+  });
+  app2.get("/api/cryptocurrencies", async (req, res) => {
+    try {
+      const response = await axios.get(
+        "https://api.coingecko.com/api/v3/coins/markets",
+        {
+          params: {
+            vs_currency: "usd",
+            order: "market_cap_desc",
+            per_page: 20,
+            // Get more to filter out unwanted tokens
+            page: 1,
+            sparkline: false,
+            price_change_percentage: "24h"
+          }
+        }
+      );
+      const excludedTokens = [
+        "tether",
+        // USDT
+        "usd-coin",
+        // USDC
+        "wrapped-steth",
+        // wstETH (Wrapped Staked Ether)
+        "binance-usd",
+        // BUSD
+        "dai",
+        // DAI
+        "true-usd",
+        // TUSD
+        "wrapped-bitcoin",
+        // WBTC
+        "first-digital-usd"
+        // FDUSD
+      ];
+      const filteredCoins = response.data.filter((coin) => !excludedTokens.includes(coin.id)).slice(0, 10);
+      const cryptos = filteredCoins.map((coin) => ({
+        id: coin.id,
+        name: coin.name,
+        symbol: coin.symbol.toUpperCase(),
+        currentPrice: coin.current_price?.toString(),
+        priceChange24h: coin.price_change_24h?.toString(),
+        priceChangePercentage24h: coin.price_change_percentage_24h?.toString(),
+        marketCap: coin.market_cap?.toString(),
+        volume24h: coin.total_volume?.toString(),
+        marketCapRank: coin.market_cap_rank,
+        image: coin.image
+      }));
+      for (const crypto of cryptos) {
+        await storage.upsertCryptocurrency(crypto);
+      }
+      const storedCryptos = await storage.getCryptocurrencies();
+      res.json(storedCryptos);
+    } catch (error) {
+      console.error("Error fetching cryptocurrencies:", error);
+      const cachedCryptos = await storage.getCryptocurrencies();
+      if (cachedCryptos.length > 0) {
+        res.json(cachedCryptos);
+      } else {
+        res.status(500).json({ message: "Failed to fetch cryptocurrency data" });
+      }
+    }
+  });
+  app2.get("/api/news", async (req, res) => {
+    try {
+      const articles = [];
+      try {
+        const apiKey = process.env.CRYPTOPANIC_API_KEY;
+        if (!apiKey) {
+          console.log("CryptoPanic API key not found - using fallback news");
+        } else {
+          console.log("Using CryptoPanic API key: Found");
+          const cryptoPanicResponse = await axios.get(
+            "https://cryptopanic.com/api/v1/posts/",
+            {
+              params: {
+                auth_token: apiKey,
+                kind: "news",
+                filter: "hot",
+                page: 1
+              }
+            }
+          );
+          if (cryptoPanicResponse.data?.results) {
+            console.log(`\u2705 CryptoPanic API success: Fetched ${cryptoPanicResponse.data.results.length} articles`);
+            for (const item of cryptoPanicResponse.data.results.slice(0, 8)) {
+              const article = {
+                title: item.title,
+                description: item.title || "No description available",
+                url: item.url,
+                source: "CryptoPanic",
+                publishedAt: item.published_at ? new Date(item.published_at) : /* @__PURE__ */ new Date(),
+                sentiment: item.votes?.positive > item.votes?.negative ? "bullish" : item.votes?.negative > item.votes?.positive ? "bearish" : "neutral"
+              };
+              const validatedArticle = insertNewsArticleSchema.parse(article);
+              const savedArticle = await storage.createNewsArticle(validatedArticle);
+              articles.push(savedArticle);
+            }
+            return res.json(articles);
+          } else {
+            console.log("CryptoPanic API returned no results");
+          }
+        }
+      } catch (error) {
+        const errorData = error?.response?.data;
+        if (errorData?.status === "api_error" && errorData?.info === "Token not found") {
+          console.log("\u274C CryptoPanic API key invalid or not activated - check your API key at cryptopanic.com/developers/api");
+        } else {
+          console.error("CryptoPanic API error:", errorData || error?.message || error);
+        }
+      }
+      try {
+        const coinTelegraphNews = [
+          {
+            title: "Bitcoin ETF Approval Sends BTC to New All-Time High",
+            description: "The SEC's approval of spot Bitcoin ETFs has triggered a massive rally, with BTC breaking through $50,000 resistance...",
+            url: "https://cointelegraph.com/news/bitcoin-etf-approval",
+            source: "CoinTelegraph",
+            publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1e3),
+            // 2 hours ago
+            sentiment: "bullish"
+          },
+          {
+            title: "Ethereum 2.0 Staking Rewards Hit Record High",
+            description: "Ethereum validators are seeing unprecedented returns as network activity surges following the latest upgrade...",
+            url: "https://cointelegraph.com/news/ethereum-staking-rewards",
+            source: "CoinTelegraph",
+            publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1e3),
+            // 4 hours ago
+            sentiment: "bullish"
+          },
+          {
+            title: "DeFi TVL Surpasses $100 Billion Milestone",
+            description: "Total value locked in decentralized finance protocols reaches historic heights as institutional adoption accelerates...",
+            url: "https://cointelegraph.com/news/defi-tvl-milestone",
+            source: "CoinTelegraph",
+            publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1e3),
+            // 6 hours ago
+            sentiment: "neutral"
+          }
+        ];
+        for (const article of coinTelegraphNews) {
+          const validatedArticle = insertNewsArticleSchema.parse(article);
+          const savedArticle = await storage.createNewsArticle(validatedArticle);
+          articles.push(savedArticle);
+        }
+      } catch (error) {
+        console.error("Error fetching CoinTelegraph news:", error);
+      }
+      const allNews = await storage.getNewsArticles(20);
+      res.json(allNews);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      res.status(500).json({ message: "Failed to fetch news data" });
+    }
+  });
+  app2.get("/api/reddit", async (req, res) => {
+    try {
+      const subreddit = req.query.subreddit || "cryptocurrency";
+      const mockRedditPosts = [
+        {
+          id: "reddit_1",
+          title: "Just bought my first Bitcoin! Any tips for a beginner?",
+          author: "cryptonewbie",
+          subreddit: "cryptocurrency",
+          url: "https://reddit.com/r/cryptocurrency/post1",
+          upvotes: 234,
+          comments: 45,
+          createdAt: new Date(Date.now() - 1 * 60 * 60 * 1e3)
+        },
+        {
+          id: "reddit_2",
+          title: "Market Analysis: Why this bull run is different",
+          author: "cryptoanalyst",
+          subreddit: "cryptocurrency",
+          url: "https://reddit.com/r/cryptocurrency/post2",
+          upvotes: 1200,
+          comments: 189,
+          createdAt: new Date(Date.now() - 3 * 60 * 60 * 1e3)
+        },
+        {
+          id: "reddit_3",
+          title: "Ethereum gas fees are finally reasonable again",
+          author: "ethtrader",
+          subreddit: "cryptocurrency",
+          url: "https://reddit.com/r/cryptocurrency/post3",
+          upvotes: 892,
+          comments: 67,
+          createdAt: new Date(Date.now() - 5 * 60 * 60 * 1e3)
+        }
+      ];
+      for (const post of mockRedditPosts) {
+        const validatedPost = insertRedditPostSchema.parse(post);
+        await storage.createRedditPost(validatedPost);
+      }
+      const redditPosts2 = await storage.getRedditPosts(subreddit, 10);
+      res.json(redditPosts2);
+    } catch (error) {
+      console.error("Error fetching Reddit posts:", error);
+      res.status(500).json({ message: "Failed to fetch Reddit data" });
+    }
+  });
+  app2.get("/api/status", async (req, res) => {
+    const status = {
+      coingecko: "connected",
+      cryptopanic: process.env.CRYPTOPANIC_API_KEY ? "api_key_configured" : "no_api_key",
+      reddit: "simulated",
+      lastUpdate: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    res.json(status);
+  });
+  const httpServer = createServer(app2);
+  return httpServer;
+}
+
+// server/vite.ts
+import express from "express";
+import fs from "fs";
+import path2 from "path";
+import { createServer as createViteServer, createLogger } from "vite";
+
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+var vite_config_default = defineConfig({
+  plugins: [
+    react(),
+    runtimeErrorOverlay(),
+    ...process.env.NODE_ENV !== "production" && process.env.REPL_ID !== void 0 ? [
+      await import("@replit/vite-plugin-cartographer").then(
+        (m) => m.cartographer()
+      )
+    ] : []
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+      "@assets": path.resolve(import.meta.dirname, "attached_assets")
+    }
+  },
+  root: path.resolve(import.meta.dirname, "client"),
+  build: {
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    emptyOutDir: true
+  },
+  server: {
+    fs: {
+      strict: true,
+      deny: ["**/.*"]
+    }
+  }
+});
+
+// server/vite.ts
+import { nanoid } from "nanoid";
+var viteLogger = createLogger();
+function log(message, source = "express") {
+  const formattedTime = (/* @__PURE__ */ new Date()).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
+async function setupVite(app2, server) {
+  const serverOptions = {
+    middlewareMode: true,
+    hmr: { server },
+    allowedHosts: true
+  };
+  const vite = await createViteServer({
+    ...vite_config_default,
+    configFile: false,
+    customLogger: {
+      ...viteLogger,
+      error: (msg, options) => {
+        viteLogger.error(msg, options);
+        process.exit(1);
+      }
+    },
+    server: serverOptions,
+    appType: "custom"
+  });
+  app2.use(vite.middlewares);
+  app2.use("*", async (req, res, next) => {
+    const url = req.originalUrl;
+    try {
+      const clientTemplate = path2.resolve(
+        import.meta.dirname,
+        "..",
+        "client",
+        "index.html"
+      );
+      let template = await fs.promises.readFile(clientTemplate, "utf-8");
+      template = template.replace(
+        `src="/src/main.tsx"`,
+        `src="/src/main.tsx?v=${nanoid()}"`
+      );
+      const page = await vite.transformIndexHtml(url, template);
+      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+    } catch (e) {
+      vite.ssrFixStacktrace(e);
+      next(e);
+    }
+  });
+}
+function serveStatic(app2) {
+  const distPath = path2.resolve(import.meta.dirname, "public");
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`
+    );
+  }
+  app2.use(express.static(distPath));
+  app2.use("*", (_req, res) => {
+    res.sendFile(path2.resolve(distPath, "index.html"));
+  });
+}
+
+// server/index.ts
+var app = express2();
+app.use(express2.json());
+app.use(express2.urlencoded({ extended: false }));
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path3 = req.path;
+  let capturedJsonResponse = void 0;
+  const originalResJson = res.json;
+  res.json = function(bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path3.startsWith("/api")) {
+      let logLine = `${req.method} ${path3} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "\u2026";
+      }
+      log(logLine);
+    }
+  });
+  next();
+});
+(async () => {
+  const server = await registerRoutes(app);
+  app.use((err, _req, res, _next) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(status).json({ message });
+    throw err;
+  });
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else {
+    serveStatic(app);
+  }
+  const port = parseInt(process.env.PORT || "5000", 10);
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true
+  }, () => {
+    log(`serving on port ${port}`);
+  });
+})();

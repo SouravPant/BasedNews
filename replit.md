@@ -8,6 +8,16 @@ CryptoHub is a full-stack cryptocurrency dashboard application that provides rea
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+**August 2, 2025** - Migration and Vercel Deployment Setup:
+- Successfully migrated CryptoHub project from Replit Agent to Replit environment
+- Created comprehensive Vercel deployment configuration
+- Set up serverless API functions for external deployment
+- Added README with deployment instructions
+- All API endpoints tested and working correctly
+- Client build system configured for production deployment
+
 ## System Architecture
 
 ### Frontend Architecture
