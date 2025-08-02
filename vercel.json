@@ -1,31 +1,4 @@
 {
-  "version": 2,
   "buildCommand": "vite build",
-  "outputDirectory": "dist/public",
-  "routes": [
-    {
-      "src": "/api/cryptocurrencies",
-      "dest": "/api/cryptocurrencies.ts"
-    },
-    {
-      "src": "/api/news",
-      "dest": "/api/news.ts"
-    },
-    {
-      "src": "/api/reddit",
-      "dest": "/api/reddit.ts"
-    },
-    {
-      "src": "/api/status",
-      "dest": "/api/status.ts"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/dist/public/assets/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/dist/public/index.html"
-    }
-  ]
+  "outputDirectory": "dist/public"
 }

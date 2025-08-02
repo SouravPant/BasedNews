@@ -15,10 +15,16 @@ export default function Dashboard() {
   const [selectedCrypto, setSelectedCrypto] = useState<Cryptocurrency | null>(null);
   const [isChartModalOpen, setIsChartModalOpen] = useState(false);
 
-  const { data: cryptocurrencies, isLoading: cryptoLoading, refetch: refetchCrypto } = useQuery<Cryptocurrency[]>({
+  const { data: cryptocurrencies, isLoading: cryptoLoading, error: cryptoError, refetch: refetchCrypto } = useQuery<Cryptocurrency[]>({
     queryKey: ["/api/cryptocurrencies"],
     refetchInterval: 30000, // Refetch every 30 seconds
   });
+
+  // Debug logging
+  console.log("Crypto data:", cryptocurrencies);
+  console.log("Crypto loading:", cryptoLoading);
+  console.log("Crypto length:", cryptocurrencies?.length);
+  console.log("Crypto error:", cryptoError);
 
   const { data: newsArticles, isLoading: newsLoading, refetch: refetchNews } = useQuery<NewsArticleType[]>({
     queryKey: ["/api/news"],
