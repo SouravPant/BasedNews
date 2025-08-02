@@ -38,7 +38,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const filteredCoins = response.data
         .filter((coin: any) => !excludedTokens.includes(coin.id))
-        .slice(0, 9); // Take top 9 after filtering
+        .slice(0, 10); // Take top 10 after filtering
 
       const cryptos = filteredCoins.map((coin: any) => ({
         id: coin.id,
