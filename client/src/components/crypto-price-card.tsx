@@ -46,7 +46,7 @@ export function CryptoPriceCard({ cryptocurrency }: CryptoPriceCardProps) {
   const isPositive = cryptocurrency.priceChangePercentage24h && parseFloat(cryptocurrency.priceChangePercentage24h) >= 0;
 
   return (
-    <Card className="bg-crypto-surface rounded-xl border border-slate-700 p-4 hover:border-slate-600 transition-colors">
+    <Card className="bg-crypto-surface rounded-xl border border-slate-700 p-4 hover:border-slate-600 transition-colors font-semibold">
       <div className="flex items-center space-x-3 mb-3">
         {cryptocurrency.image ? (
           <img 
