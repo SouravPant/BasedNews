@@ -112,37 +112,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Fetch from CryptoPanic API
       try {
-        const cryptoPanicResponse = await axios.get(
-          "https://cryptopanic.com/api/v1/posts/",
-          {
-            params: {
-              auth_token: process.env.CRYPTOPANIC_API_KEY || process.env.VITE_CRYPTOPANIC_API_KEY || "demo",
-              kind: "news",
-              filter: "hot",
-              page: 1
+        const apiKey = process.env.CRYPTOPANIC_API_KEY;
+        if (!apiKey) {
+          console.log("CryptoPanic API key not found - using fallback news");
+        } else {
+          console.log("Using CryptoPanic API key: Found");
+          
+          const cryptoPanicResponse = await axios.get(
+            "https://cryptopanic.com/api/v1/posts/",
+            {
+              params: {
+                auth_token: apiKey,
+                kind: "news",
+                filter: "hot",
+                page: 1
+              }
             }
-          }
-        );
+          );
 
-        if (cryptoPanicResponse.data?.results) {
-          for (const item of cryptoPanicResponse.data.results.slice(0, 10)) {
-            const article = {
-              title: item.title,
-              description: item.title,
-              url: item.url,
-              source: "CryptoPanic",
-              publishedAt: item.published_at ? new Date(item.published_at) : new Date(),
-              sentiment: item.votes?.positive > item.votes?.negative ? "bullish" : 
-                        item.votes?.negative > item.votes?.positive ? "bearish" : "neutral"
-            };
+          if (cryptoPanicResponse.data?.results) {
+            console.log(`✅ CryptoPanic API success: Fetched ${cryptoPanicResponse.data.results.length} articles`);
             
-            const validatedArticle = insertNewsArticleSchema.parse(article);
-            const savedArticle = await storage.createNewsArticle(validatedArticle);
-            articles.push(savedArticle);
+            for (const item of cryptoPanicResponse.data.results.slice(0, 8)) {
+              const article = {
+                title: item.title,
+                description: item.title || "No description available",
+                url: item.url,
+                source: "CryptoPanic",
+                publishedAt: item.published_at ? new Date(item.published_at) : new Date(),
+                sentiment: item.votes?.positive > item.votes?.negative ? "bullish" : 
+                          item.votes?.negative > item.votes?.positive ? "bearish" : "neutral"
+              };
+              
+              const validatedArticle = insertNewsArticleSchema.parse(article);
+              const savedArticle = await storage.createNewsArticle(validatedArticle);
+              articles.push(savedArticle);
+            }
+            
+            // Skip fallback news if CryptoPanic worked
+            return res.json(articles);
+          } else {
+            console.log("CryptoPanic API returned no results");
           }
         }
       } catch (error) {
-        console.error("Error fetching CryptoPanic news:", error);
+        const errorData = (error as any)?.response?.data;
+        if (errorData?.status === 'api_error' && errorData?.info === 'Token not found') {
+          console.log("❌ CryptoPanic API key invalid or not activated - check your API key at cryptopanic.com/developers/api");
+        } else {
+          console.error("CryptoPanic API error:", errorData || (error as any)?.message || error);
+        }
       }
 
       // Fetch from CoinTelegraph RSS (simulated for now)
@@ -247,8 +266,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/status", async (req, res) => {
     const status = {
       coingecko: "connected",
-      cryptopanic: "connected",
-      reddit: "connected",
+      cryptopanic: process.env.CRYPTOPANIC_API_KEY ? "api_key_configured" : "no_api_key",
+      reddit: "simulated",
       lastUpdate: new Date().toISOString()
     };
     
