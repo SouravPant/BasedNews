@@ -43,7 +43,7 @@
     "@radix-ui/react-tooltip": "^1.2.0",
     "@tanstack/react-query": "^5.60.5",
     "@types/cors": "^2.8.19",
-    "@vercel/node": "^5.3.8",
+    "@vercel/node": "^5.3.10",
     "axios": "^1.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
