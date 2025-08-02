@@ -6,7 +6,7 @@ import { insertNewsArticleSchema, insertRedditPostSchema } from "@shared/schema"
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
-  // Get top 10 cryptocurrencies with real-time prices from CoinGecko
+  // Get top 10 cryptocurrencies with real-time prices from CoinGecko (excluding stablecoins and wrapped tokens)
   app.get("/api/cryptocurrencies", async (req, res) => {
     try {
       const response = await axios.get(
@@ -15,7 +15,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           params: {
             vs_currency: "usd",
             order: "market_cap_desc",
-            per_page: 10,
+            per_page: 20, // Get more to filter out unwanted tokens
             page: 1,
             sparkline: false,
             price_change_percentage: "24h"
@@ -23,7 +23,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       );
 
-      const cryptos = response.data.map((coin: any) => ({
+      // Filter out stablecoins and wrapped tokens
+      const excludedTokens = [
+        'tether',           // USDT
+        'usd-coin',         // USDC
+        'staked-ether',     // stETH (Lido Staked Ether)
+        'binance-usd',      // BUSD
+        'dai',              // DAI
+        'true-usd',         // TUSD
+        'wrapped-bitcoin',  // WBTC
+        'first-digital-usd' // FDUSD
+      ];
+
+      const filteredCoins = response.data
+        .filter((coin: any) => !excludedTokens.includes(coin.id))
+        .slice(0, 10); // Take top 10 after filtering
+
+      const cryptos = filteredCoins.map((coin: any) => ({
         id: coin.id,
         name: coin.name,
         symbol: coin.symbol.toUpperCase(),
