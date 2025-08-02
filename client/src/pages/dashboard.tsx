@@ -61,7 +61,7 @@ export default function Dashboard() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {cryptoLoading ? (
-              Array.from({ length: 9 }).map((_, i) => (
+              Array.from({ length: 10 }).map((_, i) => (
                 <Card key={i} className="bg-crypto-surface border-slate-700 p-4">
                   <div className="flex items-center space-x-3 mb-3">
                     <Skeleton className="w-8 h-8 rounded-full" />
@@ -78,7 +78,7 @@ export default function Dashboard() {
                 </Card>
               ))
             ) : cryptocurrencies?.length ? (
-              cryptocurrencies.slice(0, 9).map((crypto) => (
+              cryptocurrencies.slice(0, 10).map((crypto) => (
                 <CryptoPriceCard key={crypto.id} cryptocurrency={crypto} />
               ))
             ) : (
