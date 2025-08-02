@@ -39,12 +39,16 @@ For production deployment, set these environment variables in Vercel:
 ### Deployment Files
 
 - `vercel.json` - Vercel deployment configuration
-- `api/index.ts` - Serverless API function handler
+- `api/*.ts` - Individual serverless API function handlers
 - `build.js` - Build script for client assets
 
 The deployment creates:
-- Static frontend served from `/dist/client`
-- Serverless API endpoints at `/api/*`
+- Static frontend served from `/dist/public`
+- Serverless API endpoints:
+  - `/api/cryptocurrencies` - Top 10 cryptocurrency data
+  - `/api/news` - Crypto news articles
+  - `/api/reddit` - Reddit crypto community posts  
+  - `/api/status` - API service status
 
 ## API Endpoints
 

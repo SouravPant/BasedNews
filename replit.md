@@ -12,11 +12,13 @@ Preferred communication style: Simple, everyday language.
 
 **August 2, 2025** - Migration and Vercel Deployment Setup:
 - Successfully migrated CryptoHub project from Replit Agent to Replit environment
-- Created comprehensive Vercel deployment configuration
-- Set up serverless API functions for external deployment
-- Added README with deployment instructions
+- Created comprehensive Vercel deployment configuration with individual serverless functions
+- Fixed Vercel routing issues by splitting API endpoints into separate function files
+- Set up proper static file serving for React frontend at `/dist/public`
+- Added README with detailed deployment instructions
 - All API endpoints tested and working correctly
 - Client build system configured for production deployment
+- Resolved deployment issues: separate `/api/cryptocurrencies.ts`, `/api/news.ts`, `/api/reddit.ts`, `/api/status.ts` files
 
 ## System Architecture
 
