@@ -43,7 +43,7 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl w-full h-[600px] bg-crypto-dark border-slate-700 text-white">
+      <DialogContent className="max-w-4xl w-full h-[600px] bg-card border-border text-card-foreground">
         <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div className="flex items-center space-x-3">
             {cryptocurrency.image && (
@@ -54,10 +54,10 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
               />
             )}
             <div>
-              <DialogTitle className="text-xl font-bold text-white">
+              <DialogTitle className="text-xl font-bold text-card-foreground">
                 {cryptocurrency.name} Chart
               </DialogTitle>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-muted-foreground">
                 Current Price: ${parseFloat(cryptocurrency.currentPrice || '0').toLocaleString('en-US', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: parseFloat(cryptocurrency.currentPrice || '0') < 1 ? 6 : 2,
@@ -69,7 +69,7 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="text-slate-400 hover:text-white hover:bg-slate-800"
+            className="text-muted-foreground hover:text-card-foreground hover:bg-muted"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -83,11 +83,7 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
               variant={selectedDays === option.days ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedDays(option.days)}
-              className={`text-xs ${
-                selectedDays === option.days
-                  ? "bg-crypto-accent text-white"
-                  : "border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
-              }`}
+              className="text-xs"
             >
               {option.label}
             </Button>
@@ -99,17 +95,17 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
           {isLoading ? (
             <div className="w-full h-full flex flex-col space-y-4">
               <div className="flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-slate-400" />
-                <Skeleton className="h-6 w-32 bg-slate-700" />
+                <TrendingUp className="w-5 h-5 text-muted-foreground" />
+                <Skeleton className="h-6 w-32" />
               </div>
-              <Skeleton className="flex-1 w-full bg-slate-700" />
+              <Skeleton className="flex-1 w-full" />
             </div>
           ) : error ? (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-center">
-                <TrendingUp className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                <p className="text-slate-400 text-lg mb-2">Failed to load chart data</p>
-                <p className="text-slate-500 text-sm">Please try again later</p>
+                <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground text-lg mb-2">Failed to load chart data</p>
+                <p className="text-muted-foreground text-sm">Please try again later</p>
               </div>
             </div>
           ) : chartData?.data?.length ? (
@@ -122,8 +118,8 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-center">
-                <TrendingUp className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                <p className="text-slate-400 text-lg">No chart data available</p>
+                <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground text-lg">No chart data available</p>
               </div>
             </div>
           )}

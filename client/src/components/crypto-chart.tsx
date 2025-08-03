@@ -50,36 +50,36 @@ export function CryptoChart({ data, coinName, coinSymbol, days }: CryptoChartPro
   return (
     <div className="w-full h-full">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-white mb-1">
+        <h3 className="text-lg font-semibold text-card-foreground mb-1">
           {coinName} ({coinSymbol.toUpperCase()})
         </h3>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-muted-foreground">
           {days === 1 ? '24 Hours' : `${days} Days`} Price Chart
         </p>
       </div>
       
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
           <XAxis 
             dataKey="time" 
             tickFormatter={formatXAxisTick}
-            stroke="#9ca3af"
+            stroke="hsl(var(--muted-foreground))"
             fontSize={12}
           />
           <YAxis 
             tickFormatter={(value) => `$${value.toLocaleString()}`}
-            stroke="#9ca3af"
+            stroke="hsl(var(--muted-foreground))"
             fontSize={12}
           />
           <Tooltip 
             labelFormatter={formatTooltipLabel}
             formatter={(value: number) => [formatPrice(value), 'Price']}
             contentStyle={{
-              backgroundColor: '#1f2937',
-              border: '1px solid #374151',
+              backgroundColor: 'hsl(var(--popover))',
+              border: '1px solid hsl(var(--border))',
               borderRadius: '8px',
-              color: '#f3f4f6'
+              color: 'hsl(var(--popover-foreground))'
             }}
           />
           <Line 
