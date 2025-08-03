@@ -1,8 +1,8 @@
-# CryptoHub - Real-time Cryptocurrency Dashboard
+# BasedHub - Cryptocurrency Dashboard
 
 ## Overview
 
-CryptoHub is a full-stack cryptocurrency dashboard application that provides real-time market data, news, and social media sentiment for the top cryptocurrencies. The application displays live pricing information, market statistics, crypto-related news articles, and Reddit posts from cryptocurrency communities. Built with a modern React frontend and Express.js backend, it offers a comprehensive view of the cryptocurrency market landscape.
+BasedHub is a full-stack cryptocurrency dashboard application that provides real-time market data, news, and social media sentiment for the top cryptocurrencies. The application displays live pricing information, market statistics, crypto-related news articles, and Reddit posts from cryptocurrency communities. Built with a modern React frontend and Express.js backend, it offers a comprehensive view of the cryptocurrency market landscape with a blue and black theme for dark mode, and blue and white for light mode.
 
 ## User Preferences
 
@@ -10,8 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**August 3, 2025** - Project Rebranding and Migration Completion:
+- Successfully completed migration from Replit Agent to Replit environment
+- Rebranded application from "CryptoHub" to "BasedHub"
+- Updated theme to blue and black for dark mode, blue and white for light mode
+- Changed app icon from dollar sign to lightning bolt for modern appearance
+- Updated all UI components to use new theme colors and semantic design tokens
+
 **August 2, 2025** - Migration and Vercel Deployment Setup:
-- Successfully migrated CryptoHub project from Replit Agent to Replit environment
+- Successfully migrated project from Replit Agent to Replit environment
 - **CRITICAL FIX**: Restructured to use individual Vercel serverless function files following 2024 Vercel documentation
 - Created separate API function files: `/api/cryptocurrencies.ts`, `/api/news.ts`, `/api/reddit.ts`, `/api/status.ts`
 - Installed `@vercel/node` package for proper TypeScript serverless function support

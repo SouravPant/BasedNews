@@ -13,13 +13,13 @@ export function RedditPost({ post }: RedditPostProps) {
   };
 
   return (
-    <div className="border-b border-slate-700 pb-4 last:border-b-0">
-      <h4 className="font-medium text-white mb-2 text-sm hover:text-primary cursor-pointer transition-colors">
+    <div className="border-b border-border pb-4 last:border-b-0">
+      <h4 className="font-medium text-foreground mb-2 text-sm hover:text-primary cursor-pointer transition-colors">
         <a href={post.url} target="_blank" rel="noopener noreferrer">
           {post.title}
         </a>
       </h4>
-      <div className="flex items-center space-x-4 text-xs text-slate-500">
+      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
         <span>u/{post.author}</span>
         <div className="flex items-center space-x-1">
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

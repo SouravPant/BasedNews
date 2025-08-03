@@ -37,25 +37,25 @@ export function StatusBar() {
   };
 
   return (
-    <footer className="bg-crypto-surface border-t border-slate-700 mt-12">
+    <footer className="bg-based-surface border-t border-border mt-12">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full ${getStatusColor(apiStatus?.coingecko || 'connected')}`}></div>
-              <span className="text-slate-400">CoinGecko API</span>
+              <span className="text-muted-foreground">CoinGecko API</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full ${getStatusColor(apiStatus?.cryptopanic || 'connected')}`}></div>
-              <span className="text-slate-400">CryptoPanic</span>
+              <span className="text-muted-foreground">CryptoPanic</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full ${getStatusColor(apiStatus?.reddit || 'connected')}`}></div>
-              <span className="text-slate-400">Reddit API</span>
+              <span className="text-muted-foreground">Reddit API</span>
             </div>
           </div>
           
-          <div className="text-slate-500">
+          <div className="text-muted-foreground">
             <span>Data refreshes every 30 seconds • Last update: </span>
             <span>{currentTime}</span>
           </div>

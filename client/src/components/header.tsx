@@ -36,28 +36,28 @@ export function Header({ lastUpdated }: HeaderProps) {
   };
 
   return (
-    <header className="bg-crypto-surface border-b border-slate-700 sticky top-0 z-50">
+    <header className="bg-based-surface border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">CryptoHub</h1>
-              <p className="text-xs text-slate-400">Real-time Crypto Dashboard</p>
+              <h1 className="text-xl font-bold text-foreground">BasedHub</h1>
+              <p className="text-xs text-muted-foreground">Cryptocurrency Dashboard</p>
             </div>
           </div>
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-sm">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-slate-300">{formatLastUpdated(lastUpdated)}</span>
+              <span className="text-foreground">{formatLastUpdated(lastUpdated)}</span>
             </div>
             
-            <div className="flex items-center space-x-2 text-sm text-slate-400">
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>

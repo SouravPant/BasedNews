@@ -4,55 +4,62 @@
 
 :root {
   --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --foreground: hsl(220, 100%, 10%);
+  --muted: hsl(210, 40%, 96%);
+  --muted-foreground: hsl(220, 15%, 40%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --popover-foreground: hsl(220, 100%, 10%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(60, 4.8%, 95.9%);
-  --secondary-foreground: hsl(24, 9.8%, 10%);
-  --accent: hsl(60, 4.8%, 95.9%);
-  --accent-foreground: hsl(24, 9.8%, 10%);
+  --card-foreground: hsl(220, 100%, 10%);
+  --border: hsl(220, 13%, 91%);
+  --input: hsl(220, 13%, 91%);
+  --primary: hsl(217, 91%, 60%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(210, 40%, 96%);
+  --secondary-foreground: hsl(220, 100%, 10%);
+  --accent: hsl(210, 40%, 96%);
+  --accent-foreground: hsl(220, 100%, 10%);
   --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(217, 91%, 60%);
   --radius: 0.5rem;
   
-  /* Crypto-specific colors */
-  --crypto-dark: hsl(222, 84%, 5%);
-  --crypto-surface: hsl(215, 25%, 15%);
-  --crypto-primary: hsl(217, 91%, 60%);
-  --crypto-secondary: hsl(142, 76%, 36%);
-  --crypto-accent: hsl(0, 73%, 41%);
+  /* Based-specific colors - Blue and White theme */
+  --based-primary: hsl(217, 91%, 60%);
+  --based-secondary: hsl(142, 76%, 36%);
+  --based-accent: hsl(0, 73%, 41%);
+  --based-surface: hsl(220, 13%, 91%);
+  --based-background: hsl(0, 0%, 100%);
 }
 
 .dark {
-  --background: hsl(240, 10%, 3.9%);
+  --background: hsl(220, 100%, 4%);
   --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
+  --muted: hsl(220, 50%, 12%);
+  --muted-foreground: hsl(220, 15%, 65%);
+  --popover: hsl(220, 100%, 4%);
   --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 3.9%);
+  --card: hsl(220, 50%, 8%);
   --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(240, 3.7%, 15.9%);
+  --border: hsl(220, 50%, 12%);
+  --input: hsl(220, 50%, 12%);
+  --primary: hsl(217, 91%, 60%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(220, 50%, 12%);
   --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 3.7%, 15.9%);
+  --accent: hsl(220, 50%, 12%);
   --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
+  --ring: hsl(217, 91%, 60%);
   --radius: 0.5rem;
+
+  /* Based-specific colors - Blue and Black theme */
+  --based-primary: hsl(217, 91%, 60%);
+  --based-secondary: hsl(142, 76%, 36%);
+  --based-accent: hsl(0, 73%, 41%);
+  --based-surface: hsl(220, 50%, 8%);
+  --based-background: hsl(220, 100%, 4%);
 }
 
 @layer base {
@@ -66,37 +73,37 @@
 }
 
 @layer utilities {
-  .bg-crypto-dark {
-    background-color: var(--crypto-dark);
+  .bg-based-background {
+    background-color: var(--based-background);
   }
   
-  .bg-crypto-surface {
-    background-color: var(--crypto-surface);
+  .bg-based-surface {
+    background-color: var(--based-surface);
   }
   
-  .text-crypto-primary {
-    color: var(--crypto-primary);
+  .text-based-primary {
+    color: var(--based-primary);
   }
   
-  .text-crypto-secondary {
-    color: var(--crypto-secondary);
+  .text-based-secondary {
+    color: var(--based-secondary);
   }
   
-  .text-crypto-accent {
-    color: var(--crypto-accent);
+  .text-based-accent {
+    color: var(--based-accent);
   }
   
-  .border-crypto-surface {
-    border-color: var(--crypto-surface);
+  .border-based-surface {
+    border-color: var(--based-surface);
   }
 }
 
 .animate-pulse-green {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  color: var(--crypto-secondary);
+  color: var(--based-secondary);
 }
 
 .animate-pulse-red {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  color: var(--crypto-accent);
+  color: var(--based-accent);
 }

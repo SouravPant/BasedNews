@@ -48,7 +48,7 @@ export function CryptoPriceCard({ cryptocurrency, onClick }: CryptoPriceCardProp
 
   return (
     <Card 
-      className="bg-crypto-surface rounded-xl border border-slate-700 p-4 hover:border-slate-600 transition-colors font-semibold cursor-pointer hover:bg-slate-800/50"
+      className="bg-based-surface rounded-xl border-border p-4 hover:border-primary/20 transition-colors font-semibold cursor-pointer hover:bg-primary/5"
       onClick={onClick}
     >
       <div className="flex items-center space-x-3 mb-3">
@@ -63,17 +63,17 @@ export function CryptoPriceCard({ cryptocurrency, onClick }: CryptoPriceCardProp
             }}
           />
         ) : null}
-        <div className={`w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center text-xs font-bold ${cryptocurrency.image ? 'hidden' : ''}`}>
+        <div className={`w-8 h-8 bg-muted rounded-full flex items-center justify-center text-xs font-bold ${cryptocurrency.image ? 'hidden' : ''}`}>
           {cryptocurrency.symbol?.slice(0, 3)}
         </div>
         <div>
-          <h3 className="font-semibold text-white">{cryptocurrency.name}</h3>
-          <p className="text-xs text-slate-400 font-mono">{cryptocurrency.symbol}</p>
+          <h3 className="font-semibold text-foreground">{cryptocurrency.name}</h3>
+          <p className="text-xs text-muted-foreground font-mono">{cryptocurrency.symbol}</p>
         </div>
       </div>
       
       <div className="space-y-2">
-        <div className="font-mono text-lg font-semibold text-white">
+        <div className="font-mono text-lg font-semibold text-foreground">
           {formatPrice(cryptocurrency.currentPrice)}
         </div>
         <div className="flex items-center space-x-2">
@@ -95,7 +95,7 @@ export function CryptoPriceCard({ cryptocurrency, onClick }: CryptoPriceCardProp
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l5-5 5 5" />
           </svg>
         </div>
-        <div className="text-xs text-slate-400">
+        <div className="text-xs text-muted-foreground">
           <span>Vol: </span>
           <span className="font-mono">{formatVolume(cryptocurrency.volume24h)}</span>
         </div>
