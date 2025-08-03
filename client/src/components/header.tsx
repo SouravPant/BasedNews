@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "./theme-toggle";
 
 interface HeaderProps {
   lastUpdated?: string;
@@ -63,6 +64,8 @@ export function Header({ lastUpdated }: HeaderProps) {
               </svg>
               <span>{currentTime}</span>
             </div>
+
+            <ThemeToggle />
           </div>
         </div>
       </div>

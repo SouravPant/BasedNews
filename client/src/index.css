@@ -4,21 +4,21 @@
 
 :root {
   --background: hsl(0, 0%, 100%);
-  --foreground: hsl(220, 100%, 10%);
-  --muted: hsl(210, 40%, 96%);
-  --muted-foreground: hsl(220, 15%, 40%);
+  --foreground: hsl(220, 90%, 20%);
+  --muted: hsl(217, 50%, 95%);
+  --muted-foreground: hsl(217, 30%, 50%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(220, 100%, 10%);
+  --popover-foreground: hsl(220, 90%, 20%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(220, 100%, 10%);
-  --border: hsl(220, 13%, 91%);
-  --input: hsl(220, 13%, 91%);
+  --card-foreground: hsl(220, 90%, 20%);
+  --border: hsl(217, 50%, 85%);
+  --input: hsl(217, 50%, 85%);
   --primary: hsl(217, 91%, 60%);
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(210, 40%, 96%);
-  --secondary-foreground: hsl(220, 100%, 10%);
-  --accent: hsl(210, 40%, 96%);
-  --accent-foreground: hsl(220, 100%, 10%);
+  --secondary: hsl(217, 50%, 95%);
+  --secondary-foreground: hsl(220, 90%, 20%);
+  --accent: hsl(217, 50%, 95%);
+  --accent-foreground: hsl(220, 90%, 20%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(217, 91%, 60%);
@@ -28,7 +28,7 @@
   --based-primary: hsl(217, 91%, 60%);
   --based-secondary: hsl(142, 76%, 36%);
   --based-accent: hsl(0, 73%, 41%);
-  --based-surface: hsl(220, 13%, 91%);
+  --based-surface: hsl(217, 50%, 95%);
   --based-background: hsl(0, 0%, 100%);
 }
 
@@ -60,6 +60,42 @@
   --based-accent: hsl(0, 73%, 41%);
   --based-surface: hsl(220, 50%, 8%);
   --based-background: hsl(220, 100%, 4%);
+}
+
+.base {
+  --background: linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(0, 0%, 0%) 100%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(217, 50%, 20%);
+  --muted-foreground: hsl(217, 30%, 70%);
+  --popover: hsl(217, 50%, 15%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(217, 50%, 15%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(217, 50%, 25%);
+  --input: hsl(217, 50%, 25%);
+  --primary: hsl(217, 91%, 60%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(217, 50%, 20%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(217, 50%, 20%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(217, 91%, 60%);
+  --radius: 0.5rem;
+
+  /* Base mode - Half blue, half black gradient */
+  --based-primary: hsl(217, 91%, 60%);
+  --based-secondary: hsl(142, 76%, 36%);
+  --based-accent: hsl(0, 73%, 41%);
+  --based-surface: hsl(217, 50%, 15%);
+  --based-background: linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(0, 0%, 0%) 100%);
+}
+
+/* Base mode specific styling */
+.base body {
+  background: linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(0, 0%, 0%) 100%);
+  background-attachment: fixed;
 }
 
 @layer base {
