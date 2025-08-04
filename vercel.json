@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/public",
   "functions": {
     "api/*.ts": {
       "runtime": "@vercel/node"
