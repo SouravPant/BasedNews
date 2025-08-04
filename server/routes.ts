@@ -2,7 +2,13 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import axios from "axios";
+import OpenAI from "openai";
 import { insertNewsArticleSchema, insertRedditPostSchema } from "@shared/schema";
+
+// Initialize OpenAI client
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY 
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
