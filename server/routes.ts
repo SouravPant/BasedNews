@@ -408,8 +408,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // AI Summary endpoint for news articles
   app.post("/api/summarize", async (req, res) => {
+    const { text, url } = req.body;
+    
     try {
-      const { text, url } = req.body;
       
       if (!text) {
         return res.status(400).json({ message: "Text is required for summarization" });
