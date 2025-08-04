@@ -10,7 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**August 4, 2025** - Final Migration and Vercel Deployment Fix:
+**August 4, 2025** - Final Migration and UI Updates:
+- **UI REBRANDING**: Updated application name from "BasedHub" to "Based Dashboard"
+- **CONTENT UPDATES**: Changed "Top 10 Cryptocurrencies" to "Top Cryptocurrencies" 
+- **DATA EXPANSION**: Increased cryptocurrency display from 10 to 20 top cryptocurrencies
+- **EXCLUSION ENHANCEMENT**: Added 'staked-ether' to excluded tokens list (in addition to 'wrapped-steth')
+- **UI CLEANUP**: Removed "Live" indicator, "Updates every 30s" text, and green status signals
+- **VISUAL UPDATES**: Changed all green status indicators to blue for consistent design
+- **SIMPLIFICATION**: Streamlined header with "Active" status instead of "Live" indicator
+
+**August 4, 2025** - Vercel Deployment Fix:
 - Successfully completed migration from Replit Agent to Replit environment
 - **CRITICAL FIX**: Resolved "Mixed routing properties" Vercel error by removing legacy `routes` configuration
 - **CRITICAL FIX**: Fixed "Function Runtimes must have a valid version" error by specifying @vercel/node@5.3.10

@@ -31,13 +31,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       // Filter out stablecoins and wrapped tokens
       const excludedTokens = [
-        'tether', 'usd-coin', 'wrapped-steth', 'binance-usd', 'dai',
+        'tether', 'usd-coin', 'wrapped-steth', 'staked-ether', 'binance-usd', 'dai',
         'true-usd', 'wrapped-bitcoin', 'first-digital-usd'
       ];
 
       const filteredCoins = response.data
         .filter((coin: any) => !excludedTokens.includes(coin.id))
-        .slice(0, 10);
+        .slice(0, 20);
 
       const cryptocurrencies = filteredCoins.map((coin: any) => ({
         id: coin.id,

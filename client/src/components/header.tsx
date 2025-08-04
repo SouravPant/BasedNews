@@ -25,13 +25,13 @@ export function Header({ lastUpdated }: HeaderProps) {
   }, []);
 
   const formatLastUpdated = (timestamp?: string) => {
-    if (!timestamp) return "Live";
+    if (!timestamp) return "Active";
     
     const now = new Date();
     const updated = new Date(timestamp);
     const diff = Math.floor((now.getTime() - updated.getTime()) / 1000);
     
-    if (diff < 60) return "Live";
+    if (diff < 60) return "Active";
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
     return `${Math.floor(diff / 3600)}h ago`;
   };
@@ -47,14 +47,13 @@ export function Header({ lastUpdated }: HeaderProps) {
               </svg>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">BasedHub</h1>
-              <p className="text-xs text-muted-foreground">Cryptocurrency Dashboard</p>
+              <h1 className="text-xl font-bold text-foreground">Based Dashboard</h1>
+              <p className="text-xs text-muted-foreground">Market Data & Analytics</p>
             </div>
           </div>
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-sm">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-foreground">{formatLastUpdated(lastUpdated)}</span>
             </div>
             

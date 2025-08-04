@@ -120,6 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'tether',           // USDT
         'usd-coin',         // USDC
         'wrapped-steth',    // wstETH (Wrapped Staked Ether)
+        'staked-ether',     // stETH (Lido Staked Ether)
         'binance-usd',      // BUSD
         'dai',              // DAI
         'true-usd',         // TUSD
@@ -129,7 +130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const filteredCoins = response.data
         .filter((coin: any) => !excludedTokens.includes(coin.id))
-        .slice(0, 10); // Take top 10 after filtering
+        .slice(0, 20); // Take top 20 after filtering
 
       const cryptos = filteredCoins.map((coin: any) => ({
         id: coin.id,

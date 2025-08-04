@@ -33,7 +33,7 @@ export function StatusBar() {
   }, []);
 
   const getStatusColor = (status: string) => {
-    return status === 'connected' ? 'bg-green-500' : 'bg-red-500';
+    return status === 'connected' ? 'bg-blue-500' : 'bg-red-500';
   };
 
   return (
@@ -56,7 +56,7 @@ export function StatusBar() {
           </div>
           
           <div className="text-muted-foreground">
-            <span>Data refreshes every 30 seconds • Last update: </span>
+            <span>Last update: </span>
             <span>{currentTime}</span>
           </div>
         </div>
