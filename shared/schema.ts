@@ -33,6 +33,7 @@ export const newsArticles = pgTable("news_articles", {
   publishedAt: timestamp("published_at"),
   imageUrl: text("image_url"),
   sentiment: text("sentiment"), // bullish, bearish, neutral
+  summary: text("summary"), // Pre-generated article summary
   createdAt: timestamp("created_at").defaultNow(),
 });
 
