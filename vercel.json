@@ -70,17 +70,10 @@
       ]
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!api|assets|_next/static|_next/image|favicon.ico).*)",
+      "destination": "/index.html"
     }
   ],
   "functions": {
