@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**August 4, 2025** - Reddit and Twitter API Integration with AI Summaries:
+- Implemented real Reddit API integration with client credentials authentication
+- Added Twitter API integration for fetching cryptocurrency-related tweets
+- Created AI-powered news summary modal using OpenAI GPT-4o for 50-100 word summaries
+- Users can now click any news article to get an instant AI summary
+- Updated Base app theme to match official Base brand colors and gradient styling
+- Improved token price chart functionality with proper theme integration
+
 **August 3, 2025** - Project Rebranding and Migration Completion:
 - Successfully completed migration from Replit Agent to Replit environment
 - Rebranded application from "CryptoHub" to "BasedHub"
@@ -73,10 +81,12 @@ The application integrates with multiple third-party APIs:
 
 - **CoinGecko API**: Real-time cryptocurrency market data including prices, market cap, volume, and 24h changes
 - **News API Integration**: Crypto-focused news articles with sentiment analysis (bullish/bearish/neutral)
-- **Reddit API**: Posts from cryptocurrency-related subreddits with engagement metrics
+- **Reddit API**: Real-time posts from cryptocurrency subreddits using client credentials authentication
+- **Twitter API**: Live cryptocurrency-related tweets with engagement metrics
+- **OpenAI API**: AI-powered news summaries using GPT-4o model for concise 50-100 word article summaries
 - **Neon Database**: PostgreSQL hosting service for production database
 
-The system implements proper error handling and fallback mechanisms for API failures, including cached data serving when external services are unavailable.
+The system implements proper error handling and fallback mechanisms for API failures, including cached data serving when external services are unavailable. News articles are clickable to generate AI summaries on demand.
 
 ## External Dependencies
 

@@ -2,9 +2,10 @@ import { NewsArticle as NewsArticleType } from "@shared/schema";
 
 interface NewsArticleProps {
   article: NewsArticleType;
+  onClick?: () => void;
 }
 
-export function NewsArticle({ article }: NewsArticleProps) {
+export function NewsArticle({ article, onClick }: NewsArticleProps) {
   const formatTimeAgo = (timestamp?: Date | null) => {
     if (!timestamp) return "Unknown time";
     
@@ -46,7 +47,7 @@ export function NewsArticle({ article }: NewsArticleProps) {
   };
 
   return (
-    <article className="border-b border-border pb-4 last:border-b-0">
+    <article className="border-b border-border pb-4 last:border-b-0 cursor-pointer hover:bg-muted/50 p-3 rounded-lg transition-colors" onClick={onClick}>
       <div className="flex items-start space-x-4">
         {article.imageUrl ? (
           <img 

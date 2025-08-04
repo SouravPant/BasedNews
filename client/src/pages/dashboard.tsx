@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Header } from "@/components/header";
 import { CryptoPriceCard } from "@/components/crypto-price-card";
 import { CryptoChartModal } from "@/components/crypto-chart-modal";
+import { NewsSummaryModal } from "@/components/news-summary-modal";
 import { NewsArticle } from "@/components/news-article";
 import { RedditPost } from "@/components/reddit-post";
 import { StatusBar } from "@/components/status-bar";
@@ -14,6 +15,8 @@ import { Cryptocurrency, NewsArticle as NewsArticleType, RedditPost as RedditPos
 export default function Dashboard() {
   const [selectedCrypto, setSelectedCrypto] = useState<Cryptocurrency | null>(null);
   const [isChartModalOpen, setIsChartModalOpen] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState<any | null>(null);
+  const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
 
   const { data: cryptocurrencies, isLoading: cryptoLoading, refetch: refetchCrypto } = useQuery<Cryptocurrency[]>({
     queryKey: ["/api/cryptocurrencies"],
@@ -30,6 +33,11 @@ export default function Dashboard() {
     refetchInterval: 300000, // Refetch every 5 minutes
   });
 
+  const { data: tweets, isLoading: twitterLoading, refetch: refetchTwitter } = useQuery<any[]>({
+    queryKey: ["/api/twitter"],
+    refetchInterval: 300000, // Refetch every 5 minutes
+  });
+
   const { data: apiStatus } = useQuery<{lastUpdate: string}>({
     queryKey: ["/api/status"],
     refetchInterval: 60000, // Check status every minute
@@ -41,10 +49,11 @@ export default function Dashboard() {
       refetchCrypto();
       refetchNews();
       refetchReddit();
+      refetchTwitter();
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [refetchCrypto, refetchNews, refetchReddit]);
+  }, [refetchCrypto, refetchNews, refetchReddit, refetchTwitter]);
 
   const handleCryptoClick = (crypto: Cryptocurrency) => {
     setSelectedCrypto(crypto);
@@ -54,6 +63,16 @@ export default function Dashboard() {
   const handleCloseChartModal = () => {
     setIsChartModalOpen(false);
     setSelectedCrypto(null);
+  };
+
+  const handleArticleClick = (article: any) => {
+    setSelectedArticle(article);
+    setIsSummaryModalOpen(true);
+  };
+
+  const handleCloseSummaryModal = () => {
+    setIsSummaryModalOpen(false);
+    setSelectedArticle(null);
   };
 
   return (
@@ -139,7 +158,11 @@ export default function Dashboard() {
                   ))
                 ) : newsArticles?.length ? (
                   newsArticles.map((article) => (
-                    <NewsArticle key={article.id} article={article} />
+                    <NewsArticle 
+                      key={article.id} 
+                      article={article} 
+                      onClick={() => handleArticleClick(article)}
+                    />
                   ))
                 ) : (
                   <div className="text-center py-8">
@@ -185,7 +208,7 @@ export default function Dashboard() {
               </div>
             </Card>
 
-            {/* Twitter/X Feed Placeholder */}
+            {/* Twitter/X Feed */}
             <Card className="bg-based-surface border-border p-6">
               <div className="flex items-center space-x-3 mb-6">
                 <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
@@ -194,8 +217,47 @@ export default function Dashboard() {
                 <h3 className="text-lg font-bold text-foreground">Crypto Twitter</h3>
               </div>
 
-              <div className="text-center py-8">
-                <p className="text-muted-foreground text-sm">Twitter integration coming soon</p>
+              <div className="space-y-4">
+                {twitterLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="border-b border-border pb-4">
+                      <Skeleton className="h-4 w-full mb-2" />
+                      <Skeleton className="h-3 w-3/4 mb-2" />
+                      <div className="flex items-center space-x-4">
+                        <Skeleton className="h-3 w-12" />
+                        <Skeleton className="h-3 w-8" />
+                      </div>
+                    </div>
+                  ))
+                ) : tweets?.length ? (
+                  tweets.slice(0, 5).map((tweet) => (
+                    <div key={tweet.id} className="border-b border-border pb-4 last:border-b-0">
+                      <p className="text-sm text-foreground mb-2 leading-relaxed">
+                        {tweet.text}
+                      </p>
+                      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                        <span>@{tweet.author}</span>
+                        <div className="flex items-center space-x-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                          </svg>
+                          <span>{tweet.likes}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.51 1.99L16.6 2.9l1.05 1.05c.83.83.83 2.19 0 3.02l-.7.7L15.9 6.62l.7-.7c.39-.39.39-1.02 0-1.41l-1.05-1.05.91-.91c.75-.75 1.97-.75 2.72 0s.75 1.97 0 2.72l-5.66 5.66-1.41-1.41L17.51 4.7c1.17-1.17 1.17-3.07 0-4.24-1.17-1.17-3.07-1.17-4.24 0L7.61 6.12 6.2 4.71l5.66-5.66c1.95-1.95 5.12-1.95 7.07 0s1.95 5.12 0 7.07z"/>
+                          </svg>
+                          <span>{tweet.retweets}</span>
+                        </div>
+                        <span>{new Date(tweet.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-muted-foreground">No tweets available</p>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
@@ -212,6 +274,13 @@ export default function Dashboard() {
           cryptocurrency={selectedCrypto}
         />
       )}
+
+      {/* News Summary Modal */}
+      <NewsSummaryModal
+        article={selectedArticle}
+        isOpen={isSummaryModalOpen}
+        onClose={handleCloseSummaryModal}
+      />
     </div>
   );
 }

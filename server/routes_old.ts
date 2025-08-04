@@ -318,121 +318,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Twitter API endpoint
-  app.get("/api/twitter", async (req, res) => {
-    try {
-      const tweets = [];
-      const bearerToken = process.env.TWITTER_BEARER_TOKEN;
-
-      if (bearerToken) {
-        try {
-          const twitterResponse = await axios.get('https://api.twitter.com/2/tweets/search/recent', {
-            headers: {
-              'Authorization': `Bearer ${bearerToken}`,
-              'User-Agent': 'BasedHub/1.0'
-            },
-            params: {
-              query: 'cryptocurrency OR bitcoin OR ethereum OR crypto -is:retweet',
-              max_results: 10,
-              'tweet.fields': 'created_at,author_id,public_metrics'
-            }
-          });
-
-          for (const tweet of twitterResponse.data.data || []) {
-            tweets.push({
-              id: `twitter_${tweet.id}`,
-              text: tweet.text,
-              author: tweet.author_id,
-              url: `https://twitter.com/i/web/status/${tweet.id}`,
-              likes: tweet.public_metrics?.like_count || 0,
-              retweets: tweet.public_metrics?.retweet_count || 0,
-              createdAt: new Date(tweet.created_at)
-            });
-          }
-        } catch (error) {
-          console.error("Twitter API error:", error);
-        }
-      }
-
-      // Fallback tweets if API fails
-      if (tweets.length === 0) {
-        const fallbackTweets = [
-          {
-            id: "twitter_fallback_1",
-            text: "Bitcoin just hit a new milestone! The adoption continues to grow worldwide. #Bitcoin #Crypto",
-            author: "crypto_news",
-            url: "https://twitter.com/crypto_news/fallback1",
-            likes: 1250,
-            retweets: 340,
-            createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
-          },
-          {
-            id: "twitter_fallback_2",
-            text: "Ethereum's latest update shows promising scalability improvements. The future of DeFi looks bright! #Ethereum #DeFi",
-            author: "defi_expert",
-            url: "https://twitter.com/defi_expert/fallback2",
-            likes: 890,
-            retweets: 156,
-            createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000)
-          }
-        ];
-        tweets.push(...fallbackTweets);
-      }
-
-      res.json(tweets);
-    } catch (error) {
-      console.error("Error fetching Twitter data:", error);
-      res.status(500).json({ message: "Failed to fetch Twitter data" });
-    }
-  });
-
-  // AI Summary endpoint for news articles
-  app.post("/api/summarize", async (req, res) => {
-    try {
-      const { text, url } = req.body;
-      
-      if (!text) {
-        return res.status(400).json({ message: "Text is required for summarization" });
-      }
-
-      // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: "You are a cryptocurrency news expert. Summarize the following text in exactly 50-100 words, focusing on key insights and market implications. Be concise and informative. Respond with JSON in this format: { 'summary': string, 'word_count': number }"
-          },
-          {
-            role: "user",
-            content: text
-          }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 200
-      });
-
-      const result = JSON.parse(response.choices[0].message.content || "{}");
-      
-      res.json({
-        summary: result.summary || "Summary not available",
-        word_count: result.word_count || 0,
-        url: url
-      });
-    } catch (error) {
-      console.error("Error generating summary:", error);
-      res.status(500).json({ message: "Failed to generate summary" });
-    }
-  });
-
   // API status endpoint
   app.get("/api/status", async (req, res) => {
     const status = {
       coingecko: "connected",
       cryptopanic: process.env.CRYPTOPANIC_API_KEY ? "api_key_configured" : "no_api_key",
-      reddit: process.env.REDDIT_CLIENT_ID && process.env.REDDIT_CLIENT_SECRET ? "api_configured" : "fallback_data",
-      twitter: process.env.TWITTER_BEARER_TOKEN ? "api_configured" : "fallback_data",
-      openai: process.env.OPENAI_API_KEY ? "api_configured" : "not_configured",
+      reddit: "simulated",
       lastUpdate: new Date().toISOString()
     };
     
