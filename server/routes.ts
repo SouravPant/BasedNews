@@ -10,6 +10,26 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY 
 });
 
+// Fallback summary generator for when OpenAI is unavailable
+function generateFallbackSummary(text: string): string {
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
+  const keywords = ['bitcoin', 'ethereum', 'crypto', 'blockchain', 'defi', 'nft', 'price', 'market', 'trading', 'investment'];
+  
+  // Try to extract key sentences that contain crypto keywords
+  const relevantSentences = sentences.filter(sentence => 
+    keywords.some(keyword => sentence.toLowerCase().includes(keyword))
+  ).slice(0, 2);
+  
+  if (relevantSentences.length > 0) {
+    const summary = relevantSentences.join('. ').trim() + '.';
+    return summary.length > 300 ? summary.substring(0, 297) + '...' : summary;
+  }
+  
+  // Fallback: use first sentence + indication it's auto-generated
+  const firstSentence = sentences[0]?.trim() || text.substring(0, 100);
+  return `${firstSentence}. [AI summary temporarily unavailable - showing content preview]`;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get historical price data for a specific cryptocurrency
@@ -395,13 +415,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Text is required for summarization" });
       }
 
+      // Check if OpenAI API key is available
+      if (!process.env.OPENAI_API_KEY) {
+        console.log("OpenAI API key not found");
+        return res.status(500).json({ 
+          message: "OpenAI API key not configured",
+          summary: "AI summarization is currently unavailable. Please configure the OpenAI API key to enable this feature.",
+          word_count: 20,
+          url: url
+        });
+      }
+
+      console.log("Generating AI summary for text:", text.substring(0, 100) + "...");
+
       // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
           {
             role: "system",
-            content: "You are a cryptocurrency news expert. Summarize the following text in exactly 50-100 words, focusing on key insights and market implications. Be concise and informative. Respond with JSON in this format: { 'summary': string, 'word_count': number }"
+            content: "You are a cryptocurrency expert. Summarize the following text in exactly 50-100 words, focusing on key insights and market implications. Be concise and informative. Respond with JSON in this format: { \"summary\": \"your summary here\", \"word_count\": number }"
           },
           {
             role: "user",
@@ -414,6 +447,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const result = JSON.parse(response.choices[0].message.content || "{}");
       
+      console.log("AI summary generated successfully:", result.summary?.substring(0, 50) + "...");
+      
       res.json({
         summary: result.summary || "Summary not available",
         word_count: result.word_count || 0,
@@ -421,7 +456,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error generating summary:", error);
-      res.status(500).json({ message: "Failed to generate summary" });
+      
+      // Provide a fallback response instead of just failing
+      const fallbackSummary = generateFallbackSummary(text);
+      
+      res.json({
+        summary: fallbackSummary,
+        word_count: fallbackSummary.split(' ').length,
+        url: url
+      });
     }
   });
 

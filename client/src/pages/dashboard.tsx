@@ -4,6 +4,8 @@ import { Header } from "@/components/header";
 import { CryptoPriceCard } from "@/components/crypto-price-card";
 import { CryptoChartModal } from "@/components/crypto-chart-modal";
 import { NewsSummaryModal } from "@/components/news-summary-modal";
+import { RedditSummaryModal } from "@/components/reddit-summary-modal";
+import { TwitterSummaryModal } from "@/components/twitter-summary-modal";
 import { NewsArticle } from "@/components/news-article";
 import { RedditPost } from "@/components/reddit-post";
 import { StatusBar } from "@/components/status-bar";
@@ -17,6 +19,10 @@ export default function Dashboard() {
   const [isChartModalOpen, setIsChartModalOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<any | null>(null);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
+  const [selectedRedditPost, setSelectedRedditPost] = useState<any | null>(null);
+  const [isRedditModalOpen, setIsRedditModalOpen] = useState(false);
+  const [selectedTweet, setSelectedTweet] = useState<any | null>(null);
+  const [isTwitterModalOpen, setIsTwitterModalOpen] = useState(false);
 
   const { data: cryptocurrencies, isLoading: cryptoLoading, refetch: refetchCrypto } = useQuery<Cryptocurrency[]>({
     queryKey: ["/api/cryptocurrencies"],
@@ -73,6 +79,26 @@ export default function Dashboard() {
   const handleCloseSummaryModal = () => {
     setIsSummaryModalOpen(false);
     setSelectedArticle(null);
+  };
+
+  const handleRedditClick = (post: any) => {
+    setSelectedRedditPost(post);
+    setIsRedditModalOpen(true);
+  };
+
+  const handleCloseRedditModal = () => {
+    setIsRedditModalOpen(false);
+    setSelectedRedditPost(null);
+  };
+
+  const handleTweetClick = (tweet: any) => {
+    setSelectedTweet(tweet);
+    setIsTwitterModalOpen(true);
+  };
+
+  const handleCloseTwitterModal = () => {
+    setIsTwitterModalOpen(false);
+    setSelectedTweet(null);
   };
 
   return (
@@ -198,7 +224,11 @@ export default function Dashboard() {
                   ))
                 ) : redditPosts?.length ? (
                   redditPosts.slice(0, 5).map((post) => (
-                    <RedditPost key={post.id} post={post} />
+                    <RedditPost 
+                      key={post.id} 
+                      post={post} 
+                      onClick={() => handleRedditClick(post)}
+                    />
                   ))
                 ) : (
                   <div className="text-center py-4">
@@ -231,7 +261,11 @@ export default function Dashboard() {
                   ))
                 ) : tweets?.length ? (
                   tweets.slice(0, 5).map((tweet) => (
-                    <div key={tweet.id} className="border-b border-border pb-4 last:border-b-0">
+                    <div 
+                      key={tweet.id} 
+                      className="border-b border-border pb-4 last:border-b-0 cursor-pointer hover:bg-muted/50 p-3 rounded-lg transition-colors"
+                      onClick={() => handleTweetClick(tweet)}
+                    >
                       <p className="text-sm text-foreground mb-2 leading-relaxed">
                         {tweet.text}
                       </p>
@@ -280,6 +314,20 @@ export default function Dashboard() {
         article={selectedArticle}
         isOpen={isSummaryModalOpen}
         onClose={handleCloseSummaryModal}
+      />
+
+      {/* Reddit Summary Modal */}
+      <RedditSummaryModal
+        post={selectedRedditPost}
+        isOpen={isRedditModalOpen}
+        onClose={handleCloseRedditModal}
+      />
+
+      {/* Twitter Summary Modal */}
+      <TwitterSummaryModal
+        tweet={selectedTweet}
+        isOpen={isTwitterModalOpen}
+        onClose={handleCloseTwitterModal}
       />
     </div>
   );

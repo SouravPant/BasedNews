@@ -2,9 +2,10 @@ import { RedditPost as RedditPostType } from "@shared/schema";
 
 interface RedditPostProps {
   post: RedditPostType;
+  onClick?: () => void;
 }
 
-export function RedditPost({ post }: RedditPostProps) {
+export function RedditPost({ post, onClick }: RedditPostProps) {
   const formatNumber = (num: number) => {
     if (num >= 1000) {
       return `${(num / 1000).toFixed(1)}k`;
@@ -13,7 +14,7 @@ export function RedditPost({ post }: RedditPostProps) {
   };
 
   return (
-    <div className="border-b border-border pb-4 last:border-b-0">
+    <div className="border-b border-border pb-4 last:border-b-0 cursor-pointer hover:bg-muted/50 p-3 rounded-lg transition-colors" onClick={onClick}>
       <h4 className="font-medium text-foreground mb-2 text-sm hover:text-primary cursor-pointer transition-colors">
         <a href={post.url} target="_blank" rel="noopener noreferrer">
           {post.title}

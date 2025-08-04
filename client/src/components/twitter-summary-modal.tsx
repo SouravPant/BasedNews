@@ -3,21 +3,20 @@ import { useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { X, Brain, ExternalLink } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { X, Brain, ExternalLink, Heart, Repeat2 } from "lucide-react";
 
-interface NewsArticle {
+interface Tweet {
   id: string;
-  title: string;
-  description: string;
+  text: string;
+  author: string;
   url: string;
-  source: string;
-  publishedAt: Date;
-  sentiment: string;
+  likes: number;
+  retweets: number;
+  createdAt: Date;
 }
 
-interface NewsSummaryModalProps {
-  article: NewsArticle | null;
+interface TwitterSummaryModalProps {
+  tweet: Tweet | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -28,7 +27,7 @@ interface SummaryResponse {
   url: string;
 }
 
-export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalProps) {
+export function TwitterSummaryModal({ tweet, isOpen, onClose }: TwitterSummaryModalProps) {
   const [summary, setSummary] = useState<string | null>(null);
 
   const summarizeMutation = useMutation({
@@ -39,8 +38,8 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          text: text,
-          url: article?.url
+          text: `Tweet from @${tweet?.author}: ${text}`,
+          url: tweet?.url
         })
       });
       
@@ -60,29 +59,22 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
   });
 
   const handleSummarize = () => {
-    if (article && !summary && !summarizeMutation.isPending) {
-      const fullText = `${article.title}. ${article.description}`;
-      summarizeMutation.mutate(fullText);
+    if (tweet && !summary && !summarizeMutation.isPending) {
+      summarizeMutation.mutate(tweet.text);
     }
   };
 
-  const getSentimentColor = (sentiment: string) => {
-    switch (sentiment) {
-      case 'bullish': return 'text-green-500';
-      case 'bearish': return 'text-red-500';
-      default: return 'text-muted-foreground';
-    }
+  const formatTimeAgo = (timestamp: Date) => {
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - new Date(timestamp).getTime()) / 1000);
+    
+    if (diff < 60) return "Just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
   };
 
-  const getSentimentBg = (sentiment: string) => {
-    switch (sentiment) {
-      case 'bullish': return 'bg-green-500/10';
-      case 'bearish': return 'bg-red-500/10';
-      default: return 'bg-muted';
-    }
-  };
-
-  if (!article) return null;
+  if (!tweet) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -90,18 +82,15 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
         <DialogHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
           <div className="flex-1 pr-4">
             <DialogTitle className="text-xl font-bold text-card-foreground leading-tight">
-              {article.title}
+              Tweet from @{tweet.author}
             </DialogTitle>
             <DialogDescription className="sr-only">
-              AI-powered news summary for {article.title}
+              AI-powered Twitter post summary for tweet by @{tweet.author}
             </DialogDescription>
             <div className="flex items-center gap-3 mt-3">
-              <span className="text-sm font-medium text-primary">{article.source}</span>
-              <span className={`text-xs px-2 py-1 rounded-full ${getSentimentBg(article.sentiment)} ${getSentimentColor(article.sentiment)}`}>
-                {article.sentiment}
-              </span>
+              <span className="text-sm font-medium text-blue-400">@{tweet.author}</span>
               <span className="text-xs text-muted-foreground">
-                {new Date(article.publishedAt).toLocaleDateString()}
+                {formatTimeAgo(tweet.createdAt)}
               </span>
             </div>
           </div>
@@ -116,12 +105,26 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Original Description */}
+          {/* Tweet Content */}
           <div>
-            <h3 className="text-sm font-semibold text-card-foreground mb-2">Article Description</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {article.description}
-            </p>
+            <h3 className="text-sm font-semibold text-card-foreground mb-2">Tweet Content</h3>
+            <div className="bg-muted/30 p-4 rounded-lg border-l-4 border-blue-400">
+              <p className="text-sm text-card-foreground leading-relaxed">
+                {tweet.text}
+              </p>
+            </div>
+          </div>
+
+          {/* Tweet Stats */}
+          <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
+            <div className="flex items-center gap-1">
+              <Heart className="w-4 h-4 text-red-500" />
+              <span className="text-sm font-medium">{tweet.likes}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Repeat2 className="w-4 h-4 text-green-500" />
+              <span className="text-sm">{tweet.retweets}</span>
+            </div>
           </div>
 
           {/* AI Summary Section */}
@@ -160,7 +163,7 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
 
             {!summary && !summarizeMutation.isPending && (
               <p className="text-xs text-muted-foreground italic">
-                Click "Generate Summary" to get an AI-powered concise summary of this article.
+                Click "Generate Summary" to get an AI-powered analysis of this tweet's crypto insights.
               </p>
             )}
 
@@ -178,11 +181,11 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.open(article.url, '_blank')}
+              onClick={() => window.open(tweet.url, '_blank')}
               className="flex items-center gap-2"
             >
               <ExternalLink className="w-4 h-4" />
-              Read Full Article
+              View on Twitter
             </Button>
             
             <Button onClick={onClose} variant="default" size="sm">
