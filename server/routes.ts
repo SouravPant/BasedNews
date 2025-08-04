@@ -49,15 +49,11 @@ function generateRandomSummary(): string {
   const selectedTechnical = technicalInsights[Math.floor(Math.random() * technicalInsights.length)];
   const selectedOutlook = futureOutlook[Math.floor(Math.random() * futureOutlook.length)];
 
-  const summary = `This comprehensive analysis examines ${selectedTopic} and its implications for the broader cryptocurrency ecosystem. ${selectedMarket} ${selectedTechnical} ${selectedOutlook} 
+  const summary = `This analysis examines ${selectedTopic} and its current market implications. ${selectedMarket} ${selectedTechnical}
 
-Market participants should consider multiple factors when evaluating these developments, including technological innovation, regulatory changes, and macroeconomic conditions. The cryptocurrency space continues to evolve rapidly, with new opportunities and challenges emerging regularly. Successful navigation of this environment requires continuous learning and adaptation to changing market dynamics.
+${selectedOutlook} Market participants should monitor key developments including technological innovation, regulatory changes, and institutional adoption trends. The cryptocurrency ecosystem continues evolving with new opportunities emerging regularly.
 
-The current market environment presents both opportunities and risks for investors and users. While short-term volatility remains a characteristic of the cryptocurrency market, long-term trends suggest continued growth and maturation of the ecosystem. Key metrics to monitor include network usage, developer activity, institutional adoption, and regulatory developments.
-
-Risk management remains crucial in this volatile environment. Diversification across different cryptocurrencies, thorough research before making investment decisions, and understanding the technology behind various projects are essential components of a successful cryptocurrency strategy. The importance of security practices, including proper wallet management and awareness of common scams, cannot be overstated.
-
-As the industry continues to mature, we can expect to see increased integration with traditional financial systems, improved regulatory clarity, and continued technological innovation. These factors will likely contribute to broader adoption and potentially more stable price action over time, though volatility will likely remain a characteristic of the space for the foreseeable future.`;
+Current market conditions present both growth potential and inherent risks. Successful navigation requires understanding underlying technology, maintaining proper security practices, and staying informed about regulatory developments. As the industry matures, we expect increased traditional finance integration and clearer regulatory frameworks.`;
 
   return summary;
 }
@@ -448,7 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { url } = req.body;
     
     try {
-      // Generate a comprehensive random summary (700-1000 words)
+      // Generate a concise random summary (150-200 words)
       const summary = generateRandomSummary();
       const wordCount = summary.split(' ').length;
       

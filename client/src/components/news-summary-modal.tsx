@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -60,11 +60,18 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
   });
 
   const handleSummarize = () => {
-    if (article && !summary && !summarizeMutation.isPending) {
+    if (article && !summarizeMutation.isPending) {
       const fullText = `${article.title}. ${article.description}`;
       summarizeMutation.mutate(fullText);
     }
   };
+
+  // Auto-generate summary when modal opens
+  useEffect(() => {
+    if (isOpen && article && !summary && !summarizeMutation.isPending) {
+      handleSummarize();
+    }
+  }, [isOpen, article]);
 
   const getSentimentColor = (sentiment: string) => {
     switch (sentiment) {
@@ -86,36 +93,42 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl w-full bg-card border-border text-card-foreground">
-        <DialogHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-          <div className="flex-1 pr-4">
-            <DialogTitle className="text-xl font-bold text-card-foreground leading-tight">
-              {article.title}
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              AI-powered news summary for {article.title}
-            </DialogDescription>
-            <div className="flex items-center gap-3 mt-3">
-              <span className="text-sm font-medium text-primary">{article.source}</span>
-              <span className={`text-xs px-2 py-1 rounded-full ${getSentimentBg(article.sentiment)} ${getSentimentColor(article.sentiment)}`}>
-                {article.sentiment}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {new Date(article.publishedAt).toLocaleDateString()}
-              </span>
+      <DialogContent className="max-w-3xl w-full bg-card border-border text-card-foreground">
+        <DialogHeader className="pb-4">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 pr-4">
+              <DialogTitle className="text-xl font-bold text-card-foreground leading-tight">
+                {article.title}
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                AI-powered news summary for {article.title}
+              </DialogDescription>
+              <div className="flex items-center gap-3 mt-3">
+                <span className="text-sm font-medium text-primary">{article.source}</span>
+                <span className={`text-xs px-2 py-1 rounded-full ${getSentimentBg(article.sentiment)} ${getSentimentColor(article.sentiment)}`}>
+                  {article.sentiment}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(article.publishedAt).toLocaleDateString()}
+                </span>
+              </div>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-muted-foreground hover:text-card-foreground hover:bg-muted shrink-0"
-          >
-            <X className="w-4 h-4" />
-          </Button>
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Article Image */}
+          <div className="w-full h-48 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg flex items-center justify-center border border-border">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <p className="text-sm text-muted-foreground">Cryptocurrency Market Analysis</p>
+            </div>
+          </div>
+
           {/* Original Description */}
           <div>
             <h3 className="text-sm font-semibold text-card-foreground mb-2">Article Description</h3>
@@ -129,7 +142,7 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Brain className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-card-foreground">AI Summary (50-100 words)</h3>
+                <h3 className="text-sm font-semibold text-card-foreground">AI Summary (150-200 words)</h3>
               </div>
               {!summary && !summarizeMutation.isPending && (
                 <Button
@@ -137,7 +150,7 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
                   size="sm"
                   className="text-xs"
                 >
-                  Generate Summary
+                  Regenerate Summary
                 </Button>
               )}
             </div>
@@ -160,7 +173,7 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
 
             {!summary && !summarizeMutation.isPending && (
               <p className="text-xs text-muted-foreground italic">
-                Click "Generate Summary" to get an AI-powered concise summary of this article.
+                Summary generation failed. Click "Regenerate Summary" to try again.
               </p>
             )}
 
@@ -178,7 +191,14 @@ export function NewsSummaryModal({ article, isOpen, onClose }: NewsSummaryModalP
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.open(article.url, '_blank')}
+              onClick={() => {
+                if (article.url && article.url !== "https://example.com/btc-etf-ath" && article.url !== "https://example.com/eth-staking-rewards" && article.url !== "https://example.com/defi-security-audit") {
+                  window.open(article.url, '_blank', 'noopener,noreferrer');
+                } else {
+                  // For demo articles, show a message
+                  alert('This is a demo article. In a live environment, this would open the full article.');
+                }
+              }}
               className="flex items-center gap-2"
             >
               <ExternalLink className="w-4 h-4" />
