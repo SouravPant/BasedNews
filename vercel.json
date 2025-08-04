@@ -1,14 +1,7 @@
 {
-  "buildCommand": "vite build",
-  "outputDirectory": "dist/public",
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+  "functions": {
+    "api/*.ts": {
+      "runtime": "@vercel/node"
     }
-  ]
+  }
 }
