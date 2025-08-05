@@ -126,41 +126,29 @@ export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChang
 
   return (
     <div className="w-full h-full">
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-card-foreground mb-1">
-              {coinName} ({coinSymbol.toUpperCase()})
-            </h3>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
-                {days === 1 ? '24 Hours' : `${days} Days`} Price Chart
-              </span>
-              <Badge variant={isPositive ? 'default' : 'destructive'}>
-                {isPositive ? '+' : ''}{priceChangePercentage.toFixed(2)}%
-              </Badge>
-            </div>
-          </div>
-          
-          <div className="flex gap-2">
-            <Button
-              variant={chartType === 'line' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setChartType('line')}
-            >
-              Line
-            </Button>
-            <Button
-              variant={chartType === 'area' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setChartType('area')}
-            >
-              Area
-            </Button>
-          </div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Badge variant={isPositive ? 'default' : 'destructive'}>
+            {isPositive ? '+' : ''}{priceChangePercentage.toFixed(2)}%
+          </Badge>
         </div>
         
-
+        <div className="flex gap-2">
+          <Button
+            variant={chartType === 'line' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setChartType('line')}
+          >
+            Line
+          </Button>
+          <Button
+            variant={chartType === 'area' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setChartType('area')}
+          >
+            Area
+          </Button>
+        </div>
       </div>
       
       <div className="w-full h-96">
