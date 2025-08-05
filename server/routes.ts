@@ -1,8 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
+import { insertCryptocurrencySchema, insertNewsArticleSchema, insertRedditPostSchema, insertUserWatchlistSchema, insertUserPortfolioSchema, insertUserAlertSchema } from "@shared/schema";
 import axios from "axios";
-import { insertNewsArticleSchema, insertRedditPostSchema } from "@shared/schema";
 
 // Generate comprehensive random summaries for news articles
 function generateRandomSummary(): string {
@@ -118,8 +119,89 @@ function generateFallbackChartData(basePrice: number, days: number): Array<{ tim
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
-  // Get historical price data for a specific cryptocurrency
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Enhanced search endpoints
+  app.get("/api/search/cryptocurrencies", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      if (!query) {
+        return res.status(400).json({ message: "Query parameter 'q' is required" });
+      }
+      
+      const results = await storage.searchCryptocurrencies(query);
+      res.json(results);
+    } catch (error) {
+      console.error("Error searching cryptocurrencies:", error);
+      res.status(500).json({ message: "Failed to search cryptocurrencies" });
+    }
+  });
+
+  app.get("/api/search/news", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      if (!query) {
+        return res.status(400).json({ message: "Query parameter 'q' is required" });
+      }
+      
+      const results = await storage.searchNews(query);
+      res.json(results);
+    } catch (error) {
+      console.error("Error searching news:", error);
+      res.status(500).json({ message: "Failed to search news" });
+    }
+  });
+
+  // Enhanced news API with filtering
+  app.get("/api/news", async (req, res) => {
+    try {
+      const { limit, category, sentiment, featured } = req.query;
+      const options = {
+        limit: limit ? parseInt(limit as string) : 30,
+        category: category as string,
+        sentiment: sentiment as string,
+        featured: featured === 'true' ? true : undefined
+      };
+      
+      const articles = await storage.getNewsArticles(options);
+      res.json(articles);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      res.status(500).json({ message: "Failed to fetch news" });
+    }
+  });
+
+  // Cryptocurrency detail page endpoint
+  app.get("/api/cryptocurrencies/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const cryptocurrency = await storage.getCryptocurrency(id);
+      
+      if (!cryptocurrency) {
+        return res.status(404).json({ message: "Cryptocurrency not found" });
+      }
+      
+      res.json(cryptocurrency);
+    } catch (error) {
+      console.error("Error fetching cryptocurrency:", error);
+      res.status(500).json({ message: "Failed to fetch cryptocurrency" });
+    }
+  });
+
+  // Get historical price data for charting
   app.get("/api/cryptocurrencies/:id/chart", async (req, res) => {
     try {
       const { id } = req.params;
@@ -947,6 +1029,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
     };
     
     res.json(status);
+  });
+
+  // User Personalization Endpoints
+  
+  // Watchlist management
+  app.get("/api/user/watchlist", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const watchlist = await storage.getUserWatchlist(userId);
+      res.json(watchlist);
+    } catch (error) {
+      console.error("Error fetching watchlist:", error);
+      res.status(500).json({ message: "Failed to fetch watchlist" });
+    }
+  });
+
+  app.post("/api/user/watchlist", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { cryptocurrencyId } = req.body;
+      
+      const validatedWatchlist = insertUserWatchlistSchema.parse({
+        userId,
+        cryptocurrencyId
+      });
+      
+      const watchlistItem = await storage.addToWatchlist(validatedWatchlist);
+      res.json(watchlistItem);
+    } catch (error) {
+      console.error("Error adding to watchlist:", error);
+      res.status(500).json({ message: "Failed to add to watchlist" });
+    }
+  });
+
+  app.delete("/api/user/watchlist/:cryptocurrencyId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { cryptocurrencyId } = req.params;
+      
+      await storage.removeFromWatchlist(userId, cryptocurrencyId);
+      res.json({ message: "Removed from watchlist" });
+    } catch (error) {
+      console.error("Error removing from watchlist:", error);
+      res.status(500).json({ message: "Failed to remove from watchlist" });
+    }
+  });
+
+  // Portfolio management
+  app.get("/api/user/portfolio", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const portfolio = await storage.getUserPortfolio(userId);
+      res.json(portfolio);
+    } catch (error) {
+      console.error("Error fetching portfolio:", error);
+      res.status(500).json({ message: "Failed to fetch portfolio" });
+    }
+  });
+
+  app.post("/api/user/portfolio", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const portfolioData = { ...req.body, userId };
+      
+      const validatedPortfolio = insertUserPortfolioSchema.parse(portfolioData);
+      const portfolioItem = await storage.addPortfolioItem(validatedPortfolio);
+      res.json(portfolioItem);
+    } catch (error) {
+      console.error("Error adding portfolio item:", error);
+      res.status(500).json({ message: "Failed to add portfolio item" });
+    }
+  });
+
+  app.put("/api/user/portfolio/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const portfolioItem = await storage.updatePortfolioItem(id, updates);
+      res.json(portfolioItem);
+    } catch (error) {
+      console.error("Error updating portfolio item:", error);
+      res.status(500).json({ message: "Failed to update portfolio item" });
+    }
+  });
+
+  app.delete("/api/user/portfolio/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.removePortfolioItem(id);
+      res.json({ message: "Portfolio item removed" });
+    } catch (error) {
+      console.error("Error removing portfolio item:", error);
+      res.status(500).json({ message: "Failed to remove portfolio item" });
+    }
+  });
+
+  // User alerts management
+  app.get("/api/user/alerts", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { active } = req.query;
+      const alerts = await storage.getUserAlerts(userId, active === 'true' ? true : undefined);
+      res.json(alerts);
+    } catch (error) {
+      console.error("Error fetching alerts:", error);
+      res.status(500).json({ message: "Failed to fetch alerts" });
+    }
+  });
+
+  app.post("/api/user/alerts", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const alertData = { ...req.body, userId };
+      
+      const validatedAlert = insertUserAlertSchema.parse(alertData);
+      const alert = await storage.createAlert(validatedAlert);
+      res.json(alert);
+    } catch (error) {
+      console.error("Error creating alert:", error);
+      res.status(500).json({ message: "Failed to create alert" });
+    }
+  });
+
+  app.put("/api/user/alerts/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const alert = await storage.updateAlert(id, updates);
+      res.json(alert);
+    } catch (error) {
+      console.error("Error updating alert:", error);
+      res.status(500).json({ message: "Failed to update alert" });
+    }
+  });
+
+  app.delete("/api/user/alerts/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteAlert(id);
+      res.json({ message: "Alert deleted" });
+    } catch (error) {
+      console.error("Error deleting alert:", error);
+      res.status(500).json({ message: "Failed to delete alert" });
+    }
   });
 
   const httpServer = createServer(app);
