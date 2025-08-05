@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { NewsArticle } from '@/components/news-article';
+import { NewsArticleModal } from '@/components/news-article-modal';
+import { WalletAssetsDisplay } from '@/components/wallet-assets-display';
 import { CoinbaseWallet } from '@/components/coinbase-wallet';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Loader2, TrendingUp, Globe, Search, Coins } from 'lucide-react';
 import type { NewsArticle as NewsArticleType } from '@shared/schema';
 import { Link } from 'wouter';
+import { useWallet } from '@/hooks/useMiniKit';
 
 interface FilterState {
   dateRange: string;
@@ -18,12 +21,15 @@ interface FilterState {
 export function NewsAggregator() {
   const [connectedAccount, setConnectedAccount] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedArticle, setSelectedArticle] = useState<NewsArticleType | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     dateRange: 'all',
     sentiment: 'all',
     category: 'all',
     sortBy: 'relevance'
   });
+
+  const { wallet, isConnected } = useWallet();
 
   // Fetch news articles
   const { data: news = [], isLoading: newsLoading, error: newsError } = useQuery({
@@ -168,6 +174,16 @@ export function NewsAggregator() {
           </div>
         )}
 
+        {/* Wallet Assets Display */}
+        {(connectedAccount || isConnected) && (
+          <div className="mb-8">
+            <WalletAssetsDisplay 
+              connectedAddress={connectedAccount || wallet?.address || null}
+              provider={wallet || undefined}
+            />
+          </div>
+        )}
+
         {/* News Grid */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
@@ -215,6 +231,7 @@ export function NewsAggregator() {
                 <NewsArticle
                   key={article.id}
                   article={article}
+                  onClick={() => setSelectedArticle(article)}
                 />
               ))}
             </div>
@@ -233,6 +250,15 @@ export function NewsAggregator() {
           </div>
         </div>
       </footer>
+
+      {/* News Article Modal with AI Summary */}
+      {selectedArticle && (
+        <NewsArticleModal
+          article={selectedArticle}
+          isOpen={!!selectedArticle}
+          onClose={() => setSelectedArticle(null)}
+        />
+      )}
     </div>
   );
 }
