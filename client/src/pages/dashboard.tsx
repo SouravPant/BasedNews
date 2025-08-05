@@ -23,9 +23,11 @@ import { Star, Plus, Eye, Wallet, Bell, Activity, TrendingUp, Users, Settings, B
 import { Cryptocurrency, NewsArticle as NewsArticleType, RedditPost as RedditPostType } from "@shared/schema";
 import { SearchBar } from "@/components/search-bar";
 import { NewsFilter } from "@/components/news-filter";
+import { useMiniKit } from "@/hooks/useMiniKit";
 
 export default function Dashboard() {
   const { isAuthenticated, user } = useAuth();
+  const { user: miniKitUser, wallet: miniKitWallet } = useMiniKit();
   const [, setLocation] = useLocation();
   const [selectedCrypto, setSelectedCrypto] = useState<Cryptocurrency | null>(null);
   const [isChartModalOpen, setIsChartModalOpen] = useState(false);
@@ -330,8 +332,16 @@ export default function Dashboard() {
               <div className="flex items-center space-x-2">
                 <Badge variant="outline" className="flex items-center space-x-1">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Logged in as {(user as any)?.firstName || (user as any)?.email || 'User'}</span>
+                  <span>
+                    {miniKitUser?.displayName || (user as any)?.firstName || (user as any)?.email || 'User'}
+                  </span>
                 </Badge>
+                {miniKitWallet && (
+                  <Badge variant="secondary" className="flex items-center space-x-1">
+                    <Wallet className="w-3 h-3" />
+                    <span>{miniKitWallet.address.slice(0, 6)}...{miniKitWallet.address.slice(-4)}</span>
+                  </Badge>
+                )}
               </div>
             </div>
 

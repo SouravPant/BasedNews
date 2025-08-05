@@ -18,11 +18,14 @@ import {
   LogOut
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useMiniKit } from "@/hooks/useMiniKit";
+import { ThemeToggle } from "./theme-toggle";
 import { cn } from "@/lib/utils";
 
 export function Navigation() {
   const [location] = useLocation();
   const { isAuthenticated, user } = useAuth();
+  const { user: miniKitUser, wallet: miniKitWallet } = useMiniKit();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationItems = [
@@ -92,21 +95,31 @@ export function Navigation() {
             <div className="flex items-center space-x-4">
               <NavItems />
               
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
               {/* Auth Section */}
               <div className="flex items-center space-x-2 border-l border-gray-200 dark:border-gray-700 pl-4">
                 {isAuthenticated ? (
                   <>
-                    {user?.profileImageUrl && (
+                    {miniKitUser?.pfpUrl ? (
                       <img
-                        src={user.profileImageUrl}
+                        src={miniKitUser.pfpUrl}
                         alt="Profile"
                         className="w-8 h-8 rounded-full"
                         data-testid="img-user-avatar"
                       />
+                    ) : (
+                      <User className="w-8 h-8 p-1.5 bg-gray-100 dark:bg-gray-800 rounded-full" />
                     )}
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      {user?.firstName || user?.email}
+                      {miniKitUser?.displayName || (user as any)?.firstName || (user as any)?.email || 'User'}
                     </span>
+                    {miniKitWallet && (
+                      <Badge variant="secondary" className="text-xs">
+                        {miniKitWallet.address.slice(0, 6)}...{miniKitWallet.address.slice(-4)}
+                      </Badge>
+                    )}
                     <Button
                       variant="ghost"
                       size="sm"
@@ -160,23 +173,40 @@ export function Navigation() {
                   {/* User Info */}
                   {isAuthenticated && (
                     <div className="flex items-center space-x-3 pb-4 border-b border-gray-200 dark:border-gray-700">
-                      {user?.profileImageUrl && (
+                      {miniKitUser?.pfpUrl ? (
                         <img
-                          src={user.profileImageUrl}
+                          src={miniKitUser.pfpUrl}
                           alt="Profile"
                           className="w-10 h-10 rounded-full"
                         />
+                      ) : (
+                        <User className="w-10 h-10 p-2 bg-gray-100 dark:bg-gray-800 rounded-full" />
                       )}
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium text-gray-900 dark:text-white">
-                          {user?.firstName || user?.email}
+                          {miniKitUser?.displayName || (user as any)?.firstName || (user as any)?.email || 'User'}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {user?.email}
-                        </p>
+                        {miniKitWallet && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+                            {miniKitWallet.address.slice(0, 6)}...{miniKitWallet.address.slice(-4)}
+                          </p>
+                        )}
+                        {(user as any)?.email && (
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                            {(user as any).email}
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
+
+                  {/* Theme Toggle in Mobile */}
+                  <div className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</span>
+                      <ThemeToggle />
+                    </div>
+                  </div>
 
                   {/* Navigation Items */}
                   <div className="space-y-2">

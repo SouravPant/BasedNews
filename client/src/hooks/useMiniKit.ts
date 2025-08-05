@@ -2,7 +2,17 @@ import { useEffect } from 'react';
 import { useMiniKitContext } from '../providers/MiniKitProvider';
 
 export function useMiniKit() {
-  const { setFrameReady, isFrameReady, context, isInBaseApp, user } = useMiniKitContext();
+  const { 
+    setFrameReady, 
+    isFrameReady, 
+    context, 
+    isInBaseApp, 
+    user, 
+    wallet, 
+    connectWallet, 
+    disconnectWallet,
+    signInWithBase 
+  } = useMiniKitContext();
   
   useEffect(() => {
     if (!isFrameReady) {
@@ -15,44 +25,32 @@ export function useMiniKit() {
     isFrameReady,
     context,
     isInBaseApp,
-    user
+    user,
+    wallet,
+    connectWallet,
+    disconnectWallet,
+    signInWithBase
   };
 }
 
 export function useBaseAuth() {
-  const { context, isInBaseApp } = useMiniKitContext();
+  const { context, isInBaseApp, user, signInWithBase: signIn } = useMiniKitContext();
   
-  const signInWithBase = async () => {
-    try {
-      if (context?.user) {
-        // User is already authenticated via Base App
-        return {
-          success: true,
-          user: context.user,
-          method: 'base_app'
-        };
-      }
-      
-      // In real implementation, this would trigger actual authentication
-      // For now, simulate successful auth
-      return {
-        success: true,
-        user: { username: 'demo_user' },
-        method: 'fallback'
-      };
-    } catch (error) {
-      console.error('Base authentication failed:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Authentication failed'
-      };
-    }
-  };
-
   return {
-    signInWithBase,
-    isAuthenticated: !!context?.user || isInBaseApp,
-    user: context?.user
+    signInWithBase: signIn,
+    isAuthenticated: !!user,
+    user
+  };
+}
+
+export function useWallet() {
+  const { wallet, connectWallet, disconnectWallet } = useMiniKitContext();
+  
+  return {
+    wallet,
+    connectWallet,
+    disconnectWallet,
+    isConnected: !!wallet?.isConnected
   };
 }
 

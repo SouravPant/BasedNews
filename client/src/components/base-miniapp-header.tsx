@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "./theme-toggle";
 import { useMiniKit, useBaseApp, useBaseSocial } from "@/hooks/useMiniKit";
 import { Share2, X, Plus, ExternalLink } from "lucide-react";
 
