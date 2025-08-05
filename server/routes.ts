@@ -323,6 +323,249 @@ export async function registerRoutes(app: Express): Promise<Server> {
             publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
             sentiment: "neutral",
             summary: generateRandomSummary()
+          },
+          {
+            title: "Major Bank Announces Bitcoin Treasury Strategy",
+            description: "Global financial institution reveals plans to allocate 5% of treasury reserves to Bitcoin as digital asset adoption accelerates...",
+            url: "https://example.com/news/bank-bitcoin-treasury",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Solana Network Experiences Unprecedented Growth",
+            description: "Daily active users on Solana reach all-time highs as new DeFi protocols launch with innovative features...",
+            url: "https://example.com/news/solana-growth",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 10 * 60 * 60 * 1000), // 10 hours ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Regulatory Clarity Boosts Institutional Crypto Interest",
+            description: "New guidelines from financial regulators provide clearer framework for institutional cryptocurrency investments...",
+            url: "https://example.com/news/regulatory-clarity",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Layer 2 Solutions Drive Ethereum Fee Reduction",
+            description: "Optimistic rollups and zkRollups significantly reduce transaction costs, making DeFi more accessible to retail users...",
+            url: "https://example.com/news/layer2-fees",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 14 * 60 * 60 * 1000), // 14 hours ago
+            sentiment: "neutral",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "NFT Market Shows Signs of Recovery",
+            description: "Trading volumes increase 40% this week as new utility-focused projects gain traction among collectors...",
+            url: "https://example.com/news/nft-recovery",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 16 * 60 * 60 * 1000), // 16 hours ago
+            sentiment: "neutral",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Cross-Chain Bridge Technology Reaches New Milestone",
+            description: "Interoperability protocols process record-breaking $2B in cross-chain transactions this month...",
+            url: "https://example.com/news/cross-chain-milestone",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 18 * 60 * 60 * 1000), // 18 hours ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Stablecoin Market Cap Approaches $200 Billion",
+            description: "Growing demand for digital dollars drives stablecoin adoption across global markets and emerging economies...",
+            url: "https://example.com/news/stablecoin-growth",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 20 * 60 * 60 * 1000), // 20 hours ago
+            sentiment: "neutral",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Mining Pool Decentralization Reaches Record Levels",
+            description: "Bitcoin network security improves as mining power becomes more distributed across global mining pools...",
+            url: "https://example.com/news/mining-decentralization",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 22 * 60 * 60 * 1000), // 22 hours ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Central Bank Digital Currency Pilots Expand Globally",
+            description: "Seven additional countries announce CBDC testing programs as digital currency adoption accelerates worldwide...",
+            url: "https://example.com/news/cbdc-expansion",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+            sentiment: "neutral",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Cryptocurrency Education Programs Launch in Universities",
+            description: "Leading academic institutions introduce blockchain and cryptocurrency courses to meet growing industry demand...",
+            url: "https://example.com/news/crypto-education",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 26 * 60 * 60 * 1000), // 1 day 2h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Decentralized Autonomous Organizations See Record Funding",
+            description: "DAO treasuries reach $15 billion as governance token holders approve ambitious development roadmaps...",
+            url: "https://example.com/news/dao-funding",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 28 * 60 * 60 * 1000), // 1 day 4h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Quantum-Resistant Cryptocurrency Protocols Under Development",
+            description: "Research teams work on cryptographic solutions to protect blockchain networks from potential quantum computing threats...",
+            url: "https://example.com/news/quantum-resistant",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 30 * 60 * 60 * 1000), // 1 day 6h ago
+            sentiment: "neutral",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Green Energy Mining Operations Reach 60% of Network",
+            description: "Renewable energy sources now power majority of Bitcoin mining operations as sustainability becomes priority...",
+            url: "https://example.com/news/green-mining",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 32 * 60 * 60 * 1000), // 1 day 8h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Flash Loan Attack Targets DeFi Protocol",
+            description: "Security researchers identify vulnerability in lending protocol, highlighting importance of smart contract audits...",
+            url: "https://example.com/news/flash-loan-attack",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 34 * 60 * 60 * 1000), // 1 day 10h ago
+            sentiment: "bearish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Metaverse Real Estate Sales Reach $500 Million",
+            description: "Virtual land transactions surge as major brands establish presence in blockchain-based virtual worlds...",
+            url: "https://example.com/news/metaverse-real-estate",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 36 * 60 * 60 * 1000), // 1 day 12h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Algorithmic Trading Bots Drive 70% of Crypto Volume",
+            description: "Automated trading systems dominate cryptocurrency markets as institutional adoption of algorithmic strategies grows...",
+            url: "https://example.com/news/algorithmic-trading",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 38 * 60 * 60 * 1000), // 1 day 14h ago
+            sentiment: "neutral",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Privacy Coins Face Regulatory Scrutiny",
+            description: "Financial authorities examine privacy-focused cryptocurrencies amid concerns over anti-money laundering compliance...",
+            url: "https://example.com/news/privacy-coins-regulation",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 40 * 60 * 60 * 1000), // 1 day 16h ago
+            sentiment: "bearish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Smart Contract Insurance Market Expands Rapidly",
+            description: "DeFi insurance protocols see 300% growth as users seek protection for their digital asset investments...",
+            url: "https://example.com/news/defi-insurance",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 42 * 60 * 60 * 1000), // 1 day 18h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Tokenized Real World Assets Reach $50 Billion",
+            description: "Blockchain-based representations of traditional assets gain momentum as institutional infrastructure improves...",
+            url: "https://example.com/news/tokenized-assets",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 44 * 60 * 60 * 1000), // 1 day 20h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Cryptocurrency ATM Network Reaches 50,000 Machines",
+            description: "Physical access points for digital currencies expand globally, making crypto more accessible to mainstream users...",
+            url: "https://example.com/news/crypto-atm-growth",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 46 * 60 * 60 * 1000), // 1 day 22h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Blockchain Gaming Revenue Surpasses $3 Billion",
+            description: "Play-to-earn games and NFT integration drive unprecedented growth in blockchain-based gaming ecosystem...",
+            url: "https://example.com/news/blockchain-gaming",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 48 * 60 * 60 * 1000), // 2 days ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Institutional Custody Solutions Mature",
+            description: "Traditional financial institutions launch enhanced cryptocurrency custody services with institutional-grade security...",
+            url: "https://example.com/news/institutional-custody",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 47 * 60 * 60 * 1000), // 1 day 23h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Yield Farming Strategies Evolve with New Protocols",
+            description: "DeFi users discover innovative ways to maximize returns through sophisticated liquidity mining techniques...",
+            url: "https://example.com/news/yield-farming-evolution",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 45 * 60 * 60 * 1000), // 1 day 21h ago
+            sentiment: "neutral",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Web3 Social Media Platforms Gain 10 Million Users",
+            description: "Decentralized social networks see explosive growth as users seek alternatives to traditional platforms...",
+            url: "https://example.com/news/web3-social-media",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 43 * 60 * 60 * 1000), // 1 day 19h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Cryptocurrency Payment Processing Hits New Highs",
+            description: "Merchant adoption of digital currency payments increases 400% year-over-year as infrastructure improves...",
+            url: "https://example.com/news/crypto-payments",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 41 * 60 * 60 * 1000), // 1 day 17h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Blockchain Supply Chain Solutions Gain Enterprise Adoption",
+            description: "Fortune 500 companies implement blockchain technology for supply chain transparency and efficiency improvements...",
+            url: "https://example.com/news/blockchain-supply-chain",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 39 * 60 * 60 * 1000), // 1 day 15h ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Decentralized Identity Solutions Enter Mainstream",
+            description: "Self-sovereign identity protocols gain traction as privacy concerns drive demand for user-controlled digital identity...",
+            url: "https://example.com/news/decentralized-identity",
+            source: "Crypto News",
+            publishedAt: new Date(Date.now() - 37 * 60 * 60 * 1000), // 1 day 13h ago
+            sentiment: "neutral",
+            summary: generateRandomSummary()
           }
         ];
 
@@ -335,7 +578,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Error fetching CoinTelegraph news:", error);
       }
 
-      const allNews = await storage.getNewsArticles(20);
+      const allNews = await storage.getNewsArticles(30);
       res.json(allNews);
     } catch (error) {
       console.error("Error fetching news:", error);

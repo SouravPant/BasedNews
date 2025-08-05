@@ -18,6 +18,7 @@ Preferred communication style: Simple, everyday language.
 - **CODE CLEANUP**: Updated news sources to use generic "Crypto News" instead of specific brand names
 - **CLIENT-SERVER SEPARATION**: Maintained robust security practices with proper API endpoints
 - **FULLY FUNCTIONAL**: All features working including cryptocurrency data, news with summaries, Reddit posts, and Twitter feeds
+- **NEWS EXPANSION**: Increased news articles from 3 to 30 items covering last 2 days with realistic timestamps
 
 **August 4, 2025** - Final Migration Completion and API Integration:
 - **MIGRATION COMPLETE**: Successfully migrated from Replit Agent to Replit environment
