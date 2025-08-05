@@ -115,7 +115,7 @@ export function SearchBar({
             type: 'news',
             id: article.id,
             title: article.title,
-            subtitle: `${article.source} • ${article.sentiment ? article.sentiment.charAt(0).toUpperCase() + article.sentiment.slice(1) : 'Neutral'}`,
+            subtitle: `${article.source || 'News'} • ${article.sentiment ? article.sentiment.charAt(0).toUpperCase() + article.sentiment.slice(1) : 'Neutral'}`,
             match: titleMatch ? article.title : article.description
           });
         }

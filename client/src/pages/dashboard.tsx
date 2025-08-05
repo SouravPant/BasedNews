@@ -190,7 +190,7 @@ export default function Dashboard() {
                       article={article} 
                       onClick={() => {
                         handleArticleClick(article);
-                        trackNewsArticleClick(article.id, article.source || '', article.sentiment);
+                        trackNewsArticleClick(article.id, article.source || '', article.sentiment || 'neutral');
                       }}
                     />
                   ))
@@ -225,7 +225,7 @@ export default function Dashboard() {
                     <RedditPost 
                       key={post.id} 
                       post={post} 
-                      onClick={() => handleRedditPostClick(post)}
+                      onClick={() => handleRedditClick(post)}
                     />
                   ))
                 ) : (
