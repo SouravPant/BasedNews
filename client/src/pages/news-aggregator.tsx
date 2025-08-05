@@ -26,6 +26,18 @@ export function NewsAggregator() {
   // Fetch news articles
   const { data: news = [], isLoading: newsLoading, error: newsError } = useQuery({
     queryKey: ['/api/news', filters],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (filters.sentiment !== 'all') params.append('sentiment', filters.sentiment);
+      if (filters.category !== 'all') params.append('category', filters.category);
+      params.append('limit', '30');
+      
+      const response = await fetch(`/api/news?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch news');
+      }
+      return response.json();
+    },
     refetchInterval: 60000, // Refresh every minute
   });
 
