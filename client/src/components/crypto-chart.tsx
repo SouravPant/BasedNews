@@ -18,15 +18,8 @@ interface CryptoChartProps {
 
 export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChange }: CryptoChartProps) {
   const [chartType, setChartType] = useState<'line' | 'area'>('line');
-  const [isLoading, setIsLoading] = useState(false);
 
-  const timeframes = [
-    { label: '1D', days: 1 },
-    { label: '7D', days: 7 },
-    { label: '30D', days: 30 },
-    { label: '90D', days: 90 },
-    { label: '1Y', days: 365 }
-  ];
+
 
   // Calculate price change
   const firstPrice = data[0]?.price || 0;
@@ -129,11 +122,7 @@ export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChang
     data: chartData
   }];
 
-  const handleTimeframeChange = async (newDays: number) => {
-    setIsLoading(true);
-    await onTimeframeChange(newDays);
-    setIsLoading(false);
-  };
+
 
   return (
     <div className="w-full h-full">
@@ -171,19 +160,7 @@ export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChang
           </div>
         </div>
         
-        <div className="flex gap-2 mb-4">
-          {timeframes.map((timeframe) => (
-            <Button
-              key={timeframe.label}
-              variant={days === timeframe.days ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleTimeframeChange(timeframe.days)}
-              disabled={isLoading}
-            >
-              {timeframe.label}
-            </Button>
-          ))}
-        </div>
+
       </div>
       
       <div className="w-full h-96">
