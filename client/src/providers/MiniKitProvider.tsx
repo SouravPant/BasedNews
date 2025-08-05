@@ -26,12 +26,13 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
       const isFarcaster = typeof window !== 'undefined' && 
         (window.location.href.includes('farcaster') || 
          window.location.href.includes('warpcast') ||
+         window.location.search.includes('baseapp=true') ||
          window.parent !== window);
       
       setIsInBaseApp(isFarcaster);
       
       if (isFarcaster) {
-        // Mock context for now - in real implementation this would come from SDK
+        // Mock context for testing - in real implementation this would come from SDK
         setContext({
           user: {
             fid: 12345,
@@ -44,6 +45,17 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
     };
 
     checkEnvironment();
+    
+    // Listen for messages from parent frame
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'base-app-context') {
+        setIsInBaseApp(true);
+        setContext(event.data.context);
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   const setFrameReady = async () => {

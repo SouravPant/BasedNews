@@ -18,6 +18,8 @@ import { StatusBar } from "@/components/status-bar";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Star, Plus, Eye, Wallet, Bell, Activity, TrendingUp, Users, Settings, BarChart3, AlertTriangle } from "lucide-react";
 import { Cryptocurrency, NewsArticle as NewsArticleType, RedditPost as RedditPostType } from "@shared/schema";
 import { SearchBar } from "@/components/search-bar";
 import { NewsFilter } from "@/components/news-filter";
@@ -63,17 +65,17 @@ export default function Dashboard() {
   });
 
   // User-specific data queries
-  const { data: watchlist, isLoading: watchlistLoading } = useQuery({
+  const { data: watchlist, isLoading: watchlistLoading } = useQuery<any[]>({
     queryKey: ["/api/user/watchlist"],
     enabled: isAuthenticated,
   });
 
-  const { data: portfolio, isLoading: portfolioLoading } = useQuery({
+  const { data: portfolio, isLoading: portfolioLoading } = useQuery<any[]>({
     queryKey: ["/api/user/portfolio"],
     enabled: isAuthenticated,
   });
 
-  const { data: userAlerts, isLoading: alertsLoading } = useQuery({
+  const { data: userAlerts, isLoading: alertsLoading } = useQuery<any[]>({
     queryKey: ["/api/user/alerts"],
     enabled: isAuthenticated,
   });
@@ -328,7 +330,7 @@ export default function Dashboard() {
               <div className="flex items-center space-x-2">
                 <Badge variant="outline" className="flex items-center space-x-1">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Logged in as {user?.firstName || user?.email}</span>
+                  <span>Logged in as {(user as any)?.firstName || (user as any)?.email || 'User'}</span>
                 </Badge>
               </div>
             </div>
@@ -342,7 +344,7 @@ export default function Dashboard() {
                       <Star className="w-5 h-5 text-yellow-500" />
                       <h3 className="text-lg font-semibold text-foreground">My Watchlist</h3>
                     </div>
-                    <Badge variant="secondary">{watchlist?.length || 0}</Badge>
+                    <Badge variant="secondary">{(watchlist as any[])?.length || 0}</Badge>
                   </div>
                   
                   <div className="space-y-3">
@@ -350,8 +352,8 @@ export default function Dashboard() {
                       Array.from({ length: 3 }).map((_, i) => (
                         <Skeleton key={i} className="h-12 w-full" />
                       ))
-                    ) : watchlist?.length ? (
-                      watchlist.slice(0, 5).map((item: any) => {
+                    ) : (watchlist as any[])?.length ? (
+                      (watchlist as any[]).slice(0, 5).map((item: any) => {
                         const crypto = cryptocurrencies?.find(c => c.id === item.cryptocurrencyId);
                         if (!crypto) return null;
                         return (
@@ -398,7 +400,7 @@ export default function Dashboard() {
                       </div>
                     )}
                     
-                    {watchlist?.length > 5 && (
+                    {(watchlist as any[])?.length > 5 && (
                       <Button 
                         variant="ghost" 
                         size="sm" 
@@ -407,7 +409,7 @@ export default function Dashboard() {
                         data-testid="button-view-all-watchlist"
                       >
                         <Eye className="w-4 h-4 mr-2" />
-                        View All ({watchlist.length})
+                        View All ({(watchlist as any[]).length})
                       </Button>
                     )}
                   </div>
@@ -422,18 +424,18 @@ export default function Dashboard() {
                       <Wallet className="w-5 h-5 text-blue-500" />
                       <h3 className="text-lg font-semibold text-foreground">Portfolio</h3>
                     </div>
-                    <Badge variant="secondary">{portfolio?.length || 0}</Badge>
+                    <Badge variant="secondary">{(portfolio as any[])?.length || 0}</Badge>
                   </div>
                   
                   <div className="space-y-4">
                     {portfolioLoading ? (
                       <Skeleton className="h-16 w-full" />
-                    ) : portfolio?.length ? (
+                    ) : (portfolio as any[])?.length ? (
                       <>
                         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                           <p className="text-sm text-muted-foreground mb-1">Total Portfolio Value</p>
                           <p className="text-2xl font-bold text-foreground" data-testid="portfolio-total-value">
-                            ${portfolio.reduce((total: number, holding: any) => {
+                            ${(portfolio as any[]).reduce((total: number, holding: any) => {
                               const crypto = cryptocurrencies?.find(c => c.id === holding.cryptocurrencyId);
                               const currentPrice = parseFloat(crypto?.currentPrice || "0");
                               return total + (currentPrice * holding.amount);
@@ -442,7 +444,7 @@ export default function Dashboard() {
                         </div>
                         
                         <div className="space-y-2">
-                          {portfolio.slice(0, 3).map((holding: any) => {
+                          {(portfolio as any[]).slice(0, 3).map((holding: any) => {
                             const crypto = cryptocurrencies?.find(c => c.id === holding.cryptocurrencyId);
                             if (!crypto) return null;
                             const currentValue = parseFloat(crypto.currentPrice || "0") * holding.amount;
@@ -503,7 +505,7 @@ export default function Dashboard() {
                       <Bell className="w-5 h-5 text-orange-500" />
                       <h3 className="text-lg font-semibold text-foreground">Price Alerts</h3>
                     </div>
-                    <Badge variant="secondary">{userAlerts?.length || 0}</Badge>
+                    <Badge variant="secondary">{(userAlerts as any[])?.length || 0}</Badge>
                   </div>
                   
                   <div className="space-y-3">
