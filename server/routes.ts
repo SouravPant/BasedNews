@@ -681,7 +681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const searchTerm = query.toLowerCase();
-      const results = { cryptocurrencies: [], news: [] };
+      const results: { cryptocurrencies: any[], news: any[] } = { cryptocurrencies: [], news: [] };
 
       // Search cryptocurrencies
       try {
