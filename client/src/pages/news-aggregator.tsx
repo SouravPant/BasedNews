@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { NewsArticle } from '@/components/news-article';
 import { CoinbaseWallet } from '@/components/coinbase-wallet';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { Loader2, TrendingUp, Globe, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, TrendingUp, Globe, Search, Coins } from 'lucide-react';
 import type { NewsArticle as NewsArticleType } from '@shared/schema';
+import { Link } from 'wouter';
 
 interface FilterState {
   dateRange: string;
@@ -73,6 +75,12 @@ export function NewsAggregator() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
+              <Link to="/coins">
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <Coins className="h-4 w-4" />
+                  Top 100 Coins
+                </Button>
+              </Link>
               <div className="bg-blue-600 p-2 rounded-lg">
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>

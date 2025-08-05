@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NewsAggregator } from "@/pages/news-aggregator";
+import { Coins } from "@/pages/coins";
 import NotFound from "@/pages/not-found";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Toaster />
           <Switch>
             <Route path="/" component={NewsAggregator} />
+            <Route path="/coins" component={Coins} />
             <Route component={NotFound} />
           </Switch>
         </TooltipProvider>

@@ -15,29 +15,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'GET') {
     try {
+      // Get page and per_page from query params, default to 20 for backward compatibility
+      const page = parseInt(req.query.page as string) || 1;
+      const per_page = parseInt(req.query.per_page as string) || 20;
+      const includeStablecoins = req.query.includeStablecoins === 'true';
+      
       const response = await axios.get(
         "https://api.coingecko.com/api/v3/coins/markets",
         {
           params: {
             vs_currency: "usd",
             order: "market_cap_desc",
-            per_page: 20,
-            page: 1,
+            per_page: Math.min(per_page, 250), // CoinGecko API limit
+            page: page,
             sparkline: false,
             price_change_percentage: "24h"
           }
         }
       );
 
-      // Filter out stablecoins and wrapped tokens
+      // Filter out stablecoins and wrapped tokens only if not explicitly included
       const excludedTokens = [
         'tether', 'usd-coin', 'wrapped-steth', 'staked-ether', 'binance-usd', 'dai',
         'true-usd', 'wrapped-bitcoin', 'first-digital-usd'
       ];
 
-      const filteredCoins = response.data
-        .filter((coin: any) => !excludedTokens.includes(coin.id))
-        .slice(0, 20);
+      let filteredCoins = response.data;
+      
+      if (!includeStablecoins) {
+        filteredCoins = filteredCoins.filter((coin: any) => !excludedTokens.includes(coin.id));
+      }
+
+      // For the original endpoint (per_page=20), limit to 20. For the new endpoint, return all filtered coins.
+      if (per_page === 20 && page === 1) {
+        filteredCoins = filteredCoins.slice(0, 20);
+      }
 
       const cryptocurrencies = filteredCoins.map((coin: any) => ({
         id: coin.id,
