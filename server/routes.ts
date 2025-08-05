@@ -234,10 +234,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get crypto news from CryptoPanic and CoinTelegraph RSS
+  // Get crypto news from multiple sources with filtering support
   app.get("/api/news", async (req, res) => {
     try {
       const articles = [];
+      const sourceFilter = req.query.source as string;
 
       // Fetch from CryptoPanic API
       try {
@@ -296,7 +297,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Fetch from CoinTelegraph RSS (simulated for now)
       try {
-        const cryptoNews = [
+        // Generate diverse news from multiple sources
+        const allNews = [];
+        
+        // Crypto News source articles
+        const cryptoNewsArticles = [
           {
             title: "Bitcoin ETF Approval Sends BTC to New All-Time High",
             description: "The SEC's approval of spot Bitcoin ETFs has triggered a massive rally, with BTC breaking through $50,000 resistance...",
@@ -569,7 +574,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         ];
 
-        for (const article of cryptoNews) {
+        // CoinDesk source articles
+        const coinDeskArticles = [
+          {
+            title: "Institutional Bitcoin Holdings Reach Historic Milestone",
+            description: "Corporate treasuries and investment funds now control over 1.2 million Bitcoin as institutional adoption accelerates...",
+            url: "https://example.com/news/institutional-bitcoin-holdings",
+            source: "CoinDesk",
+            publishedAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Ethereum Layer 2 Ecosystem Sees 400% Growth in TVL",
+            description: "Polygon, Arbitrum, and Optimism lead surge in total value locked as users migrate to cheaper alternatives...",
+            url: "https://example.com/news/ethereum-layer2-growth",
+            source: "CoinDesk",
+            publishedAt: new Date(Date.now() - 7 * 60 * 60 * 1000), // 7 hours ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Regulatory Framework for Stablecoins Nears Completion",
+            description: "US lawmakers reach bipartisan agreement on comprehensive stablecoin legislation expected to pass this quarter...",
+            url: "https://example.com/news/stablecoin-regulation",
+            source: "CoinDesk",
+            publishedAt: new Date(Date.now() - 15 * 60 * 60 * 1000), // 15 hours ago
+            sentiment: "neutral",
+            summary: generateRandomSummary()
+          }
+        ];
+
+        // CoinTelegraph source articles  
+        const coinTelegraphArticles = [
+          {
+            title: "Central Bank Digital Currencies Enter Testing Phase",
+            description: "Major economies launch pilot programs for digital versions of national currencies as CBDC development accelerates...",
+            url: "https://example.com/news/cbdc-testing-phase",
+            source: "CoinTelegraph",
+            publishedAt: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+            sentiment: "neutral",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "NFT Gaming Platforms Report Record User Engagement",
+            description: "Play-to-earn games experience 300% increase in daily active users as new mechanics improve player retention...",
+            url: "https://example.com/news/nft-gaming-engagement",
+            source: "CoinTelegraph", 
+            publishedAt: new Date(Date.now() - 11 * 60 * 60 * 1000), // 11 hours ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          },
+          {
+            title: "Cryptocurrency Exchange Security Reaches New Standards",
+            description: "Leading platforms implement advanced multi-signature and cold storage solutions following security audit recommendations...",
+            url: "https://example.com/news/exchange-security-standards",
+            source: "CoinTelegraph",
+            publishedAt: new Date(Date.now() - 19 * 60 * 60 * 1000), // 19 hours ago
+            sentiment: "bullish",
+            summary: generateRandomSummary()
+          }
+        ];
+
+        // Combine all news sources
+        allNews.push(...cryptoNewsArticles, ...coinDeskArticles, ...coinTelegraphArticles);
+
+        for (const article of allNews) {
           const validatedArticle = insertNewsArticleSchema.parse(article);
           const savedArticle = await storage.createNewsArticle(validatedArticle);
           articles.push(savedArticle);
@@ -578,11 +648,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Error fetching CoinTelegraph news:", error);
       }
 
-      const allNews = await storage.getNewsArticles(30);
-      res.json(allNews);
+      let allNews = await storage.getNewsArticles(50);
+      
+      // Apply source filter if specified
+      if (sourceFilter && sourceFilter !== 'all') {
+        const sourceMap: { [key: string]: string } = {
+          'crypto-news': 'Crypto News',
+          'coindesk': 'CoinDesk', 
+          'cointelegraph': 'CoinTelegraph'
+        };
+        
+        const targetSource = sourceMap[sourceFilter];
+        if (targetSource) {
+          allNews = allNews.filter(article => article.source === targetSource);
+        }
+      }
+      
+      res.json(allNews.slice(0, 30));
     } catch (error) {
       console.error("Error fetching news:", error);
       res.status(500).json({ message: "Failed to fetch news data" });
+    }
+  });
+
+  // Search endpoint for cryptocurrencies and news
+  app.get("/api/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      
+      if (!query || query.trim().length < 2) {
+        return res.json({ cryptocurrencies: [], news: [] });
+      }
+
+      const searchTerm = query.toLowerCase();
+      const results = { cryptocurrencies: [], news: [] };
+
+      // Search cryptocurrencies
+      try {
+        const cryptoResponse = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+          params: {
+            vs_currency: 'usd',
+            order: 'market_cap_desc',
+            per_page: 100,
+            page: 1,
+            sparkline: false
+          }
+        });
+
+        if (cryptoResponse.data) {
+          const matchingCryptos = cryptoResponse.data.filter((crypto: any) => 
+            crypto.name?.toLowerCase().includes(searchTerm) ||
+            crypto.symbol?.toLowerCase().includes(searchTerm)
+          ).slice(0, 5);
+          
+          results.cryptocurrencies = matchingCryptos.map((crypto: any) => ({
+            id: crypto.id,
+            name: crypto.name,
+            symbol: crypto.symbol?.toUpperCase(),
+            currentPrice: crypto.current_price,
+            priceChange24h: crypto.price_change_percentage_24h,
+            marketCap: crypto.market_cap,
+            image: crypto.image
+          }));
+        }
+      } catch (error) {
+        console.error("Error searching cryptocurrencies:", error);
+      }
+
+      // Search news articles
+      try {
+        const allNews = await storage.getNewsArticles(100);
+        const matchingNews = allNews.filter((article: any) =>
+          article.title?.toLowerCase().includes(searchTerm) ||
+          article.description?.toLowerCase().includes(searchTerm)
+        ).slice(0, 5);
+        
+        results.news = matchingNews;
+      } catch (error) {
+        console.error("Error searching news:", error);
+      }
+
+      res.json(results);
+    } catch (error) {
+      console.error("Error in search:", error);
+      res.status(500).json({ message: "Search failed" });
     }
   });
 

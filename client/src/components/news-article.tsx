@@ -56,6 +56,18 @@ export function NewsArticle({ article, onClick }: NewsArticleProps) {
     }
   };
 
+  const handleExternalLink = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (article.url && !article.url.includes('example.com')) {
+      try {
+        new URL(article.url);
+        window.open(article.url, '_blank', 'noopener,noreferrer');
+      } catch (error) {
+        console.warn('Invalid URL:', article.url);
+      }
+    }
+  };
+
   return (
     <article className="border-b border-border pb-4 last:border-b-0 cursor-pointer hover:bg-muted/50 p-3 rounded-lg transition-colors" onClick={onClick}>
       <div className="flex items-start space-x-4">
@@ -77,9 +89,13 @@ export function NewsArticle({ article, onClick }: NewsArticleProps) {
         )}
         <div className="flex-1">
           <h3 className="font-semibold text-foreground mb-2 hover:text-primary cursor-pointer transition-colors">
-            <a href={article.url} target="_blank" rel="noopener noreferrer">
-              {article.title}
-            </a>
+            {article.url && !article.url.includes('example.com') ? (
+              <span onClick={handleExternalLink} className="hover:underline">
+                {article.title}
+              </span>
+            ) : (
+              <span>{article.title}</span>
+            )}
           </h3>
           {article.description && (
             <p className="text-sm text-muted-foreground mb-3 line-clamp-2">

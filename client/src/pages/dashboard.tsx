@@ -13,6 +13,8 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Cryptocurrency, NewsArticle as NewsArticleType, RedditPost as RedditPostType } from "@shared/schema";
+import { SearchBar } from "@/components/search-bar";
+import { NewsFilter } from "@/components/news-filter";
 
 export default function Dashboard() {
   const [selectedCrypto, setSelectedCrypto] = useState<Cryptocurrency | null>(null);
@@ -23,6 +25,7 @@ export default function Dashboard() {
   const [isRedditModalOpen, setIsRedditModalOpen] = useState(false);
   const [selectedTweet, setSelectedTweet] = useState<any | null>(null);
   const [isTwitterModalOpen, setIsTwitterModalOpen] = useState(false);
+  const [newsFilter, setNewsFilter] = useState<string | null>(null);
 
   const { data: cryptocurrencies, isLoading: cryptoLoading, refetch: refetchCrypto } = useQuery<Cryptocurrency[]>({
     queryKey: ["/api/cryptocurrencies"],
@@ -30,7 +33,8 @@ export default function Dashboard() {
   });
 
   const { data: newsArticles, isLoading: newsLoading, refetch: refetchNews } = useQuery<NewsArticleType[]>({
-    queryKey: ["/api/news"],
+    queryKey: ["/api/news", newsFilter],
+    queryFn: () => fetch(`/api/news${newsFilter ? `?source=${newsFilter}` : ''}`).then(res => res.json()),
     refetchInterval: 300000, // Refetch every 5 minutes
   });
 
@@ -86,6 +90,24 @@ export default function Dashboard() {
     setIsRedditModalOpen(true);
   };
 
+  const handleSearchResult = (result: any) => {
+    if (result.type === 'crypto') {
+      const crypto = cryptocurrencies?.find(c => c.id === result.id);
+      if (crypto) {
+        handleCryptoClick(crypto);
+      }
+    } else if (result.type === 'news') {
+      const article = newsArticles?.find(a => a.id === result.id);
+      if (article) {
+        handleArticleClick(article);
+      }
+    }
+  };
+
+  const handleNewsFilterChange = (source: string | null) => {
+    setNewsFilter(source);
+  };
+
   const handleCloseRedditModal = () => {
     setIsRedditModalOpen(false);
     setSelectedRedditPost(null);
@@ -106,6 +128,18 @@ export default function Dashboard() {
       <Header lastUpdated={apiStatus?.lastUpdate} />
       
       <main className="container mx-auto px-4 py-6">
+        {/* Search Section */}
+        <section className="mb-8">
+          <div className="flex items-center justify-center mb-6">
+            <SearchBar 
+              cryptocurrencies={cryptocurrencies || []}
+              newsArticles={newsArticles || []}
+              onResultClick={handleSearchResult}
+              placeholder="Search cryptocurrencies and news articles..."
+            />
+          </div>
+        </section>
+
         {/* Price Grid Section */}
         <section className="mb-8">
           <div className="flex items-center justify-between mb-6">
@@ -153,6 +187,11 @@ export default function Dashboard() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-foreground">Latest Crypto News</h2>
               </div>
+              
+              <NewsFilter 
+                onFilterChange={handleNewsFilterChange}
+                activeFilter={newsFilter}
+              />
 
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {newsLoading ? (
