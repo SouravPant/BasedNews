@@ -14,6 +14,10 @@ interface CryptoChartProps {
 }
 
 export function CryptoChart({ data, coinName, coinSymbol, days }: CryptoChartProps) {
+  // Detect theme for proper axis colors
+  const isDarkTheme = document.documentElement.classList.contains('dark') || 
+                     document.documentElement.classList.contains('base');
+  const axisColor = isDarkTheme ? '#ffffff' : '#374151';
   const formatXAxisTick = (tickItem: string) => {
     const date = new Date(tickItem);
     if (days === 1) {
@@ -64,14 +68,16 @@ export function CryptoChart({ data, coinName, coinSymbol, days }: CryptoChartPro
           <XAxis 
             dataKey="time" 
             tickFormatter={formatXAxisTick}
-            stroke="hsl(var(--foreground))"
+            stroke={axisColor}
             fontSize={12}
+            tick={{ fill: axisColor, fontSize: 12 }}
           />
           <YAxis 
             tickFormatter={(value) => `$${value.toLocaleString()}`}
-            stroke="hsl(var(--foreground))"
+            stroke={axisColor}
             fontSize={12}
             width={80}
+            tick={{ fill: axisColor, fontSize: 12 }}
           />
           <Tooltip 
             labelFormatter={formatTooltipLabel}
