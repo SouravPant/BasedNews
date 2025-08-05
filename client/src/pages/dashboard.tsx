@@ -152,14 +152,6 @@ export default function Dashboard() {
             <Card className="bg-based-surface border-border p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-foreground">Latest Crypto News</h2>
-                <div className="flex items-center space-x-2">
-                  <Badge variant="secondary" className="bg-primary/20 text-primary">
-                    CoinTelegraph
-                  </Badge>
-                  <Badge variant="secondary" className="bg-green-500/20 text-green-400">
-                    CryptoPanic
-                  </Badge>
-                </div>
               </div>
 
               <div className="space-y-4 max-h-96 overflow-y-auto">

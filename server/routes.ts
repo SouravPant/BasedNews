@@ -267,7 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 title: item.title,
                 description: item.title || "No description available",
                 url: item.url,
-                source: "CryptoPanic",
+                source: "Crypto News",
                 publishedAt: item.published_at ? new Date(item.published_at) : new Date(),
                 sentiment: item.votes?.positive > item.votes?.negative ? "bullish" : 
                           item.votes?.negative > item.votes?.positive ? "bearish" : "neutral",
@@ -296,12 +296,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Fetch from CoinTelegraph RSS (simulated for now)
       try {
-        const coinTelegraphNews = [
+        const cryptoNews = [
           {
             title: "Bitcoin ETF Approval Sends BTC to New All-Time High",
             description: "The SEC's approval of spot Bitcoin ETFs has triggered a massive rally, with BTC breaking through $50,000 resistance...",
-            url: "https://cointelegraph.com/news/bitcoin-etf-approval",
-            source: "CoinTelegraph",
+            url: "https://example.com/news/bitcoin-etf-approval",
+            source: "Crypto News",
             publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
             sentiment: "bullish",
             summary: generateRandomSummary()
@@ -309,8 +309,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           {
             title: "Ethereum 2.0 Staking Rewards Hit Record High",
             description: "Ethereum validators are seeing unprecedented returns as network activity surges following the latest upgrade...",
-            url: "https://cointelegraph.com/news/ethereum-staking-rewards",
-            source: "CoinTelegraph",
+            url: "https://example.com/news/ethereum-staking-rewards",
+            source: "Crypto News",
             publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
             sentiment: "bullish",
             summary: generateRandomSummary()
@@ -318,15 +318,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           {
             title: "DeFi TVL Surpasses $100 Billion Milestone",
             description: "Total value locked in decentralized finance protocols reaches historic heights as institutional adoption accelerates...",
-            url: "https://cointelegraph.com/news/defi-tvl-milestone",
-            source: "CoinTelegraph",
+            url: "https://example.com/news/defi-tvl-milestone",
+            source: "Crypto News",
             publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
             sentiment: "neutral",
             summary: generateRandomSummary()
           }
         ];
 
-        for (const article of coinTelegraphNews) {
+        for (const article of cryptoNews) {
           const validatedArticle = insertNewsArticleSchema.parse(article);
           const savedArticle = await storage.createNewsArticle(validatedArticle);
           articles.push(savedArticle);

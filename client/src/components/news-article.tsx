@@ -10,12 +10,22 @@ export function NewsArticle({ article, onClick }: NewsArticleProps) {
     if (!timestamp) return "Unknown time";
     
     const now = new Date();
-    const diff = Math.floor((now.getTime() - new Date(timestamp).getTime()) / 1000);
+    const articleDate = new Date(timestamp);
     
-    if (diff < 60) return "Just now";
-    if (diff < 3600) return `${Math.floor(diff / 60)} hours ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-    return `${Math.floor(diff / 86400)} days ago`;
+    // Validate the date
+    if (isNaN(articleDate.getTime())) return "Unknown time";
+    
+    const diffMs = now.getTime() - articleDate.getTime();
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffSeconds < 60) return "Just now";
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 30) return `${diffDays}d ago`;
+    return articleDate.toLocaleDateString();
   };
 
   const getSentimentIcon = (sentiment?: string | null) => {
