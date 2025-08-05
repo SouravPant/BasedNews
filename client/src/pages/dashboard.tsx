@@ -2,12 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { Header } from "@/components/header";
 import { CryptoPriceCard } from "@/components/crypto-price-card";
+import { DraggableCryptoGrid } from "@/components/draggable-crypto-grid";
+import { GridLoadingState, NewsCardSkeleton, ErrorState, EmptyState } from "@/components/loading-states";
+import { trackCryptoCardClick, trackNewsArticleClick, trackSearchQuery, trackNewsFilterUsage } from "@/lib/analytics";
 import { CryptoChartModal } from "@/components/crypto-chart-modal";
 import { NewsSummaryModal } from "@/components/news-summary-modal";
 import { RedditSummaryModal } from "@/components/reddit-summary-modal";
 import { TwitterSummaryModal } from "@/components/twitter-summary-modal";
 import { NewsArticle } from "@/components/news-article";
 import { RedditPost } from "@/components/reddit-post";
+import { TwitterPost } from "@/components/twitter-post";
 import { StatusBar } from "@/components/status-bar";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,6 +72,9 @@ export default function Dashboard() {
   const handleCryptoClick = (crypto: Cryptocurrency) => {
     setSelectedCrypto(crypto);
     setIsChartModalOpen(true);
+    
+    // Track analytics
+    trackCryptoCardClick(crypto.symbol || '', crypto.name || '');
   };
 
   const handleCloseChartModal = () => {
@@ -134,6 +141,10 @@ export default function Dashboard() {
             <SearchBar 
               cryptocurrencies={cryptocurrencies || []}
               newsArticles={newsArticles || []}
+              onFiltersChange={(filters) => {
+                // Handle filter changes - could be used to update global search state
+                console.log('Search filters changed:', filters);
+              }}
               onResultClick={handleSearchResult}
               placeholder="Search cryptocurrencies and news articles..."
             />
@@ -144,40 +155,14 @@ export default function Dashboard() {
         <section className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground">Top Cryptocurrencies</h2>
+            <p className="text-sm text-muted-foreground">Drag to reorder</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {cryptoLoading ? (
-              Array.from({ length: 10 }).map((_, i) => (
-                <Card key={i} className="bg-based-surface border-border p-4">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <Skeleton className="w-8 h-8 rounded-full" />
-                    <div className="space-y-1">
-                      <Skeleton className="h-4 w-16" />
-                      <Skeleton className="h-3 w-8" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Skeleton className="h-6 w-24" />
-                    <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-3 w-20" />
-                  </div>
-                </Card>
-              ))
-            ) : cryptocurrencies?.length ? (
-              cryptocurrencies.map((crypto) => (
-                <CryptoPriceCard 
-                  key={crypto.id} 
-                  cryptocurrency={crypto} 
-                  onClick={() => handleCryptoClick(crypto)}
-                />
-              ))
-            ) : (
-              <div className="col-span-full text-center py-8">
-                <p className="text-muted-foreground">Failed to load cryptocurrency data</p>
-              </div>
-            )}
-          </div>
+          <DraggableCryptoGrid
+            cryptocurrencies={cryptocurrencies || []}
+            isLoading={cryptoLoading}
+            onCryptoClick={handleCryptoClick}
+          />
         </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -196,29 +181,24 @@ export default function Dashboard() {
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {newsLoading ? (
                   Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="border-b border-border pb-4">
-                      <div className="flex items-start space-x-4">
-                        <Skeleton className="w-20 h-15 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-full" />
-                          <Skeleton className="h-3 w-3/4" />
-                          <Skeleton className="h-3 w-1/2" />
-                        </div>
-                      </div>
-                    </div>
+                    <NewsCardSkeleton key={i} />
                   ))
                 ) : newsArticles?.length ? (
                   newsArticles.map((article) => (
                     <NewsArticle 
                       key={article.id} 
                       article={article} 
-                      onClick={() => handleArticleClick(article)}
+                      onClick={() => {
+                        handleArticleClick(article);
+                        trackNewsArticleClick(article.id, article.source || '', article.sentiment);
+                      }}
                     />
                   ))
                 ) : (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No news articles available</p>
-                  </div>
+                  <EmptyState
+                    title="No news available"
+                    message="We couldn't load any news articles at the moment."
+                  />
                 )}
               </div>
             </Card>
@@ -238,122 +218,83 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {redditLoading ? (
                   Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="border-b border-border pb-4">
-                      <Skeleton className="h-4 w-full mb-2" />
-                      <div className="flex items-center space-x-4">
-                        <Skeleton className="h-3 w-16" />
-                        <Skeleton className="h-3 w-8" />
-                        <Skeleton className="h-3 w-8" />
-                      </div>
-                    </div>
+                    <Skeleton key={i} className="h-16 w-full" />
                   ))
                 ) : redditPosts?.length ? (
                   redditPosts.slice(0, 5).map((post) => (
                     <RedditPost 
                       key={post.id} 
                       post={post} 
-                      onClick={() => handleRedditClick(post)}
+                      onClick={() => handleRedditPostClick(post)}
                     />
                   ))
                 ) : (
-                  <div className="text-center py-4">
-                    <p className="text-muted-foreground">No Reddit posts available</p>
-                  </div>
+                  <EmptyState
+                    title="No Reddit posts"
+                    message="Unable to load Reddit posts at this time."
+                  />
                 )}
               </div>
             </Card>
 
-            {/* Twitter/X Feed */}
+            {/* Twitter Feed */}
             <Card className="bg-based-surface border-border p-6">
               <div className="flex items-center space-x-3 mb-6">
                 <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                 </svg>
-                <h3 className="text-lg font-bold text-foreground">Crypto Twitter</h3>
+                <h3 className="text-lg font-bold text-foreground">Twitter Feed</h3>
               </div>
 
               <div className="space-y-4">
                 {twitterLoading ? (
                   Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="border-b border-border pb-4">
-                      <Skeleton className="h-4 w-full mb-2" />
-                      <Skeleton className="h-3 w-3/4 mb-2" />
-                      <div className="flex items-center space-x-4">
-                        <Skeleton className="h-3 w-12" />
-                        <Skeleton className="h-3 w-8" />
-                      </div>
-                    </div>
+                    <Skeleton key={i} className="h-20 w-full" />
                   ))
                 ) : tweets?.length ? (
                   tweets.slice(0, 5).map((tweet) => (
-                    <div 
+                    <TwitterPost 
                       key={tweet.id} 
-                      className="border-b border-border pb-4 last:border-b-0 cursor-pointer hover:bg-muted/50 p-3 rounded-lg transition-colors"
+                      tweet={tweet} 
                       onClick={() => handleTweetClick(tweet)}
-                    >
-                      <p className="text-sm text-foreground mb-2 leading-relaxed">
-                        {tweet.text}
-                      </p>
-                      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                        <span>@{tweet.author}</span>
-                        <div className="flex items-center space-x-1">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                          </svg>
-                          <span>{tweet.likes}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M17.51 1.99L16.6 2.9l1.05 1.05c.83.83.83 2.19 0 3.02l-.7.7L15.9 6.62l.7-.7c.39-.39.39-1.02 0-1.41l-1.05-1.05.91-.91c.75-.75 1.97-.75 2.72 0s.75 1.97 0 2.72l-5.66 5.66-1.41-1.41L17.51 4.7c1.17-1.17 1.17-3.07 0-4.24-1.17-1.17-3.07-1.17-4.24 0L7.61 6.12 6.2 4.71l5.66-5.66c1.95-1.95 5.12-1.95 7.07 0s1.95 5.12 0 7.07z"/>
-                          </svg>
-                          <span>{tweet.retweets}</span>
-                        </div>
-                        <span>{new Date(tweet.createdAt).toLocaleDateString()}</span>
-                      </div>
-                    </div>
+                    />
                   ))
                 ) : (
-                  <div className="text-center py-4">
-                    <p className="text-muted-foreground">No tweets available</p>
-                  </div>
+                  <EmptyState
+                    title="No tweets available"
+                    message="Unable to load Twitter posts at this time."
+                  />
                 )}
               </div>
             </Card>
           </div>
         </div>
-      </main>
 
-      <StatusBar />
-
-      {/* Chart Modal */}
-      {selectedCrypto && (
-        <CryptoChartModal 
+        {/* Modals */}
+        <CryptoChartModal
           isOpen={isChartModalOpen}
-          onClose={handleCloseChartModal}
+          onClose={() => setIsChartModalOpen(false)}
           cryptocurrency={selectedCrypto}
         />
-      )}
 
-      {/* News Summary Modal */}
-      <NewsSummaryModal
-        article={selectedArticle}
-        isOpen={isSummaryModalOpen}
-        onClose={handleCloseSummaryModal}
-      />
+        <NewsSummaryModal
+          isOpen={isSummaryModalOpen}
+          onClose={() => setIsSummaryModalOpen(false)}
+          article={selectedArticle}
+        />
 
-      {/* Reddit Summary Modal */}
-      <RedditSummaryModal
-        post={selectedRedditPost}
-        isOpen={isRedditModalOpen}
-        onClose={handleCloseRedditModal}
-      />
+        <RedditSummaryModal
+          isOpen={isRedditModalOpen}
+          onClose={handleCloseRedditModal}
+          post={selectedRedditPost}
+        />
 
-      {/* Twitter Summary Modal */}
-      <TwitterSummaryModal
-        tweet={selectedTweet}
-        isOpen={isTwitterModalOpen}
-        onClose={handleCloseTwitterModal}
-      />
+        <TwitterSummaryModal
+          isOpen={isTwitterModalOpen}
+          onClose={handleCloseTwitterModal}
+          tweet={selectedTweet}
+        />
+      </main>
     </div>
   );
 }

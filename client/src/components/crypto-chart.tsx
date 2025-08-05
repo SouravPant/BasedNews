@@ -1,5 +1,7 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { format } from 'date-fns';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import Chart from 'react-apexcharts';
 
 interface ChartDataPoint {
   time: string;
@@ -11,94 +13,188 @@ interface CryptoChartProps {
   coinName: string;
   coinSymbol: string;
   days: number;
+  onTimeframeChange: (days: number) => void;
 }
 
-export function CryptoChart({ data, coinName, coinSymbol, days }: CryptoChartProps) {
-  // Detect theme for proper axis colors
-  const isDarkTheme = document.documentElement.classList.contains('dark') || 
-                     document.documentElement.classList.contains('base');
-  const axisColor = isDarkTheme ? '#ffffff' : '#374151';
-  const formatXAxisTick = (tickItem: string) => {
-    const date = new Date(tickItem);
-    if (days === 1) {
-      return format(date, 'HH:mm');
-    } else if (days <= 7) {
-      return format(date, 'MMM dd');
-    } else {
-      return format(date, 'MMM dd');
-    }
-  };
+export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChange }: CryptoChartProps) {
+  const [chartType, setChartType] = useState<'line' | 'area'>('line');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const formatTooltipLabel = (label: string) => {
-    const date = new Date(label);
-    if (days === 1) {
-      return format(date, 'MMM dd, HH:mm');
-    } else {
-      return format(date, 'MMM dd, yyyy');
-    }
-  };
+  const timeframes = [
+    { label: '1D', days: 1 },
+    { label: '7D', days: 7 },
+    { label: '30D', days: 30 },
+    { label: '90D', days: 90 },
+    { label: '1Y', days: 365 }
+  ];
 
-  const formatPrice = (value: number) => {
-    return `$${value.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: value < 1 ? 6 : 2,
-    })}`;
-  };
-
-  // Calculate price change color
+  // Calculate price change
   const firstPrice = data[0]?.price || 0;
   const lastPrice = data[data.length - 1]?.price || 0;
   const priceChange = lastPrice - firstPrice;
-  const lineColor = priceChange >= 0 ? '#3b82f6' : '#ef4444'; // Use blue instead of green for brand consistency
+  const priceChangePercentage = firstPrice > 0 ? ((priceChange / firstPrice) * 100) : 0;
+  const isPositive = priceChange >= 0;
+
+  // Prepare chart data
+  const chartData = data.map(point => ({
+    x: new Date(point.time).getTime(),
+    y: point.price
+  }));
+
+  const isDarkMode = document.documentElement.classList.contains('dark');
+
+  const chartOptions = {
+    chart: {
+      type: chartType as any,
+      height: 400,
+      toolbar: {
+        show: true,
+        tools: {
+          download: true,
+          selection: true,
+          zoom: true,
+          zoomin: true,
+          zoomout: true,
+          pan: true,
+          reset: true
+        }
+      },
+      zoom: {
+        enabled: true,
+        type: 'x' as any,
+        autoScaleYaxis: true
+      },
+      background: 'transparent'
+    },
+    theme: {
+      mode: (isDarkMode ? 'dark' : 'light') as 'dark' | 'light'
+    },
+    stroke: {
+      curve: 'smooth' as any,
+      width: 2
+    },
+    colors: [isPositive ? '#3b82f6' : '#ef4444'],
+    fill: {
+      type: chartType === 'area' ? 'gradient' : 'solid',
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.7,
+        opacityTo: 0.1,
+        stops: [0, 100]
+      }
+    },
+    xaxis: {
+      type: 'datetime' as any,
+      labels: {
+        format: days === 1 ? 'HH:mm' : days <= 7 ? 'MMM dd' : 'MMM dd, yyyy',
+        style: {
+          colors: isDarkMode ? '#9ca3af' : '#6b7280'
+        }
+      }
+    },
+    yaxis: {
+      labels: {
+        formatter: (value: number) => `$${value.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: value < 1 ? 6 : 2,
+        })}`,
+        style: {
+          colors: isDarkMode ? '#9ca3af' : '#6b7280'
+        }
+      }
+    },
+    tooltip: {
+      theme: isDarkMode ? 'dark' : 'light',
+      x: {
+        format: days === 1 ? 'MMM dd, HH:mm' : 'MMM dd, yyyy'
+      },
+      y: {
+        formatter: (value: number) => `$${value.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: value < 1 ? 6 : 2,
+        })}`
+      }
+    },
+    grid: {
+      borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+      strokeDashArray: 3
+    },
+    dataLabels: {
+      enabled: false
+    }
+  };
+
+  const series = [{
+    name: `${coinName} Price`,
+    data: chartData
+  }];
+
+  const handleTimeframeChange = async (newDays: number) => {
+    setIsLoading(true);
+    await onTimeframeChange(newDays);
+    setIsLoading(false);
+  };
 
   return (
     <div className="w-full h-full">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-card-foreground mb-1">
-          {coinName} ({coinSymbol.toUpperCase()})
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          {days === 1 ? '24 Hours' : `${days} Days`} Price Chart
-        </p>
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold text-card-foreground mb-1">
+              {coinName} ({coinSymbol.toUpperCase()})
+            </h3>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                {days === 1 ? '24 Hours' : `${days} Days`} Price Chart
+              </span>
+              <Badge variant={isPositive ? 'default' : 'destructive'}>
+                {isPositive ? '+' : ''}{priceChangePercentage.toFixed(2)}%
+              </Badge>
+            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button
+              variant={chartType === 'line' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setChartType('line')}
+            >
+              Line
+            </Button>
+            <Button
+              variant={chartType === 'area' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setChartType('area')}
+            >
+              Area
+            </Button>
+          </div>
+        </div>
+        
+        <div className="flex gap-2 mb-4">
+          {timeframes.map((timeframe) => (
+            <Button
+              key={timeframe.label}
+              variant={days === timeframe.days ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleTimeframeChange(timeframe.days)}
+              disabled={isLoading}
+            >
+              {timeframe.label}
+            </Button>
+          ))}
+        </div>
       </div>
       
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 20, right: 30, left: 80, bottom: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="time" 
-            tickFormatter={formatXAxisTick}
-            stroke={axisColor}
-            fontSize={12}
-            tick={{ fill: axisColor, fontSize: 12 }}
-          />
-          <YAxis 
-            tickFormatter={(value) => `$${value.toLocaleString()}`}
-            stroke={axisColor}
-            fontSize={12}
-            width={80}
-            tick={{ fill: axisColor, fontSize: 12 }}
-          />
-          <Tooltip 
-            labelFormatter={formatTooltipLabel}
-            formatter={(value: number) => [formatPrice(value), 'Price']}
-            contentStyle={{
-              backgroundColor: 'hsl(var(--popover))',
-              border: '1px solid hsl(var(--border))',
-              borderRadius: '8px',
-              color: 'hsl(var(--popover-foreground))'
-            }}
-          />
-          <Line 
-            type="monotone" 
-            dataKey="price" 
-            stroke={lineColor}
-            strokeWidth={2}
-            dot={false}
-            activeDot={{ r: 4, fill: lineColor }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      <div className="w-full h-96">
+        <Chart
+          options={chartOptions}
+          series={series}
+          type={chartType}
+          height={400}
+          width="100%"
+        />
+      </div>
     </div>
   );
 }

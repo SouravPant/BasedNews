@@ -10,7 +10,7 @@ import { X, TrendingUp } from 'lucide-react';
 interface CryptoChartModalProps {
   isOpen: boolean;
   onClose: () => void;
-  cryptocurrency: Cryptocurrency;
+  cryptocurrency: Cryptocurrency | null;
 }
 
 interface ChartData {
@@ -26,11 +26,11 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
   const [selectedDays, setSelectedDays] = useState<number>(7);
 
   const { data: chartData, isLoading, error } = useQuery<ChartData>({
-    queryKey: ['/api/cryptocurrencies', cryptocurrency.id, 'chart', selectedDays],
+    queryKey: ['/api/cryptocurrencies', cryptocurrency?.id, 'chart', selectedDays],
     queryFn: () => 
-      fetch(`/api/cryptocurrencies/${cryptocurrency.id}/chart?days=${selectedDays}`)
+      fetch(`/api/cryptocurrencies/${cryptocurrency?.id}/chart?days=${selectedDays}`)
         .then(res => res.json()),
-    enabled: isOpen,
+    enabled: isOpen && !!cryptocurrency?.id,
   });
 
   const timeRangeOptions = [
@@ -41,12 +41,16 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
     { label: '1Y', days: 365 },
   ];
 
+  if (!cryptocurrency) {
+    return null;
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl w-full h-[600px] bg-card border-border text-card-foreground">
         <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div className="flex items-center space-x-3">
-            {cryptocurrency.image && (
+            {cryptocurrency?.image && (
               <img 
                 src={cryptocurrency.image} 
                 alt={cryptocurrency.name}
@@ -106,6 +110,7 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
               coinName={cryptocurrency.name}
               coinSymbol={cryptocurrency.symbol}
               days={selectedDays}
+              onTimeframeChange={setSelectedDays}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
