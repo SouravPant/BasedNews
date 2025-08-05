@@ -197,7 +197,6 @@ export class DatabaseStorage implements IStorage {
   async getNewsArticles(options: { limit?: number; category?: string; sentiment?: string; featured?: boolean } = {}): Promise<NewsArticle[]> {
     const { limit = 30, category, sentiment, featured } = options;
     
-    let query = db.select().from(newsArticles);
     const conditions = [];
 
     if (category && category !== 'all') {
@@ -210,6 +209,8 @@ export class DatabaseStorage implements IStorage {
       conditions.push(eq(newsArticles.featured, featured));
     }
 
+    let query = db.select().from(newsArticles);
+    
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
     }
