@@ -59,6 +59,72 @@ Current market conditions present both growth potential and inherent risks. Succ
   return summary;
 }
 
+// Function to populate news data
+async function populateNewsData() {
+  try {
+    const cryptoNewsArticles = [
+      {
+        title: "Bitcoin ETF Approval Sends BTC to New All-Time High",
+        description: "The SEC's approval of spot Bitcoin ETFs has triggered a massive rally, with BTC breaking through $50,000 resistance...",
+        url: "https://example.com/news/bitcoin-etf-approval",
+        source: "Crypto News",
+        publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+        sentiment: "bullish",
+        summary: generateRandomSummary()
+      },
+      {
+        title: "Ethereum 2.0 Staking Rewards Hit Record High",
+        description: "Ethereum validators are seeing unprecedented returns as network activity surges following the latest upgrade...",
+        url: "https://example.com/news/ethereum-staking-rewards",
+        source: "Crypto News",
+        publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
+        sentiment: "bullish",
+        summary: generateRandomSummary()
+      },
+      {
+        title: "DeFi TVL Surpasses $100 Billion Milestone",
+        description: "Total value locked in decentralized finance protocols reaches historic heights as institutional adoption accelerates...",
+        url: "https://example.com/news/defi-tvl-milestone",
+        source: "Crypto News",
+        publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
+        sentiment: "neutral",
+        summary: generateRandomSummary()
+      },
+      {
+        title: "Major Bank Announces Bitcoin Treasury Strategy",
+        description: "Global financial institution reveals plans to allocate 5% of treasury reserves to Bitcoin as digital asset adoption accelerates...",
+        url: "https://example.com/news/bank-bitcoin-treasury",
+        source: "Crypto News",
+        publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
+        sentiment: "bullish",
+        summary: generateRandomSummary()
+      },
+      {
+        title: "Layer 2 Solutions Drive Ethereum Fee Reduction",
+        description: "Optimistic rollups and zkRollups significantly reduce transaction costs, making DeFi more accessible to retail users...",
+        url: "https://example.com/news/layer2-fees",
+        source: "Crypto News",
+        publishedAt: new Date(Date.now() - 14 * 60 * 60 * 1000),
+        sentiment: "neutral",
+        summary: generateRandomSummary()
+      }
+    ];
+
+    for (const article of cryptoNewsArticles) {
+      try {
+        const validatedArticle = insertNewsArticleSchema.parse(article);
+        await storage.createNewsArticle(validatedArticle);
+      } catch (error) {
+        console.error("Error creating news article:", error);
+      }
+    }
+
+    console.log(`Successfully populated ${cryptoNewsArticles.length} news articles`);
+  } catch (error) {
+    console.error("Error populating news data:", error);
+  }
+}
+
 // Helper function to get base price for different coins
 function getBasePriceForCoin(coinId: string): number {
   const basePrices: { [key: string]: number } = {
@@ -165,6 +231,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Populate news data endpoint for testing
+  app.post("/api/news/populate", async (req, res) => {
+    try {
+      console.log("Manual population triggered...");
+      await populateNewsData();
+      const articles = await storage.getNewsArticles({ limit: 10 });
+      res.json({ message: `Successfully populated ${articles.length} articles`, articles });
+    } catch (error) {
+      console.error("Population error:", error);
+      res.status(500).json({ message: "Failed to populate news", error: error.message });
+    }
+  });
+
   // Enhanced news API with filtering
   app.get("/api/news", async (req, res) => {
     try {
@@ -176,7 +255,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         featured: featured === 'true' ? true : undefined
       };
       
-      const articles = await storage.getNewsArticles(options);
+      let articles = await storage.getNewsArticles(options);
+      
+      // If no articles exist, populate with sample data
+      if (articles.length === 0) {
+        console.log("No articles found, populating with sample news data...");
+        try {
+          await populateNewsData();
+          articles = await storage.getNewsArticles(options);
+          console.log(`Populated and retrieved ${articles.length} articles`);
+        } catch (populateError) {
+          console.error("Error during population:", populateError);
+        }
+      }
+      
       res.json(articles);
     } catch (error) {
       console.error("Error fetching news:", error);
