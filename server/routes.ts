@@ -483,7 +483,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             source: "Crypto News",
             publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
             sentiment: "bullish",
-            summary: generateRandomSummary()
+            imageUrl: "https://images.unsplash.com/photo-1640161704729-cbe966a08476?w=800&h=400&fit=crop",
+            summary: "The SEC's historic approval of spot Bitcoin ETFs has catalyzed unprecedented market momentum, with Bitcoin surging past $50,000 as institutional investors flood into the cryptocurrency market. Major financial institutions are reporting record-breaking trading volumes, while crypto exchanges struggle to handle the massive influx of new users. This regulatory milestone marks a turning point for cryptocurrency adoption, legitimizing Bitcoin as a mainstream investment vehicle and potentially opening doors for additional crypto-based financial products in the traditional finance sector."
           },
           {
             title: "Ethereum 2.0 Staking Rewards Hit Record High",

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NewsArticle as NewsArticleType } from "@shared/schema";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -67,18 +67,40 @@ export function NewsArticleModal({ article, isOpen, onClose }: NewsArticleModalP
 
     setIsGeneratingSummary(true);
     try {
+      // Use existing summary if available, otherwise create from content
+      if (article.summary && article.summary.trim()) {
+        setAiSummary(article.summary);
+        return;
+      }
+
       // Create a concise summary from existing content
       const contentToSummarize = article.content || article.description || article.title;
       
-      // Simple extractive summarization - take first 100 words
-      const words = contentToSummarize.split(' ');
-      const summary = words.slice(0, 100).join(' ') + (words.length > 100 ? '...' : '');
+      // Clean and process the content
+      const cleanText = contentToSummarize.replace(/\s+/g, ' ').trim();
+      const words = cleanText.split(' ');
       
-      // Add some intelligent processing
-      const sentences = summary.split(/[.!?]+/).filter(s => s.trim().length > 0);
-      const finalSummary = sentences.slice(0, 3).join('. ') + (sentences.length > 3 ? '.' : '');
+      // Take approximately 100 words but ensure we end at sentence boundaries
+      let wordCount = 0;
+      let summary = '';
+      const sentences = cleanText.split(/[.!?]+/).filter(s => s.trim().length > 0);
       
-      setAiSummary(finalSummary);
+      for (const sentence of sentences) {
+        const sentenceWords = sentence.trim().split(' ').length;
+        if (wordCount + sentenceWords <= 100) {
+          summary += sentence.trim() + '. ';
+          wordCount += sentenceWords;
+        } else {
+          break;
+        }
+      }
+      
+      // If we couldn't build a proper summary, fallback to word truncation
+      if (!summary.trim()) {
+        summary = words.slice(0, 100).join(' ') + (words.length > 100 ? '...' : '');
+      }
+      
+      setAiSummary(summary.trim());
     } catch (error) {
       console.error('Error generating summary:', error);
       setAiSummary("Unable to generate summary at this time.");
@@ -111,6 +133,9 @@ export function NewsArticleModal({ article, isOpen, onClose }: NewsArticleModalP
           <DialogTitle className="text-xl font-bold leading-tight pr-8">
             {article.title}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            News article details and summary
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -124,6 +149,8 @@ export function NewsArticleModal({ article, isOpen, onClose }: NewsArticleModalP
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
+                loading="lazy"
+                crossOrigin="anonymous"
               />
             </div>
           )}
@@ -177,15 +204,15 @@ export function NewsArticleModal({ article, isOpen, onClose }: NewsArticleModalP
             <CardContent className="p-4">
               <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                AI Summary (100 words)
+                Summary (100 words)
               </h3>
               {isGeneratingSummary ? (
                 <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
                   <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                  <span>Generating intelligent summary...</span>
+                  <span>Generating summary...</span>
                 </div>
               ) : (
-                <p className="text-blue-800 dark:text-blue-200 leading-relaxed">
+                <p className="text-blue-800 dark:text-blue-200 leading-relaxed whitespace-pre-wrap">
                   {aiSummary}
                 </p>
               )}

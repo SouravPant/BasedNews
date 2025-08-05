@@ -92,10 +92,10 @@ export function NewsAggregator() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Crypto News
+                  BasedNews
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Real-time cryptocurrency news aggregator
+                  Based news aggregator
                 </p>
               </div>
             </div>
@@ -164,7 +164,7 @@ export function NewsAggregator() {
               <Globe className="h-5 w-5 text-blue-600" />
               <div>
                 <h3 className="font-medium text-blue-900 dark:text-blue-100">
-                  Welcome to Crypto News!
+                  Welcome to BasedNews!
                 </h3>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
                   Stay updated with the latest cryptocurrency news and market insights.
@@ -243,7 +243,7 @@ export function NewsAggregator() {
       <footer className="mt-16 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-600 dark:text-gray-400">
-            <p className="mb-2">Crypto News Aggregator</p>
+            <p className="mb-2">BasedNews Aggregator</p>
             <p className="text-sm">
               Real-time cryptocurrency news powered by multiple sources
             </p>
