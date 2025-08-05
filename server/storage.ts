@@ -339,12 +339,16 @@ export class DatabaseStorage implements IStorage {
       .where(eq(userAlerts.userId, userId));
 
     if (active !== undefined) {
-      query = query.where(
-        and(
-          eq(userAlerts.userId, userId),
-          eq(userAlerts.isActive, active)
+      return await db
+        .select()
+        .from(userAlerts)
+        .where(
+          and(
+            eq(userAlerts.userId, userId),
+            eq(userAlerts.isActive, active)
+          )
         )
-      );
+        .orderBy(desc(userAlerts.createdAt));
     }
 
     return await query.orderBy(desc(userAlerts.createdAt));

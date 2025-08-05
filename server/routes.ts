@@ -730,7 +730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Error fetching CoinTelegraph news:", error);
       }
 
-      let allNews = await storage.getNewsArticles(50);
+      let allNews = await storage.getNewsArticles({ limit: 50 });
       
       // Apply source filter if specified
       if (sourceFilter && sourceFilter !== 'all') {
@@ -799,7 +799,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Search news articles
       try {
-        const allNews = await storage.getNewsArticles(100);
+        const allNews = await storage.getNewsArticles({ limit: 100 });
         const matchingNews = allNews.filter((article: any) =>
           article.title?.toLowerCase().includes(searchTerm) ||
           article.description?.toLowerCase().includes(searchTerm)
