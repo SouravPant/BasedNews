@@ -1,0 +1,16 @@
+{
+  "name": "BasedHub - Crypto Dashboard",
+  "version": "1.0.0",
+  "iconUrl": "https://based-news-eight.vercel.app/icon-192x192.png",
+  "splashImageUrl": "https://based-news-eight.vercel.app/splash.png",
+  "splashBackgroundColor": "#1e40af",
+  "homeUrl": "https://based-news-eight.vercel.app",
+  "imageUrl": "https://based-news-eight.vercel.app/preview.png",
+  "description": "Real-time cryptocurrency dashboard with market data, news, and portfolio tracking. Built for Base App with seamless wallet integration.",
+  "categories": ["finance", "defi", "analytics"],
+  "screenshots": [
+    "https://based-news-eight.vercel.app/screenshot1.png",
+    "https://based-news-eight.vercel.app/screenshot2.png"
+  ],
+  "noIndex": true
+}
