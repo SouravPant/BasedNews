@@ -83,7 +83,7 @@ export function NewsArticle({ article, onClick }: NewsArticleProps) {
               <div className="flex items-center space-x-1">
                 {getSentimentIcon(article.sentiment)}
                 <span className={getSentimentColor(article.sentiment)}>
-                  {article.sentiment.charAt(0).toUpperCase() + article.sentiment.slice(1)}
+                  {article.sentiment ? article.sentiment.charAt(0).toUpperCase() + article.sentiment.slice(1) : 'Neutral'}
                 </span>
               </div>
             )}

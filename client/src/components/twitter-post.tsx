@@ -53,7 +53,7 @@ export function TwitterPost({ tweet, onClick }: TwitterPostProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-              {tweet.author.charAt(0).toUpperCase()}
+              {tweet.author ? tweet.author.charAt(0).toUpperCase() : '?'}
             </div>
             <div>
               <p className="font-medium text-foreground">@{tweet.author}</p>

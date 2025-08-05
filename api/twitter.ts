@@ -23,29 +23,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           {
             id: "twitter_fallback_1",
             text: "Bitcoin just broke through key resistance levels! The momentum is building for a potential rally to new highs. #Bitcoin #Crypto",
-            username: "CryptoAnalyst",
+            author: "CryptoAnalyst",
             createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
             retweets: 45,
             likes: 123,
-            replies: 18
+            replies: 18,
+            sentiment: "bullish"
           },
           {
-            id: "twitter_fallback_2",
+            id: "twitter_fallback_2", 
             text: "Ethereum gas fees are surprisingly low today. Perfect time to interact with DeFi protocols! #Ethereum #DeFi",
-            username: "DeFiTrader",
+            author: "DeFiTrader",
             createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
             retweets: 28,
             likes: 89,
-            replies: 12
+            replies: 12,
+            sentiment: "bullish"
           },
           {
             id: "twitter_fallback_3",
             text: "The institutional adoption of cryptocurrency continues to accelerate. Major corporations are adding BTC to their balance sheets. #Bitcoin #Adoption",
-            username: "InstitutionalCrypto",
+            author: "InstitutionalCrypto",
             createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
             retweets: 67,
             likes: 203,
-            replies: 34
+            replies: 34,
+            sentiment: "bullish"
           }
         ];
         return res.status(200).json(fallbackTweets);
@@ -67,11 +70,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const tweets = response.data.data?.map((tweet: any) => ({
         id: tweet.id,
         text: tweet.text,
-        username: `user_${tweet.author_id}`, // Twitter API v2 doesn't include username by default
+        author: `user_${tweet.author_id}`, // Twitter API v2 doesn't include username by default
         createdAt: tweet.created_at,
         retweets: tweet.public_metrics?.retweet_count || 0,
         likes: tweet.public_metrics?.like_count || 0,
-        replies: tweet.public_metrics?.reply_count || 0
+        replies: tweet.public_metrics?.reply_count || 0,
+        sentiment: 'neutral'
       })) || [];
 
       res.status(200).json(tweets);
@@ -83,20 +87,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         {
           id: "twitter_fallback_1",
           text: "Bitcoin market showing strong bullish signals as institutional interest continues to grow. Key support levels holding well. #Bitcoin #Crypto",
-          username: "CryptoAnalyst",
+          author: "CryptoAnalyst",
           createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
           retweets: 52,
           likes: 147,
-          replies: 23
+          replies: 23,
+          sentiment: "bullish"
         },
         {
           id: "twitter_fallback_2",
           text: "DeFi yields are looking attractive again as gas fees normalize. Time to reassess portfolio allocations. #DeFi #Ethereum",
-          username: "YieldFarmer",
+          author: "YieldFarmer",
           createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
           retweets: 31,
           likes: 95,
-          replies: 16
+          replies: 16,
+          sentiment: "bullish"
         }
       ];
       
