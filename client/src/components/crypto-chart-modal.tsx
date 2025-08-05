@@ -65,14 +65,6 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-muted-foreground hover:text-card-foreground hover:bg-muted"
-          >
-            <X className="w-4 h-4" />
-          </Button>
         </DialogHeader>
 
         {/* Time Range Selector */}

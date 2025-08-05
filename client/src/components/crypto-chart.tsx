@@ -45,7 +45,7 @@ export function CryptoChart({ data, coinName, coinSymbol, days }: CryptoChartPro
   const firstPrice = data[0]?.price || 0;
   const lastPrice = data[data.length - 1]?.price || 0;
   const priceChange = lastPrice - firstPrice;
-  const lineColor = priceChange >= 0 ? '#10b981' : '#ef4444';
+  const lineColor = priceChange >= 0 ? '#3b82f6' : '#ef4444'; // Use blue instead of green for brand consistency
 
   return (
     <div className="w-full h-full">
@@ -59,18 +59,19 @@ export function CryptoChart({ data, coinName, coinSymbol, days }: CryptoChartPro
       </div>
       
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+        <LineChart data={data} margin={{ top: 20, right: 30, left: 80, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
           <XAxis 
             dataKey="time" 
             tickFormatter={formatXAxisTick}
-            stroke="hsl(var(--muted-foreground))"
+            stroke="hsl(var(--foreground))"
             fontSize={12}
           />
           <YAxis 
             tickFormatter={(value) => `$${value.toLocaleString()}`}
-            stroke="hsl(var(--muted-foreground))"
+            stroke="hsl(var(--foreground))"
             fontSize={12}
+            width={80}
           />
           <Tooltip 
             labelFormatter={formatTooltipLabel}
