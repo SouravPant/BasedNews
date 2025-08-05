@@ -4,58 +4,21 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
-import { MiniKitProvider } from "./providers/MiniKitProvider";
-import { Navigation } from "@/components/navigation";
-import { useAuth } from "@/hooks/useAuth";
-import { useMiniKit } from "@/hooks/useMiniKit";
+import { NewsAggregator } from "@/pages/news-aggregator";
 import NotFound from "@/pages/not-found";
-import Dashboard from "@/pages/dashboard";
-import { Landing } from "@/pages/landing";
-import { CryptocurrencyDetail } from "@/components/cryptocurrency-detail";
-
-function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const { isInBaseApp, user } = useMiniKit();
-
-  // In Base App environment, use Base App authentication
-  const shouldShowLanding = isLoading || (!isAuthenticated && !isInBaseApp);
-
-  return (
-    <div className="min-h-screen">
-      <Navigation />
-      <Switch>
-        {shouldShowLanding ? (
-          <Route path="/" component={Landing} />
-        ) : (
-          <>
-            <Route path="/" component={Dashboard} />
-            <Route path="/crypto/:id">
-              {(params) => <CryptocurrencyDetail id={params.id} />}
-            </Route>
-            <Route path="/cryptocurrencies" component={Dashboard} />
-            <Route path="/news" component={Dashboard} />
-            <Route path="/portfolio" component={Dashboard} />
-            <Route path="/watchlist" component={Dashboard} />
-            <Route path="/alerts" component={Dashboard} />
-          </>
-        )}
-        <Route component={NotFound} />
-      </Switch>
-    </div>
-  );
-}
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <MiniKitProvider>
-        <ThemeProvider defaultTheme="light" storageKey="basedhub-theme">
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
-        </ThemeProvider>
-      </MiniKitProvider>
+      <ThemeProvider defaultTheme="light" storageKey="crypto-news-theme">
+        <TooltipProvider>
+          <Toaster />
+          <Switch>
+            <Route path="/" component={NewsAggregator} />
+            <Route component={NotFound} />
+          </Switch>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

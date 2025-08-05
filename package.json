@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@coinbase/onchainkit": "^0.38.18",
+    "@coinbase/wallet-sdk": "^4.3.7",
     "@farcaster/core": "^0.18.5",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",

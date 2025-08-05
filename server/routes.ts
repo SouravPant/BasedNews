@@ -817,7 +817,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get Reddit posts from crypto subreddits
+  // Reddit endpoint removed - focusing on news aggregation only
+  /*
   app.get("/api/reddit", async (req, res) => {
     try {
       const subreddit = req.query.subreddit as string || "cryptocurrency";
@@ -918,6 +919,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch Reddit data" });
     }
   });
+  */
 
   // Twitter API endpoint
   app.get("/api/twitter", async (req, res) => {
