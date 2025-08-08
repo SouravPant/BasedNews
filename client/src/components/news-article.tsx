@@ -77,10 +77,9 @@ export function NewsArticle({ article, onClick }: NewsArticleProps) {
         rel="noopener noreferrer"
         className="block p-4 h-full"
         onClick={(e) => {
-          if (!article.url || article.url.includes('example.com')) {
-            e.preventDefault();
-            onClick?.();
-          }
+          // Always prevent default and show summary modal first
+          e.preventDefault();
+          onClick?.();
         }}
       >
         <div className="flex flex-col h-full">

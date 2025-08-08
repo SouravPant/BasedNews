@@ -515,7 +515,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           params: {
             vs_currency: "usd",
             order: "market_cap_desc",
-            per_page: 20, // Get more to filter out unwanted tokens
+            per_page: 150, // Get more to filter out unwanted tokens and return 100
             page: 1,
             sparkline: false,
             price_change_percentage: "24h"
@@ -538,7 +538,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const filteredCoins = response.data
         .filter((coin: any) => !excludedTokens.includes(coin.id))
-        .slice(0, 20); // Take top 20 after filtering
+        .slice(0, 100); // Take top 100 after filtering
 
       const cryptos = filteredCoins.map((coin: any) => ({
         id: coin.id,
