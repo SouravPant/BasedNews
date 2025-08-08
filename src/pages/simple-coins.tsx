@@ -1,18 +1,21 @@
 import React from "react";
+import { CryptoChartModalSimple } from "../components/crypto-chart-modal-simple";
 
 export function SimpleCoins() {
   const [coins, setCoins] = React.useState([]);
   const [status, setStatus] = React.useState('Loading top cryptocurrencies...');
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [selectedCoin, setSelectedCoin] = React.useState(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   React.useEffect(() => {
     console.log('Fetching cryptocurrency data...');
-    fetch('/api/cryptocurrencies?per_page=50')
+    fetch('/api/cryptocurrencies?per_page=100')
       .then(res => res.json())
       .then(data => {
         console.log('Crypto data loaded:', data.length, 'coins');
         setCoins(Array.isArray(data) ? data : []);
-        setStatus(`Successfully loaded ${Array.isArray(data) ? data.length : 0} cryptocurrencies`);
+        setStatus(`Successfully loaded top cryptocurrencies`);
       })
       .catch(err => {
         console.error('Error loading crypto data:', err);
@@ -61,6 +64,16 @@ export function SimpleCoins() {
     if (!percentage) return '0.00%';
     const num = parseFloat(percentage);
     return `${num >= 0 ? '+' : ''}${num.toFixed(2)}%`;
+  };
+
+  const handleCoinClick = (coin) => {
+    setSelectedCoin(coin);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCoin(null);
   };
 
   return (
@@ -244,7 +257,8 @@ export function SimpleCoins() {
                   key={coin.id || index}
                   style={{
                     borderBottom: '1px solid #f3f4f6',
-                    transition: 'background-color 0.2s'
+                    transition: 'background-color 0.2s',
+                    cursor: 'pointer'
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.backgroundColor = '#f9fafb';
@@ -252,6 +266,7 @@ export function SimpleCoins() {
                   onMouseOut={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
                   }}
+                  onClick={() => handleCoinClick(coin)}
                 >
                   <td style={{
                     padding: '16px',
@@ -357,6 +372,13 @@ export function SimpleCoins() {
           Real-time cryptocurrency market data • Powered by CoinGecko API
         </p>
       </footer>
+
+      {/* Chart Modal */}
+      <CryptoChartModalSimple 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        cryptocurrency={selectedCoin}
+      />
     </div>
   );
 }

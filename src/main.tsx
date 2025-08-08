@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import React from "react";
 import "./index.css";
 import { SimpleCoins } from "./pages/simple-coins";
+import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 
 function WorkingNewsApp() {
   const [news, setNews] = React.useState([]);
@@ -302,10 +303,20 @@ function App() {
   }, []);
 
   if (currentPage === 'coins') {
-    return <SimpleCoins />;
+    return (
+      <>
+        <ThemeToggleSimple />
+        <SimpleCoins />
+      </>
+    );
   }
 
-  return <WorkingNewsApp />;
+  return (
+    <>
+      <ThemeToggleSimple />
+      <WorkingNewsApp />
+    </>
+  );
 }
 
 console.log('Starting App...');
