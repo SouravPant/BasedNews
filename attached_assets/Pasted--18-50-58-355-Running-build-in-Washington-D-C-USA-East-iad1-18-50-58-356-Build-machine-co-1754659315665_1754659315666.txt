@@ -1,0 +1,43 @@
+[18:50:58.355] Running build in Washington, D.C., USA (East) – iad1
+[18:50:58.356] Build machine configuration: 2 cores, 8 GB
+[18:50:58.371] Cloning github.com/SouravPant/BasedNews (Branch: main, Commit: f96b490)
+[18:50:59.921] Cloning completed: 1.549s
+[18:51:00.358] Found .vercelignore
+[18:51:00.408] Removed 127 ignored files defined in .vercelignore
+[18:51:00.409]   /.git/config
+[18:51:00.409]   /.git/description
+[18:51:00.409]   /.git/FETCH_HEAD
+[18:51:00.409]   /.git/HEAD
+[18:51:00.409]   /.git/hooks/applypatch-msg.sample
+[18:51:00.409]   /.git/hooks/commit-msg.sample
+[18:51:00.409]   /.git/hooks/fsmonitor-watchman.sample
+[18:51:00.409]   /.git/hooks/post-update.sample
+[18:51:00.410]   /.git/hooks/pre-applypatch.sample
+[18:51:00.410]   /.git/hooks/pre-commit.sample
+[18:51:00.988] Restored build cache from previous deployment (6kydJjJAwWkqKMquvWJGm2mmnuRn)
+[18:51:11.742] Running "vercel build"
+[18:51:12.216] Vercel CLI 44.7.3
+[18:51:12.402] WARN! Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+[18:51:13.133] Installing dependencies...
+[18:51:15.630] 
+[18:51:15.631] up to date in 2s
+[18:51:15.631] 
+[18:51:15.632] 142 packages are looking for funding
+[18:51:15.632]   run `npm fund` for details
+[18:51:15.664] Running "npm run build"
+[18:51:15.773] 
+[18:51:15.774] > rest-express@1.0.0 build
+[18:51:15.774] > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+[18:51:15.774] 
+[18:51:16.073] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[18:51:16.126] transforming...
+[18:51:16.136] [32m✓[39m 2 modules transformed.
+[18:51:16.140] [31mx[39m Build failed in 39ms
+[18:51:16.140] [31merror during build:
+[18:51:16.140] [31mCould not resolve "./src/main.tsx" from "client/index.html"[31m
+[18:51:16.141] file: [36m/vercel/path0/client/index.html[31m
+[18:51:16.141]     at getRollupError (file:///vercel/path0/node_modules/rollup/dist/es/shared/parseAst.js:401:41)
+[18:51:16.141]     at error (file:///vercel/path0/node_modules/rollup/dist/es/shared/parseAst.js:397:42)
+[18:51:16.141]     at ModuleLoader.handleInvalidResolvedId (file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:21490:24)
+[18:51:16.141]     at file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:21450:26[39m
+[18:51:16.155] Error: Command "npm run build" exited with 1
