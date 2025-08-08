@@ -22,6 +22,8 @@ export function NewsAggregator() {
   const [connectedAccount, setConnectedAccount] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArticle, setSelectedArticle] = useState<NewsArticleType | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allNews, setAllNews] = useState<NewsArticleType[]>([]);
   const [filters, setFilters] = useState<FilterState>({
     dateRange: 'all',
     sentiment: 'all',
@@ -30,21 +32,24 @@ export function NewsAggregator() {
   });
 
   const { wallet, isConnected } = useWallet();
+  const articlesPerPage = 12;
 
-  // Fetch news articles
-  const { data: news = [], isLoading: newsLoading, error: newsError } = useQuery({
-    queryKey: ['/api/news', filters],
+  // Fetch news articles with pagination
+  const { data: news = [], isLoading: newsLoading, error: newsError, refetch } = useQuery({
+    queryKey: ['/api/news', filters, currentPage],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filters.sentiment !== 'all') params.append('sentiment', filters.sentiment);
       if (filters.category !== 'all') params.append('category', filters.category);
-      params.append('limit', '30');
+      params.append('limit', (articlesPerPage * currentPage).toString());
       
       const response = await fetch(`/api/news?${params.toString()}`);
       if (!response.ok) {
         throw new Error('Failed to fetch news');
       }
-      return response.json();
+      const result = await response.json();
+      setAllNews(result);
+      return result;
     },
     refetchInterval: 60000, // Refresh every minute
   });
@@ -56,7 +61,7 @@ export function NewsAggregator() {
   });
 
   // Filter news based on search query
-  const filteredNews = (news as NewsArticleType[]).filter((article: NewsArticleType) => {
+  const filteredNews = (allNews as NewsArticleType[]).filter((article: NewsArticleType) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -65,6 +70,11 @@ export function NewsAggregator() {
       article.source.toLowerCase().includes(query)
     );
   });
+
+  const loadMoreNews = async () => {
+    setCurrentPage(prev => prev + 1);
+    await refetch();
+  };
 
   const handleAccountChange = (account: string | null) => {
     setConnectedAccount(account);
@@ -195,15 +205,32 @@ export function NewsAggregator() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredNews.map((article: NewsArticleType) => (
-                <NewsArticle
-                  key={article.id}
-                  article={article}
-                  onClick={() => setSelectedArticle(article)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {filteredNews.map((article: NewsArticleType) => (
+                  <NewsArticle
+                    key={article.id}
+                    article={article}
+                    onClick={() => setSelectedArticle(article)}
+                  />
+                ))}
+              </div>
+              
+              {/* Load More Button */}
+              {filteredNews.length >= articlesPerPage && !newsLoading && (
+                <div className="mt-12 text-center">
+                  <Button
+                    onClick={loadMoreNews}
+                    variant="outline"
+                    size="lg"
+                    className="px-8 py-3 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    <Globe className="mr-2 h-4 w-4" />
+                    Load More News
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
