@@ -171,11 +171,12 @@ function WorkingNewsApp() {
               style={{
                 border: '1px solid #e5e7eb',
                 borderRadius: '12px',
-                padding: '20px',
+                padding: '0',
                 backgroundColor: '#ffffff',
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
                 transition: 'transform 0.2s, box-shadow 0.2s',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                overflow: 'hidden'
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
@@ -186,35 +187,76 @@ function WorkingNewsApp() {
                 e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)';
               }}
             >
+              {/* Article Image */}
+              {article.urlToImage && (
+                <div style={{
+                  height: '200px',
+                  backgroundImage: `url(${article.urlToImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  position: 'relative'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.3))'
+                  }}></div>
+                  <span style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    fontSize: '12px',
+                    backgroundColor: '#dbeafe',
+                    color: '#1d4ed8',
+                    padding: '4px 8px',
+                    borderRadius: '20px',
+                    fontWeight: '600',
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    📝 Summary
+                  </span>
+                </div>
+              )}
+
+              {/* Article Content */}
               <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                marginBottom: '12px'
+                padding: '20px'
               }}>
-                <h3 style={{
-                  fontSize: '18px',
-                  fontWeight: '600',
-                  color: '#1f2937',
-                  lineHeight: '1.4',
-                  flex: 1,
-                  marginRight: '8px',
-                  margin: 0
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  marginBottom: '12px'
                 }}>
-                  {article.title}
-                </h3>
-                <span style={{
-                  fontSize: '12px',
-                  backgroundColor: '#dbeafe',
-                  color: '#1d4ed8',
-                  padding: '4px 8px',
-                  borderRadius: '20px',
-                  fontWeight: '600',
-                  whiteSpace: 'nowrap'
-                }}>
-                  📝 Summary
-                </span>
-              </div>
+                  <h3 style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    color: '#1f2937',
+                    lineHeight: '1.4',
+                    flex: 1,
+                    marginRight: '8px',
+                    margin: 0
+                  }}>
+                    {article.title}
+                  </h3>
+                  {!article.urlToImage && (
+                    <span style={{
+                      fontSize: '12px',
+                      backgroundColor: '#dbeafe',
+                      color: '#1d4ed8',
+                      padding: '4px 8px',
+                      borderRadius: '20px',
+                      fontWeight: '600',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      📝 Summary
+                    </span>
+                  )}
+                </div>
 
               {article.description && (
                 <p style={{
@@ -281,30 +323,31 @@ function WorkingNewsApp() {
                 )}
               </div>
 
-              {article.url && (
-                <a
-                  href={article.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'inline-block',
-                    fontSize: '14px',
-                    color: '#2563eb',
-                    textDecoration: 'none',
-                    fontWeight: '500',
-                    borderBottom: '1px solid transparent',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.borderBottomColor = '#2563eb';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.borderBottomColor = 'transparent';
-                  }}
-                >
-                  Read Full Article →
-                </a>
-              )}
+                {article.url && (
+                  <a
+                    href={article.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-block',
+                      fontSize: '14px',
+                      color: '#2563eb',
+                      textDecoration: 'none',
+                      fontWeight: '500',
+                      borderBottom: '1px solid transparent',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.borderBottomColor = '#2563eb';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.borderBottomColor = 'transparent';
+                    }}
+                  >
+                    Read Full Article →
+                  </a>
+                )}
+              </div>
             </article>
           ))}
         </div>

@@ -56,7 +56,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               source: article.source?.name || 'Unknown Source',
               publishedAt: article.publishedAt || new Date().toISOString(),
               sentiment: detectSentiment(article.title + ' ' + (article.description || '')),
-              description: article.description || article.title
+              description: article.description || article.title,
+              urlToImage: article.urlToImage || null,
+              content: article.content || null
             }));
 
             return res.status(200).json(newsArticles);
@@ -83,7 +85,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             source: article.author || 'CoinGecko',
             publishedAt: article.created_at || new Date().toISOString(),
             sentiment: detectSentiment(article.title + ' ' + (article.description || '')),
-            description: article.description || article.title
+            description: article.description || article.title,
+            urlToImage: article.thumb_2x || article.thumb || null,
+            content: article.description || null
           }));
 
           return res.status(200).json(newsArticles);
@@ -101,7 +105,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           source: "CoinTelegraph",
           publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
           sentiment: "bullish" as const,
-          description: "The approval of a major Bitcoin ETF has propelled BTC to unprecedented price levels, marking a significant milestone for cryptocurrency adoption."
+          description: "The approval of a major Bitcoin ETF has propelled BTC to unprecedented price levels, marking a significant milestone for cryptocurrency adoption.",
+          urlToImage: "https://images.unsplash.com/photo-1605792657660-596af9009e82?w=500&h=300&fit=crop",
+          content: "The approval of a major Bitcoin ETF has propelled BTC to unprecedented price levels, marking a significant milestone for cryptocurrency adoption. Trading volumes have surged as institutional investors enter the market."
         },
         {
           title: "Ethereum 2.0 Staking Rewards Reach Record Levels",
@@ -109,7 +115,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           source: "CoinDesk",
           publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
           sentiment: "bullish" as const,
-          description: "Ethereum validators are experiencing higher-than-expected staking rewards as network activity continues to surge."
+          description: "Ethereum validators are experiencing higher-than-expected staking rewards as network activity continues to surge.",
+          urlToImage: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=500&h=300&fit=crop",
+          content: "Ethereum validators are experiencing higher-than-expected staking rewards as network activity continues to surge. The proof-of-stake mechanism has proven more efficient than anticipated."
         },
         {
           title: "DeFi Protocol Security Audit Reveals Critical Vulnerabilities",
@@ -117,7 +125,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           source: "CoinTelegraph",
           publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
           sentiment: "bearish" as const,
-          description: "A comprehensive security audit of a popular DeFi protocol has uncovered several critical vulnerabilities that could pose risks to user funds."
+          description: "A comprehensive security audit of a popular DeFi protocol has uncovered several critical vulnerabilities that could pose risks to user funds.",
+          urlToImage: "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=500&h=300&fit=crop",
+          content: "A comprehensive security audit of a popular DeFi protocol has uncovered several critical vulnerabilities that could pose risks to user funds. The protocol team is working on immediate fixes."
         }
       ];
       
@@ -133,7 +143,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           source: "CryptoPanic",
           publishedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
           sentiment: "neutral" as const,
-          description: "Cryptocurrency markets are displaying mixed signals as investors await regulatory clarity."
+          description: "Cryptocurrency markets are displaying mixed signals as investors await regulatory clarity.",
+          urlToImage: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=500&h=300&fit=crop",
+          content: "Cryptocurrency markets are displaying mixed signals as investors await regulatory clarity. Trading volumes remain stable despite recent volatility."
         }
       ];
       
