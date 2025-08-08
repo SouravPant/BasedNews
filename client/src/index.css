@@ -3,6 +3,39 @@
 @tailwind utilities;
 
 :root {
+  /* Base Dark Mode - Base.org inspired dark theme */
+  --background: hsl(221, 39%, 11%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(215, 28%, 17%);
+  --muted-foreground: hsl(215, 16%, 65%);
+  --popover: hsl(221, 39%, 11%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(215, 28%, 17%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(215, 28%, 20%);
+  --input: hsl(215, 28%, 17%);
+  --primary: hsl(221, 83%, 53%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(215, 28%, 17%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(215, 28%, 17%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 50.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(221, 83%, 53%);
+  --radius: 0.5rem;
+  
+  /* Base-specific colors for dark theme */
+  --base-blue: hsl(221, 83%, 53%);
+  --base-blue-light: hsl(221, 83%, 60%);
+  --base-blue-dark: hsl(221, 39%, 11%);
+  --base-surface: hsl(215, 28%, 17%);
+  --base-background: hsl(221, 39%, 11%);
+  --base-border: hsl(215, 28%, 20%);
+}
+
+.light {
+  /* Light mode variant for Base theme */
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(221, 39%, 11%);
   --muted: hsl(210, 40%, 98%);
@@ -18,37 +51,6 @@
   --secondary: hsl(210, 40%, 98%);
   --secondary-foreground: hsl(221, 39%, 11%);
   --accent: hsl(210, 40%, 98%);
-  --accent-foreground: hsl(221, 39%, 11%);
-  --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(221, 83%, 53%);
-  --radius: 0.5rem;
-  
-  /* Base-specific colors inspired by Base.org */
-  --base-blue: hsl(221, 83%, 53%);
-  --base-blue-light: hsl(214, 95%, 93%);
-  --base-blue-dark: hsl(221, 39%, 11%);
-  --base-surface: hsl(210, 40%, 98%);
-  --base-background: hsl(0, 0%, 100%);
-  --base-border: hsl(214, 32%, 91%);
-}
-
-.dark {
-  --background: hsl(221, 39%, 11%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(215, 28%, 17%);
-  --muted-foreground: hsl(215, 16%, 65%);
-  --popover: hsl(221, 39%, 11%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(215, 28%, 17%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(215, 28%, 17%);
-  --input: hsl(215, 28%, 17%);
-  --primary: hsl(221, 83%, 53%);
-  --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(215, 28%, 17%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(215, 28%, 17%);
   --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(0, 0%, 98%);
