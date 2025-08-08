@@ -59,6 +59,80 @@ Current market conditions present both growth potential and inherent risks. Succ
   return summary;
 }
 
+// Helper function to get time ago format
+function getTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+  const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+  
+  if (diffInHours < 1) {
+    return `${diffInMinutes} minutes ago`;
+  } else if (diffInHours < 24) {
+    return `${diffInHours} hours ago`;
+  } else {
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays} days ago`;
+  }
+}
+
+// Helper function to generate crypto-related image URLs
+function generateCryptoImage(title: string): string {
+  const keywords = ['bitcoin', 'ethereum', 'crypto', 'blockchain', 'defi', 'nft', 'trading'];
+  const foundKeyword = keywords.find(keyword => 
+    title.toLowerCase().includes(keyword)
+  ) || 'cryptocurrency';
+  
+  const imageUrls: { [key: string]: string } = {
+    'bitcoin': 'https://images.unsplash.com/photo-1640161704729-cbe966a08476?w=800&h=400&fit=crop',
+    'ethereum': 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=400&fit=crop',
+    'crypto': 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&h=400&fit=crop',
+    'blockchain': 'https://images.unsplash.com/photo-1639762681057-408e52192e55?w=800&h=400&fit=crop',
+    'defi': 'https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=800&h=400&fit=crop',
+    'nft': 'https://images.unsplash.com/photo-1642104704074-907c0698cbd9?w=800&h=400&fit=crop',
+    'trading': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=400&fit=crop',
+    'cryptocurrency': 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&h=400&fit=crop'
+  };
+  
+  return imageUrls[foundKeyword] || imageUrls['cryptocurrency'];
+}
+
+// Helper function to generate summary from content
+function generateSummaryFromContent(content: string): string {
+  if (!content || content.trim().length === 0) {
+    return "Article summary not available.";
+  }
+  
+  // Clean and process the content
+  const cleanText = content.replace(/\s+/g, ' ').replace(/[^\w\s.,!?-]/g, '').trim();
+  const words = cleanText.split(' ');
+  
+  // Take approximately 100 words but ensure we end at sentence boundaries
+  let wordCount = 0;
+  let summary = '';
+  const sentences = cleanText.split(/[.!?]+/).filter(s => s.trim().length > 10);
+  
+  for (const sentence of sentences) {
+    const sentenceWords = sentence.trim().split(' ').length;
+    if (wordCount + sentenceWords <= 100) {
+      summary += sentence.trim() + '. ';
+      wordCount += sentenceWords;
+    } else {
+      break;
+    }
+  }
+  
+  // If we couldn't build a proper summary, fallback to word truncation
+  if (!summary.trim() || summary.length < 50) {
+    summary = words.slice(0, Math.min(100, words.length)).join(' ');
+    if (words.length > 100) {
+      summary += '...';
+    }
+  }
+  
+  return summary.trim() || "Content summary not available.";
+}
+
 // Function to populate news data
 async function populateNewsData() {
   try {
@@ -240,7 +314,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: `Successfully populated ${articles.length} articles`, articles });
     } catch (error) {
       console.error("Population error:", error);
-      res.status(500).json({ message: "Failed to populate news", error: error.message });
+      res.status(500).json({ message: "Failed to populate news", error: (error as Error).message });
     }
   });
 
@@ -408,20 +482,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get crypto news from multiple sources with filtering support
+  // Get crypto news from multiple real APIs
   app.get("/api/news", async (req, res) => {
     try {
       const articles = [];
-      const sourceFilter = req.query.source as string;
+      let apiSources = [];
 
-      // Fetch from CryptoPanic API
+      // 1. CryptoCompare News API
+      try {
+        console.log("Fetching from CryptoCompare News API...");
+        const cryptoCompareResponse = await axios.get(
+          "https://min-api.cryptocompare.com/data/v2/news/",
+          {
+            params: {
+              lang: "EN",
+              sortOrder: "latest",
+              categories: "BTC,ETH,Altcoin,Blockchain,Mining,ICO,Regulation,Ethereum,DeFi,NFT",
+              lmt: 15
+            }
+          }
+        );
+
+        if (cryptoCompareResponse.data?.Data) {
+          apiSources.push("CryptoCompare");
+          console.log(`✅ CryptoCompare API: Fetched ${cryptoCompareResponse.data.Data.length} articles`);
+          
+          for (const item of cryptoCompareResponse.data.Data.slice(0, 10)) {
+            // const timeAgo = getTimeAgo(new Date(item.published_on * 1000));
+            const article = {
+              title: item.title,
+              description: item.body ? item.body.substring(0, 200) + "..." : item.title,
+              content: item.body,
+              url: item.url || item.guid,
+              source: item.source_info?.name || "CryptoCompare",
+              author: null,
+              publishedAt: new Date(item.published_on * 1000),
+              imageUrl: item.imageurl || generateCryptoImage(item.title),
+              sentiment: "neutral",
+              category: item.categories?.split(',')[0] || null,
+              summary: generateSummaryFromContent(item.body || item.title)
+            };
+            
+            const validatedArticle = insertNewsArticleSchema.parse(article);
+            const savedArticle = await storage.createNewsArticle(validatedArticle);
+            articles.push(savedArticle);
+          }
+        }
+      } catch (error) {
+        console.error("CryptoCompare API error:", (error as any)?.message);
+      }
+
+      // 2. CryptoPanic API
       try {
         const apiKey = process.env.CRYPTOPANIC_API_KEY;
-        if (!apiKey) {
-          console.log("CryptoPanic API key not found - using fallback news");
-        } else {
-          console.log("Using CryptoPanic API key: Found");
-          
+        if (apiKey) {
+          console.log("Fetching from CryptoPanic API...");
           const cryptoPanicResponse = await axios.get(
             "https://cryptopanic.com/api/v1/posts/",
             {
@@ -435,43 +550,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
           );
 
           if (cryptoPanicResponse.data?.results) {
-            console.log(`✅ CryptoPanic API success: Fetched ${cryptoPanicResponse.data.results.length} articles`);
+            apiSources.push("CryptoPanic");
+            console.log(`✅ CryptoPanic API: Fetched ${cryptoPanicResponse.data.results.length} articles`);
             
             for (const item of cryptoPanicResponse.data.results.slice(0, 8)) {
               const article = {
                 title: item.title,
-                description: item.title || "No description available",
+                description: item.title,
                 url: item.url,
-                source: "Crypto News",
+                source: item.source?.name || "CryptoPanic",
                 publishedAt: item.published_at ? new Date(item.published_at) : new Date(),
-                sentiment: item.votes?.positive > item.votes?.negative ? "bullish" : 
-                          item.votes?.negative > item.votes?.positive ? "bearish" : "neutral",
-                summary: generateRandomSummary()
+                imageUrl: generateCryptoImage(item.title),
+                sentiment: "neutral",
+                summary: generateSummaryFromContent(item.title)
               };
               
               const validatedArticle = insertNewsArticleSchema.parse(article);
               const savedArticle = await storage.createNewsArticle(validatedArticle);
               articles.push(savedArticle);
             }
-            
-            // Skip fallback news if CryptoPanic worked
-            return res.json(articles);
-          } else {
-            console.log("CryptoPanic API returned no results");
           }
         }
       } catch (error) {
-        const errorData = (error as any)?.response?.data;
-        if (errorData?.status === 'api_error' && errorData?.info === 'Token not found') {
-          console.log("❌ CryptoPanic API key invalid or not activated - check your API key at cryptopanic.com/developers/api");
-        } else {
-          console.error("CryptoPanic API error:", errorData || (error as any)?.message || error);
-        }
+        console.error("CryptoPanic API error:", (error as any)?.message);
       }
 
-      // Fetch from CoinTelegraph RSS (simulated for now)
+      // 3. Reddit Crypto News (using Reddit JSON API)
       try {
-        // Generate diverse news from multiple sources
+        console.log("Fetching from Reddit r/CryptoCurrency...");
+        const redditResponse = await axios.get(
+          "https://www.reddit.com/r/CryptoCurrency/hot.json",
+          {
+            params: {
+              limit: 10
+            },
+            headers: {
+              'User-Agent': 'BasedNews/1.0'
+            }
+          }
+        );
+
+        if (redditResponse.data?.data?.children) {
+          apiSources.push("Reddit");
+          console.log(`✅ Reddit API: Fetched ${redditResponse.data.data.children.length} posts`);
+          
+          for (const post of redditResponse.data.data.children.slice(0, 8)) {
+            const item = post.data;
+            if (!item.is_self && item.url && !item.url.includes('reddit.com')) {
+              const article = {
+                title: item.title,
+                description: item.selftext ? item.selftext.substring(0, 200) + "..." : item.title,
+                content: item.selftext,
+                url: item.url,
+                source: "Reddit Crypto",
+                author: item.author,
+                publishedAt: new Date(item.created_utc * 1000),
+                imageUrl: item.preview?.images?.[0]?.source?.url?.replace(/&amp;/g, '&') || generateCryptoImage(item.title),
+                sentiment: "neutral",
+                summary: generateSummaryFromContent(item.selftext || item.title)
+              };
+              
+              const validatedArticle = insertNewsArticleSchema.parse(article);
+              const savedArticle = await storage.createNewsArticle(validatedArticle);
+              articles.push(savedArticle);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Reddit API error:", (error as any)?.message);
+      }
+
+      if (articles.length > 0) {
+        console.log(`✅ Successfully fetched ${articles.length} articles from: ${apiSources.join(', ')}`);
+        // Sort by publish date (newest first)
+        articles.sort((a, b) => new Date(b.publishedAt || new Date()).getTime() - new Date(a.publishedAt || new Date()).getTime());
+        return res.json(articles);
+      }
+
+      // Fallback news if all APIs fail
+      try {
+        console.log("All APIs failed, using fallback news...");
         const allNews = [];
         
         // Crypto News source articles
@@ -825,19 +983,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let allNews = await storage.getNewsArticles({ limit: 50 });
       
-      // Apply source filter if specified
-      if (sourceFilter && sourceFilter !== 'all') {
-        const sourceMap: { [key: string]: string } = {
-          'crypto-news': 'Crypto News',
-          'coindesk': 'CoinDesk', 
-          'cointelegraph': 'CoinTelegraph'
-        };
+      // Apply source filter if specified (sourceFilter was removed in updated API)
+      // if (sourceFilter && sourceFilter !== 'all') {
+      //   const sourceMap: { [key: string]: string } = {
+      //     'crypto-news': 'Crypto News',
+      //     'coindesk': 'CoinDesk', 
+      //     'cointelegraph': 'CoinTelegraph'
+      //   };
         
-        const targetSource = sourceMap[sourceFilter];
-        if (targetSource) {
-          allNews = allNews.filter(article => article.source === targetSource);
-        }
-      }
+      //   const targetSource = sourceMap[sourceFilter];
+      //   if (targetSource) {
+      //     allNews = allNews.filter(article => article.source === targetSource);
+      //   }
+      // }
       
       res.json(allNews.slice(0, 30));
     } catch (error) {

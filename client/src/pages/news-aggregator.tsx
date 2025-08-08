@@ -123,38 +123,7 @@ export function NewsAggregator() {
             <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           </div>
           
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setFilters(prev => ({ ...prev, sentiment: prev.sentiment === 'bullish' ? 'all' : 'bullish' }))}
-              className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                filters.sentiment === 'bullish' 
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-                  : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              Bullish
-            </button>
-            <button
-              onClick={() => setFilters(prev => ({ ...prev, sentiment: prev.sentiment === 'bearish' ? 'all' : 'bearish' }))}
-              className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                filters.sentiment === 'bearish' 
-                  ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' 
-                  : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              Bearish
-            </button>
-            <button
-              onClick={() => setFilters(prev => ({ ...prev, category: prev.category === 'DeFi' ? 'all' : 'DeFi' }))}
-              className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                filters.category === 'DeFi' 
-                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
-                  : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              DeFi
-            </button>
-          </div>
+
         </div>
 
         {/* Welcome Message for Connected Users */}
@@ -245,7 +214,7 @@ export function NewsAggregator() {
           <div className="text-center text-gray-600 dark:text-gray-400">
             <p className="mb-2">BasedNews Aggregator</p>
             <p className="text-sm">
-              Real-time cryptocurrency news powered by multiple sources
+              Based news aggregator
             </p>
           </div>
         </div>

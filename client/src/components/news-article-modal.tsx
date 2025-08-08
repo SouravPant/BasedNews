@@ -204,7 +204,7 @@ export function NewsArticleModal({ article, isOpen, onClose }: NewsArticleModalP
             <CardContent className="p-4">
               <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                Summary (100 words)
+                Summary
               </h3>
               {isGeneratingSummary ? (
                 <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
