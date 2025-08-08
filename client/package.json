@@ -2,6 +2,6 @@
   "name": "cryptohub-client",
   "private": true,
   "scripts": {
-    "build": "cd .. && vite build"
+    "build": "cd .. && npm install && vite build"
   }
 }

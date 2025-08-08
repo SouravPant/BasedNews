@@ -1,5 +1,5 @@
 // Vercel serverless function entry point
-import createApp from '../server/index.js';
+import createApp from '../server/index.ts';
 
 let appInstance: any = null;
 
