@@ -23,7 +23,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/public/index.html"
+      "dest": "/index.html"
     }
   ],
   "crons": [
