@@ -14,7 +14,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "light",
+  theme: "light", 
   setTheme: () => null,
 };
 
@@ -27,31 +27,42 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [isClient, setIsClient] = useState(false);
 
-  // Initialize theme from localStorage on client side only
+  // Following Next.js official guidance for hydration mismatches
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Load theme from localStorage only after client hydration
+  useEffect(() => {
+    if (!isClient) return;
+    
     const savedTheme = localStorage.getItem(storageKey) as Theme;
-    if (savedTheme && savedTheme !== defaultTheme) {
+    if (savedTheme && (savedTheme === "light" || savedTheme === "dark" || savedTheme === "base")) {
       setTheme(savedTheme);
     }
-  }, [storageKey, defaultTheme]);
+  }, [isClient, storageKey]);
 
+  // Apply theme to document only on client side
   useEffect(() => {
+    if (!isClient) return;
+    
     const root = window.document.documentElement;
-
-    // Remove all theme classes
     root.classList.remove("light", "dark", "base");
-
-    // Add the current theme class
     root.classList.add(theme);
-  }, [theme]);
+  }, [theme, isClient]);
+
+  const handleSetTheme = (newTheme: Theme) => {
+    setTheme(newTheme);
+    if (isClient) {
+      localStorage.setItem(storageKey, newTheme);
+    }
+  };
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
-    },
+    setTheme: handleSetTheme,
   };
 
   return (
