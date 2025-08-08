@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 type Theme = "dark" | "light" | "base";
 
@@ -46,12 +46,14 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
+  const handleSetTheme = useCallback((newTheme: Theme) => {
+    localStorage.setItem(storageKey, newTheme);
+    setTheme(newTheme);
+  }, [storageKey]);
+
   const value = {
     theme,
-    setTheme: (newTheme: Theme) => {
-      localStorage.setItem(storageKey, newTheme);
-      setTheme(newTheme);
-    },
+    setTheme: handleSetTheme,
   };
 
   return (
