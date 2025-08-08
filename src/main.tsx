@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import React from "react";
 import "./index.css";
-import { SimpleCoins } from "./pages/simple-coins";
+import { EnhancedCoins } from "./pages/enhanced-coins";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 import { WalletConnect } from "./components/wallet-connect";
 
@@ -308,7 +308,7 @@ function App() {
       <>
         <ThemeToggleSimple />
         <WalletConnect />
-        <SimpleCoins />
+        <EnhancedCoins />
       </>
     );
   }
