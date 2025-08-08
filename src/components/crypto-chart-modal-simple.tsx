@@ -1,4 +1,5 @@
 import React from "react";
+import Chart from 'react-apexcharts';
 
 interface CryptoChartModalProps {
   isOpen: boolean;
@@ -6,140 +7,184 @@ interface CryptoChartModalProps {
   cryptocurrency: any;
 }
 
-// Simple SVG chart component
-function SimpleChart({ data }: { data: Array<{ time: string; price: number }> }) {
+// ApexCharts component - same as the working version
+function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; price: number }>, coinName: string, days: number }) {
+  const [chartType, setChartType] = React.useState<'line' | 'area'>('area');
+
   if (!data || data.length === 0) return null;
 
-  const prices = data.map(d => d.price);
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
-  const priceRange = maxPrice - minPrice;
-  
-  // Generate SVG path
-  const svgWidth = 100; // percentage
-  const svgHeight = 100; // percentage
-  
-  const pathData = data.map((point, index) => {
-    const x = (index / (data.length - 1)) * svgWidth;
-    const y = svgHeight - ((point.price - minPrice) / priceRange) * svgHeight;
-    return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
-  }).join(' ');
+  // Calculate price change
+  const firstPrice = data[0]?.price || 0;
+  const lastPrice = data[data.length - 1]?.price || 0;
+  const priceChange = lastPrice - firstPrice;
+  const priceChangePercentage = firstPrice > 0 ? ((priceChange / firstPrice) * 100) : 0;
+  const isPositive = priceChange >= 0;
 
-  const isPositive = data[data.length - 1]?.price >= data[0]?.price;
-  const lineColor = isPositive ? '#22c55e' : '#ef4444';
-  const fillColor = isPositive ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+  // Prepare chart data
+  const chartData = data.map(point => ({
+    x: new Date(point.time).getTime(),
+    y: point.price
+  }));
+
+  const isDarkMode = document.documentElement.classList.contains('dark') || document.documentElement.classList.contains('base');
+
+  const chartOptions = {
+    chart: {
+      type: chartType as any,
+      height: 350,
+      toolbar: {
+        show: true,
+        tools: {
+          download: true,
+          selection: true,
+          zoom: true,
+          zoomin: true,
+          zoomout: true,
+          pan: true,
+          reset: true
+        }
+      },
+      zoom: {
+        enabled: true,
+        type: 'x' as any,
+        autoScaleYaxis: true
+      },
+      background: 'transparent'
+    },
+    theme: {
+      mode: (isDarkMode ? 'dark' : 'light') as 'dark' | 'light'
+    },
+    stroke: {
+      curve: 'smooth' as any,
+      width: 3
+    },
+    colors: [isPositive ? '#0052ff' : '#ef4444'],
+    fill: {
+      type: chartType === 'area' ? 'gradient' : 'solid',
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.7,
+        opacityTo: 0.1,
+        stops: [0, 100]
+      }
+    },
+    xaxis: {
+      type: 'datetime' as any,
+      labels: {
+        format: days === 1 ? 'HH:mm' : days <= 7 ? 'MMM dd' : 'MMM dd, yyyy',
+        style: {
+          colors: isDarkMode ? '#9ca3af' : '#6b7280'
+        }
+      }
+    },
+    yaxis: {
+      labels: {
+        formatter: (value: number) => `$${value.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: value < 1 ? 6 : 2,
+        })}`,
+        style: {
+          colors: isDarkMode ? '#9ca3af' : '#6b7280'
+        }
+      }
+    },
+    tooltip: {
+      theme: isDarkMode ? 'dark' : 'light',
+      x: {
+        format: days === 1 ? 'MMM dd, HH:mm' : 'MMM dd, yyyy'
+      },
+      y: {
+        formatter: (value: number) => `$${value.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: value < 1 ? 6 : 2,
+        })}`
+      }
+    },
+    grid: {
+      borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+      strokeDashArray: 3
+    },
+    dataLabels: {
+      enabled: false
+    }
+  };
+
+  const series = [{
+    name: `${coinName} Price`,
+    data: chartData
+  }];
 
   return (
-    <div style={{ 
-      width: '100%', 
-      height: '100%', 
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      {/* Chart Header */}
+    <div style={{ width: '100%', height: '100%' }}>
       <div style={{
-        padding: '16px',
-        borderBottom: '1px solid #e5e7eb'
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: '16px',
+        padding: '0 16px'
       }}>
         <div style={{
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          gap: '8px'
         }}>
-          <div style={{ fontSize: '14px', color: '#6b7280' }}>
-            Price Chart ({data.length} data points)
-          </div>
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
+            padding: '4px 8px',
+            borderRadius: '6px',
             fontSize: '12px',
-            color: lineColor,
-            fontWeight: '600'
+            fontWeight: '600',
+            backgroundColor: isPositive ? '#dcfce7' : '#fef2f2',
+            color: isPositive ? '#166534' : '#dc2626'
           }}>
-            {isPositive ? '📈' : '📉'}
-            {isPositive ? 'Trending Up' : 'Trending Down'}
+            {isPositive ? '+' : ''}{priceChangePercentage.toFixed(2)}%
           </div>
+          <span style={{ fontSize: '14px', color: '#6b7280' }}>
+            {data.length} data points
+          </span>
+        </div>
+        
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => setChartType('line')}
+            style={{
+              padding: '6px 12px',
+              fontSize: '12px',
+              fontWeight: '600',
+              border: '1px solid #e5e7eb',
+              borderRadius: '6px',
+              backgroundColor: chartType === 'line' ? '#0052ff' : 'transparent',
+              color: chartType === 'line' ? '#ffffff' : '#6b7280',
+              cursor: 'pointer'
+            }}
+          >
+            Line
+          </button>
+          <button
+            onClick={() => setChartType('area')}
+            style={{
+              padding: '6px 12px',
+              fontSize: '12px',
+              fontWeight: '600',
+              border: '1px solid #e5e7eb',
+              borderRadius: '6px',
+              backgroundColor: chartType === 'area' ? '#0052ff' : 'transparent',
+              color: chartType === 'area' ? '#ffffff' : '#6b7280',
+              cursor: 'pointer'
+            }}
+          >
+            Area
+          </button>
         </div>
       </div>
-
-      {/* SVG Chart */}
-      <div style={{ 
-        flex: 1, 
-        padding: '16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <svg
+      
+      <div style={{ width: '100%', height: '350px' }}>
+        <Chart
+          options={chartOptions}
+          series={series}
+          type={chartType}
+          height={350}
           width="100%"
-          height="100%"
-          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-          style={{ overflow: 'visible' }}
-        >
-          {/* Grid lines */}
-          <defs>
-            <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#f3f4f6" strokeWidth="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-          
-          {/* Area fill */}
-          <path
-            d={`${pathData} L ${svgWidth} ${svgHeight} L 0 ${svgHeight} Z`}
-            fill={fillColor}
-            stroke="none"
-          />
-          
-          {/* Price line */}
-          <path
-            d={pathData}
-            fill="none"
-            stroke={lineColor}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          
-          {/* Data points */}
-          {data.map((point, index) => {
-            const x = (index / (data.length - 1)) * svgWidth;
-            const y = svgHeight - ((point.price - minPrice) / priceRange) * svgHeight;
-            return (
-              <circle
-                key={index}
-                cx={x}
-                cy={y}
-                r="2"
-                fill={lineColor}
-                stroke="#ffffff"
-                strokeWidth="1"
-              />
-            );
-          })}
-        </svg>
-      </div>
-
-      {/* Price range info */}
-      <div style={{
-        padding: '12px 16px',
-        borderTop: '1px solid #e5e7eb',
-        display: 'flex',
-        justifyContent: 'space-between',
-        fontSize: '12px',
-        color: '#6b7280'
-      }}>
-        <div>
-          <span style={{ fontWeight: '600' }}>Low:</span> ${minPrice.toFixed(4)}
-        </div>
-        <div>
-          <span style={{ fontWeight: '600' }}>High:</span> ${maxPrice.toFixed(4)}
-        </div>
-        <div>
-          <span style={{ fontWeight: '600' }}>Range:</span> ${priceRange.toFixed(4)}
-        </div>
+        />
       </div>
     </div>
   );
@@ -154,31 +199,24 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
     if (isOpen && cryptocurrency?.id) {
       setLoading(true);
       
-      // Try multiple sources for chart data
-      Promise.race([
-        // Our API first
-        fetch(`/api/cryptocurrencies/${cryptocurrency.id}/chart?days=${timeframe}`)
-          .then(res => res.json()),
-        
-        // CoinGecko API as backup
-        fetch(`https://api.coingecko.com/api/v3/coins/${cryptocurrency.id}/market_chart?vs_currency=usd&days=${timeframe}`)
-          .then(res => res.json())
-          .then(data => ({
-            data: data.prices?.map(([timestamp, price]) => ({
-              time: new Date(timestamp).toISOString(),
-              price: price
-            })) || []
-          }))
-      ])
-      .then(data => {
-        console.log('Chart data received:', data);
-        setChartData(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Chart data error:', err);
-        setLoading(false);
-      });
+      // Use our working API endpoint
+      fetch(`/api/cryptocurrencies/${cryptocurrency.id}/chart?days=${timeframe}`)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log('Chart data received:', data);
+          setChartData(data);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error('Chart data error:', err);
+          setChartData(null);
+          setLoading(false);
+        });
     }
   }, [isOpen, cryptocurrency?.id, timeframe]);
 
@@ -506,7 +544,11 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
               <div>Loading chart data...</div>
             </div>
           ) : chartData?.data?.length > 0 ? (
-            <SimpleChart data={chartData.data} />
+            <WorkingChart 
+              data={chartData.data} 
+              coinName={cryptocurrency?.name || 'Unknown'}
+              days={parseInt(timeframe)}
+            />
           ) : (
             <div style={{
               position: 'absolute',
