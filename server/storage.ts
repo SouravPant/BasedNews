@@ -209,13 +209,18 @@ export class DatabaseStorage implements IStorage {
       conditions.push(eq(newsArticles.featured, featured));
     }
 
-    let query = db.select().from(newsArticles);
-    
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      return await db
+        .select()
+        .from(newsArticles)
+        .where(and(...conditions))
+        .orderBy(desc(newsArticles.publishedAt))
+        .limit(limit);
     }
 
-    return await query
+    return await db
+      .select()
+      .from(newsArticles)
       .orderBy(desc(newsArticles.publishedAt))
       .limit(limit);
   }
@@ -279,13 +284,18 @@ export class DatabaseStorage implements IStorage {
 
   // Reddit operations
   async getRedditPosts(subreddit?: string, limit: number = 10): Promise<RedditPost[]> {
-    let query = db.select().from(redditPosts);
-    
     if (subreddit) {
-      query = query.where(eq(redditPosts.subreddit, subreddit));
+      return await db
+        .select()
+        .from(redditPosts)
+        .where(eq(redditPosts.subreddit, subreddit))
+        .orderBy(desc(redditPosts.createdAt))
+        .limit(limit);
     }
-
-    return await query
+    
+    return await db
+      .select()
+      .from(redditPosts)
       .orderBy(desc(redditPosts.createdAt))
       .limit(limit);
   }
