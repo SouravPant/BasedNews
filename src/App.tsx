@@ -10,7 +10,7 @@ import NotFound from "@/pages/not-found";
 
 function App() {
   return (
-    <div className="light">
+    <div className="light" style={{ minHeight: '100vh', background: 'var(--background, #ffffff)' }}>
       <QueryClientProvider client={queryClient}>
         <MiniKitProvider>
           <TooltipProvider>
