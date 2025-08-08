@@ -3,6 +3,12 @@
 ## Overview
 BasedHub is a full-stack cryptocurrency dashboard application focused on providing real-time market data, news, and social media sentiment for top cryptocurrencies. It aims to offer a comprehensive view of the cryptocurrency market landscape, with a modern design and responsive UI, supporting both light and dark modes. The project has evolved to specifically function as a focused crypto news aggregator, capable of integrating as a Base Mini App for enhanced wallet connectivity and social features.
 
+## Recent Changes
+- **Migration Completed (Aug 8, 2025)**: Successfully migrated from Replit Agent to standard Replit environment
+- **Database Setup**: Provisioned PostgreSQL database with complete schema deployment
+- **Vercel Configuration**: Ready for deployment with serverless API functions and automated news cron jobs
+- **Build System**: Optimized for both development on Replit and production deployment on Vercel
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
