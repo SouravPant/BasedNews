@@ -78,8 +78,12 @@ if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
     }, () => {
       log(`serving on port ${port}`);
       
-      // Start the news scheduler after server starts
-      startNewsScheduler();
+      // Only start the news scheduler in development (not in Vercel serverless)
+      if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+        startNewsScheduler();
+      } else {
+        log('Skipping local news scheduler - using Vercel cron jobs');
+      }
     });
   });
 }
