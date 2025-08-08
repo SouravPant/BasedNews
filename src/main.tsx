@@ -4,10 +4,13 @@ import "./index.css";
 import { EnhancedCoins } from "./pages/enhanced-coins";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 import { WalletConnect } from "./components/wallet-connect";
+import { NewsSummaryModal } from "./components/news-summary-modal";
 
 function WorkingNewsApp() {
   const [news, setNews] = React.useState([]);
   const [status, setStatus] = React.useState('Loading news...');
+  const [selectedArticle, setSelectedArticle] = React.useState(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   React.useEffect(() => {
     console.log('Fetching news...');
@@ -23,6 +26,16 @@ function WorkingNewsApp() {
         setStatus('Error loading news: ' + err.message);
       });
   }, []);
+
+  const handleArticleClick = (article) => {
+    setSelectedArticle(article);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedArticle(null);
+  };
 
   return (
     <div style={{
@@ -119,6 +132,7 @@ function WorkingNewsApp() {
           {news.map((article, index) => (
             <article 
               key={index}
+              onClick={() => handleArticleClick(article)}
               style={{
                 border: '1px solid #e5e7eb',
                 borderRadius: '12px',
@@ -137,15 +151,35 @@ function WorkingNewsApp() {
                 e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)';
               }}
             >
-              <h3 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: '#1f2937',
-                marginBottom: '12px',
-                lineHeight: '1.4'
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                marginBottom: '12px'
               }}>
-                {article.title}
-              </h3>
+                <h3 style={{
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  color: '#1f2937',
+                  lineHeight: '1.4',
+                  flex: 1,
+                  marginRight: '8px',
+                  margin: 0
+                }}>
+                  {article.title}
+                </h3>
+                <span style={{
+                  fontSize: '12px',
+                  backgroundColor: '#dbeafe',
+                  color: '#1d4ed8',
+                  padding: '4px 8px',
+                  borderRadius: '20px',
+                  fontWeight: '600',
+                  whiteSpace: 'nowrap'
+                }}>
+                  📝 Summary
+                </span>
+              </div>
 
               {article.description && (
                 <p style={{
@@ -252,6 +286,13 @@ function WorkingNewsApp() {
           Real-time cryptocurrency news aggregator • Built with React
         </p>
       </footer>
+
+      {/* News Summary Modal */}
+      <NewsSummaryModal 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        article={selectedArticle}
+      />
     </div>
   );
 }
