@@ -4,50 +4,51 @@
 
 :root {
   --background: hsl(0, 0%, 100%);
-  --foreground: hsl(220, 90%, 20%);
-  --muted: hsl(217, 50%, 95%);
-  --muted-foreground: hsl(217, 30%, 50%);
+  --foreground: hsl(221, 39%, 11%);
+  --muted: hsl(210, 40%, 98%);
+  --muted-foreground: hsl(215, 16%, 47%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(220, 90%, 20%);
+  --popover-foreground: hsl(221, 39%, 11%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(220, 90%, 20%);
-  --border: hsl(217, 50%, 85%);
-  --input: hsl(217, 50%, 85%);
-  --primary: hsl(217, 91%, 60%);
+  --card-foreground: hsl(221, 39%, 11%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --primary: hsl(221, 83%, 53%);
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(217, 50%, 95%);
-  --secondary-foreground: hsl(220, 90%, 20%);
-  --accent: hsl(217, 50%, 95%);
-  --accent-foreground: hsl(220, 90%, 20%);
+  --secondary: hsl(210, 40%, 98%);
+  --secondary-foreground: hsl(221, 39%, 11%);
+  --accent: hsl(210, 40%, 98%);
+  --accent-foreground: hsl(221, 39%, 11%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(217, 91%, 60%);
+  --ring: hsl(221, 83%, 53%);
   --radius: 0.5rem;
   
-  /* Based-specific colors - Blue and White theme */
-  --based-primary: hsl(217, 91%, 60%);
-  --based-secondary: hsl(142, 76%, 36%);
-  --based-accent: hsl(0, 73%, 41%);
-  --based-surface: hsl(217, 50%, 95%);
-  --based-background: hsl(0, 0%, 100%);
+  /* Base-specific colors inspired by Base.org */
+  --base-blue: hsl(221, 83%, 53%);
+  --base-blue-light: hsl(214, 95%, 93%);
+  --base-blue-dark: hsl(221, 39%, 11%);
+  --base-surface: hsl(210, 40%, 98%);
+  --base-background: hsl(0, 0%, 100%);
+  --base-border: hsl(214, 32%, 91%);
 }
 
 .dark {
-  --background: hsl(220, 100%, 4%);
+  --background: hsl(221, 39%, 11%);
   --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(220, 50%, 12%);
-  --muted-foreground: hsl(220, 15%, 65%);
-  --popover: hsl(220, 100%, 4%);
+  --muted: hsl(215, 28%, 17%);
+  --muted-foreground: hsl(215, 16%, 65%);
+  --popover: hsl(221, 39%, 11%);
   --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(220, 50%, 8%);
+  --card: hsl(215, 28%, 17%);
   --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(220, 50%, 12%);
-  --input: hsl(220, 50%, 12%);
-  --primary: hsl(217, 91%, 60%);
+  --border: hsl(215, 28%, 17%);
+  --input: hsl(215, 28%, 17%);
+  --primary: hsl(221, 83%, 53%);
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(220, 50%, 12%);
+  --secondary: hsl(215, 28%, 17%);
   --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(220, 50%, 12%);
+  --accent: hsl(215, 28%, 17%);
   --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(0, 0%, 98%);

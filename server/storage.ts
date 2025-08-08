@@ -112,7 +112,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Cryptocurrency operations
-  async getCryptocurrencies(limit: number = 50): Promise<Cryptocurrency[]> {
+  async getCryptocurrencies(limit: number = 100): Promise<Cryptocurrency[]> {
     return await db
       .select()
       .from(cryptocurrencies)
@@ -221,11 +221,46 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createNewsArticle(article: InsertNewsArticle): Promise<NewsArticle> {
-    const [newsArticle] = await db
-      .insert(newsArticles)
-      .values(article)
-      .returning();
-    return newsArticle;
+    try {
+      // Check for existing article with same title or URL to prevent duplicates
+      const existing = await db
+        .select()
+        .from(newsArticles)
+        .where(
+          or(
+            eq(newsArticles.title, article.title),
+            article.url ? eq(newsArticles.url, article.url) : undefined
+          )
+        )
+        .limit(1);
+
+      if (existing.length > 0) {
+        // Return existing article instead of creating duplicate
+        console.log(`Duplicate article detected: "${article.title}" - returning existing`);
+        return existing[0];
+      }
+
+      const [newsArticle] = await db
+        .insert(newsArticles)
+        .values(article)
+        .onConflictDoNothing()
+        .returning();
+      
+      // If no article was returned due to conflict, fetch the existing one
+      if (!newsArticle) {
+        const [existingArticle] = await db
+          .select()
+          .from(newsArticles)
+          .where(eq(newsArticles.title, article.title))
+          .limit(1);
+        return existingArticle;
+      }
+      
+      return newsArticle;
+    } catch (error) {
+      console.error('Error creating news article:', error);
+      throw error;
+    }
   }
 
   async searchNews(query: string): Promise<NewsArticle[]> {
