@@ -63,50 +63,79 @@
 }
 
 .base {
-  /* Base app inspired theme - Blue gradient with modern dark elements */
-  --background: hsl(220, 20%, 8%);
+  /* Base app inspired theme - Blue brand colors from Base.org */
+  --background: hsl(216, 20%, 10%);
   --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(217, 25%, 15%);
-  --muted-foreground: hsl(217, 20%, 65%);
-  --popover: hsl(220, 20%, 10%);
+  --muted: hsl(216, 15%, 20%);
+  --muted-foreground: hsl(216, 10%, 65%);
+  --popover: hsl(216, 25%, 8%);
   --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(220, 25%, 12%);
+  --card: hsl(216, 20%, 15%);
   --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(217, 30%, 18%);
-  --input: hsl(217, 30%, 18%);
-  --primary: hsl(217, 91%, 60%);
+  --border: hsl(216, 15%, 25%);
+  --input: hsl(216, 15%, 25%);
+  --primary: hsl(221, 83%, 53%); /* Base blue #0052FF */
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(217, 25%, 15%);
+  --secondary: hsl(216, 15%, 20%);
   --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(217, 91%, 60%);
+  --accent: hsl(221, 83%, 53%);
   --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(217, 91%, 60%);
+  --ring: hsl(221, 83%, 53%);
   --radius: 0.75rem;
 
-  /* Base mode - Inspired by Base brand colors */
-  --based-primary: hsl(217, 91%, 60%);
-  --based-secondary: hsl(142, 76%, 36%);
+  /* Base brand colors */
+  --based-primary: hsl(221, 83%, 53%); /* #0052FF */
+  --based-secondary: hsl(216, 15%, 20%);
   --based-accent: hsl(0, 73%, 41%);
-  --based-surface: hsl(220, 25%, 12%);
-  --based-background: hsl(220, 20%, 8%);
+  --based-surface: hsl(216, 20%, 15%);
+  --based-background: hsl(216, 20%, 10%);
 }
 
-/* Base mode specific styling with gradient header/footer */
+/* Base mode body styling */
 .base {
-  background: linear-gradient(180deg, hsl(217, 91%, 60%) 0%, hsl(220, 20%, 8%) 15%, hsl(220, 20%, 8%) 85%, hsl(0, 0%, 0%) 100%);
+  background: radial-gradient(ellipse at top, hsl(221, 83%, 8%) 0%, hsl(216, 20%, 10%) 50%, hsl(220, 20%, 5%) 100%);
   min-height: 100vh;
 }
 
+/* Base mode header with brand blue gradient */
 .base header {
-  background: linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(217, 80%, 45%) 100%);
-  border-bottom: 1px solid hsl(217, 50%, 25%);
+  background: linear-gradient(135deg, hsl(221, 83%, 53%) 0%, hsl(221, 80%, 45%) 100%);
+  border-bottom: 1px solid hsl(221, 50%, 25%);
+  backdrop-filter: blur(10px);
 }
 
+/* Base mode footer */
 .base footer {
-  background: linear-gradient(135deg, hsl(0, 0%, 0%) 0%, hsl(220, 20%, 8%) 100%);
-  border-top: 1px solid hsl(217, 30%, 18%);
+  background: linear-gradient(135deg, hsl(216, 20%, 5%) 0%, hsl(216, 20%, 10%) 100%);
+  border-top: 1px solid hsl(216, 15%, 25%);
+}
+
+/* Improved image loading and error states */
+.image-loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+.dark .image-loading {
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+}
+
+.base .image-loading {
+  background: linear-gradient(90deg, hsl(216, 20%, 15%) 25%, hsl(216, 25%, 20%) 50%, hsl(216, 20%, 15%) 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 @layer base {

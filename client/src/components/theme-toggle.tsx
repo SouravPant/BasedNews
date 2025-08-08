@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Moon, Sun, Monitor, Zap } from "lucide-react";
+import { Moon, Sun, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -34,10 +34,6 @@ export function ThemeToggle() {
         <DropdownMenuItem onClick={() => setTheme("base")}>
           <Zap className="mr-2 h-4 w-4" />
           <span>Base Mode</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          <Monitor className="mr-2 h-4 w-4" />
-          <span>System</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

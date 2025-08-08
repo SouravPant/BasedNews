@@ -89,16 +89,39 @@ export function NewsArticle({ article, onClick }: NewsArticleProps) {
             <img 
               src={article.imageUrl} 
               alt={article.title}
-              className="w-full h-48 rounded-lg object-cover mb-4"
+              className="w-full h-48 rounded-lg object-cover mb-4 bg-gray-100 dark:bg-gray-800"
+              loading="lazy"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDQwMCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTEyLjVMMjAwIDg3LjVMMjI1IDExMi41TDI1MCA4Ny41TDI3NSAxNzUuNUgxMjVMMTc1IDExMi41WiIgZmlsbD0iIzlDQTNBRiIvPgo8Y2lyY2xlIGN4PSIxNTAiIGN5PSIxMDAiIHI9IjEyLjUiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+';
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                // Create and show placeholder
+                const placeholder = target.parentElement?.querySelector('.image-placeholder');
+                if (placeholder) {
+                  (placeholder as HTMLElement).style.display = 'flex';
+                }
               }}
+              onLoad={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.opacity = '1';
+              }}
+              style={{ opacity: 0, transition: 'opacity 0.3s ease' }}
             />
-          ) : (
-            <div className="w-full h-48 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+          ) : null}
+          
+          {/* Placeholder for failed images */}
+          <div className="image-placeholder w-full h-48 bg-gray-100 dark:bg-gray-700 base:bg-gray-800 rounded-lg flex-col items-center justify-center mb-4 hidden">
+            <svg className="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+            </svg>
+            <span className="text-xs text-gray-500">Image not available</span>
+          </div>
+          
+          {!article.imageUrl && (
+            <div className="w-full h-48 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-700 dark:to-gray-800 base:from-blue-900/20 base:to-blue-800/20 rounded-lg flex flex-col items-center justify-center mb-4 border border-gray-200 dark:border-gray-600 base:border-blue-800/30">
+              <svg className="w-12 h-12 text-blue-500 dark:text-blue-400 base:text-blue-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v4.5H6v-4.5Z" />
               </svg>
+              <span className="text-xs text-blue-600 dark:text-blue-400 base:text-blue-400 font-medium">Crypto News</span>
             </div>
           )}
           
