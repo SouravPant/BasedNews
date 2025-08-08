@@ -1,8 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "vite build --config vite.config.simple.ts && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+  "buildCommand": "vite build --config vite.config.simple.ts",
   "outputDirectory": "dist",
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
