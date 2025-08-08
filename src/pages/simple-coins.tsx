@@ -9,18 +9,73 @@ export function SimpleCoins() {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   React.useEffect(() => {
-    console.log('Fetching cryptocurrency data...');
-    fetch('/api/cryptocurrencies?per_page=100')
-      .then(res => res.json())
-      .then(data => {
-        console.log('Crypto data loaded:', data.length, 'coins');
-        setCoins(Array.isArray(data) ? data : []);
-        setStatus(`Successfully loaded top cryptocurrencies`);
-      })
-      .catch(err => {
-        console.error('Error loading crypto data:', err);
-        setStatus('Error loading cryptocurrencies: ' + err.message);
-      });
+    console.log('Fetching Base ecosystem cryptocurrency data...');
+    
+    // First try to get Base ecosystem tokens specifically
+    const baseEcosystemIds = [
+      'aerodrome-finance', 'based-brett', 'degen-base', 'coinbase-wrapped-staked-eth',
+      'toshi', 'moca-network', 'zora', 'kaito', 'morpho', 'virtual-protocol',
+      'curve-dao-token', 'pancakeswap', 'maple-finance', 'balancer', 'sushiswap',
+      'reserve-rights', 'wormhole', 'axelar', 'layerzero', 'iotex'
+    ];
+
+    // Fetch multiple sources for comprehensive Base ecosystem data
+    Promise.all([
+      // Base ecosystem tokens from our API
+      fetch('/api/cryptocurrencies?per_page=100')
+        .then(res => res.json())
+        .catch(() => []),
+      
+      // CoinGecko API for Base ecosystem (backup)
+      fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${baseEcosystemIds.join(',')}&order=market_cap_desc&per_page=50&page=1&sparkline=false`)
+        .then(res => res.json())
+        .catch(() => [])
+    ])
+    .then(([apiData, coinGeckoData]) => {
+      console.log('API data:', apiData.length, 'CoinGecko data:', coinGeckoData.length);
+      
+      // Combine and deduplicate data, prioritizing Base ecosystem tokens
+      const combined = [];
+      const seenIds = new Set();
+
+      // Add CoinGecko Base ecosystem data first (if available)
+      if (Array.isArray(coinGeckoData)) {
+        coinGeckoData.forEach(coin => {
+          if (!seenIds.has(coin.id)) {
+            combined.push({
+              id: coin.id,
+              name: coin.name,
+              symbol: coin.symbol,
+              currentPrice: coin.current_price?.toString(),
+              priceChangePercentage24h: coin.price_change_percentage_24h?.toString(),
+              marketCap: coin.market_cap?.toString(),
+              volume24h: coin.total_volume?.toString(),
+              marketCapRank: coin.market_cap_rank,
+              image: coin.image
+            });
+            seenIds.add(coin.id);
+          }
+        });
+      }
+
+      // Add our API data, filtering for any remaining spots
+      if (Array.isArray(apiData)) {
+        apiData.forEach(coin => {
+          if (!seenIds.has(coin.id) && combined.length < 100) {
+            combined.push(coin);
+            seenIds.add(coin.id);
+          }
+        });
+      }
+
+      setCoins(combined);
+      setStatus(`Successfully loaded Base ecosystem cryptocurrencies`);
+      console.log('Combined crypto data:', combined.length, 'total coins');
+    })
+    .catch(err => {
+      console.error('Error loading crypto data:', err);
+      setStatus('Error loading cryptocurrencies: ' + err.message);
+    });
   }, []);
 
   const filteredCoins = coins.filter(coin => {

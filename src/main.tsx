@@ -3,6 +3,7 @@ import React from "react";
 import "./index.css";
 import { SimpleCoins } from "./pages/simple-coins";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
+import { WalletConnect } from "./components/wallet-connect";
 
 function WorkingNewsApp() {
   const [news, setNews] = React.useState([]);
@@ -306,6 +307,7 @@ function App() {
     return (
       <>
         <ThemeToggleSimple />
+        <WalletConnect />
         <SimpleCoins />
       </>
     );
@@ -314,6 +316,7 @@ function App() {
   return (
     <>
       <ThemeToggleSimple />
+      <WalletConnect />
       <WorkingNewsApp />
     </>
   );

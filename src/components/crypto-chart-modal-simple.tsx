@@ -6,6 +6,145 @@ interface CryptoChartModalProps {
   cryptocurrency: any;
 }
 
+// Simple SVG chart component
+function SimpleChart({ data }: { data: Array<{ time: string; price: number }> }) {
+  if (!data || data.length === 0) return null;
+
+  const prices = data.map(d => d.price);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  const priceRange = maxPrice - minPrice;
+  
+  // Generate SVG path
+  const svgWidth = 100; // percentage
+  const svgHeight = 100; // percentage
+  
+  const pathData = data.map((point, index) => {
+    const x = (index / (data.length - 1)) * svgWidth;
+    const y = svgHeight - ((point.price - minPrice) / priceRange) * svgHeight;
+    return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+  }).join(' ');
+
+  const isPositive = data[data.length - 1]?.price >= data[0]?.price;
+  const lineColor = isPositive ? '#22c55e' : '#ef4444';
+  const fillColor = isPositive ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+
+  return (
+    <div style={{ 
+      width: '100%', 
+      height: '100%', 
+      position: 'relative',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      {/* Chart Header */}
+      <div style={{
+        padding: '16px',
+        borderBottom: '1px solid #e5e7eb'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <div style={{ fontSize: '14px', color: '#6b7280' }}>
+            Price Chart ({data.length} data points)
+          </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '12px',
+            color: lineColor,
+            fontWeight: '600'
+          }}>
+            {isPositive ? '📈' : '📉'}
+            {isPositive ? 'Trending Up' : 'Trending Down'}
+          </div>
+        </div>
+      </div>
+
+      {/* SVG Chart */}
+      <div style={{ 
+        flex: 1, 
+        padding: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <svg
+          width="100%"
+          height="100%"
+          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+          style={{ overflow: 'visible' }}
+        >
+          {/* Grid lines */}
+          <defs>
+            <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#f3f4f6" strokeWidth="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+          
+          {/* Area fill */}
+          <path
+            d={`${pathData} L ${svgWidth} ${svgHeight} L 0 ${svgHeight} Z`}
+            fill={fillColor}
+            stroke="none"
+          />
+          
+          {/* Price line */}
+          <path
+            d={pathData}
+            fill="none"
+            stroke={lineColor}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          
+          {/* Data points */}
+          {data.map((point, index) => {
+            const x = (index / (data.length - 1)) * svgWidth;
+            const y = svgHeight - ((point.price - minPrice) / priceRange) * svgHeight;
+            return (
+              <circle
+                key={index}
+                cx={x}
+                cy={y}
+                r="2"
+                fill={lineColor}
+                stroke="#ffffff"
+                strokeWidth="1"
+              />
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* Price range info */}
+      <div style={{
+        padding: '12px 16px',
+        borderTop: '1px solid #e5e7eb',
+        display: 'flex',
+        justifyContent: 'space-between',
+        fontSize: '12px',
+        color: '#6b7280'
+      }}>
+        <div>
+          <span style={{ fontWeight: '600' }}>Low:</span> ${minPrice.toFixed(4)}
+        </div>
+        <div>
+          <span style={{ fontWeight: '600' }}>High:</span> ${maxPrice.toFixed(4)}
+        </div>
+        <div>
+          <span style={{ fontWeight: '600' }}>Range:</span> ${priceRange.toFixed(4)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: CryptoChartModalProps) {
   const [chartData, setChartData] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
@@ -14,16 +153,32 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
   React.useEffect(() => {
     if (isOpen && cryptocurrency?.id) {
       setLoading(true);
-      fetch(`/api/cryptocurrencies/${cryptocurrency.id}/chart?days=${timeframe}`)
-        .then(res => res.json())
-        .then(data => {
-          setChartData(data);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error('Chart data error:', err);
-          setLoading(false);
-        });
+      
+      // Try multiple sources for chart data
+      Promise.race([
+        // Our API first
+        fetch(`/api/cryptocurrencies/${cryptocurrency.id}/chart?days=${timeframe}`)
+          .then(res => res.json()),
+        
+        // CoinGecko API as backup
+        fetch(`https://api.coingecko.com/api/v3/coins/${cryptocurrency.id}/market_chart?vs_currency=usd&days=${timeframe}`)
+          .then(res => res.json())
+          .then(data => ({
+            data: data.prices?.map(([timestamp, price]) => ({
+              time: new Date(timestamp).toISOString(),
+              price: price
+            })) || []
+          }))
+      ])
+      .then(data => {
+        console.log('Chart data received:', data);
+        setChartData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Chart data error:', err);
+        setLoading(false);
+      });
     }
   }, [isOpen, cryptocurrency?.id, timeframe]);
 
@@ -325,43 +480,39 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
           height: '300px',
           backgroundColor: '#f9fafb',
           borderRadius: '12px',
-          border: '2px dashed #d1d5db',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '24px'
+          border: '1px solid #e5e7eb',
+          marginBottom: '24px',
+          position: 'relative',
+          overflow: 'hidden'
         }}>
           {loading ? (
             <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
               textAlign: 'center',
               color: '#6b7280'
             }}>
               <div style={{
-                fontSize: '18px',
-                marginBottom: '8px'
-              }}>
-                📊
-              </div>
+                width: '40px',
+                height: '40px',
+                border: '4px solid #e5e7eb',
+                borderTop: '4px solid #2563eb',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 12px'
+              }}></div>
               <div>Loading chart data...</div>
             </div>
           ) : chartData?.data?.length > 0 ? (
-            <div style={{
-              textAlign: 'center',
-              color: '#6b7280'
-            }}>
-              <div style={{
-                fontSize: '18px',
-                marginBottom: '8px'
-              }}>
-                📈
-              </div>
-              <div>Chart data loaded ({chartData.data.length} points)</div>
-              <div style={{ fontSize: '12px', marginTop: '4px' }}>
-                Interactive charts coming soon!
-              </div>
-            </div>
+            <SimpleChart data={chartData.data} />
           ) : (
             <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
               textAlign: 'center',
               color: '#6b7280'
             }}>
@@ -371,7 +522,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
               }}>
                 📊
               </div>
-              <div>Chart unavailable</div>
+              <div>Chart data unavailable</div>
             </div>
           )}
         </div>

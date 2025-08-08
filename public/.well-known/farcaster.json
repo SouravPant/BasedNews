@@ -1,0 +1,21 @@
+{
+  "frame": {
+    "version": "1",
+    "name": "BasedNews",
+    "subtitle": "Base Ecosystem News & Crypto Tracker",
+    "description": "Real-time cryptocurrency news aggregator and market data for the Base ecosystem. Track prices, view charts, and stay updated with the latest crypto news - all in one mini app.",
+    "iconUrl": "https://based-news-eight.vercel.app/icon.png",
+    "homeUrl": "https://based-news-eight.vercel.app",
+    "splashImageUrl": "https://based-news-eight.vercel.app/splash.png",
+    "splashBackgroundColor": "#0052ff",
+    "heroImageUrl": "https://based-news-eight.vercel.app/hero.png",
+    "tagline": "Your Base ecosystem crypto companion",
+    "screenshotUrls": [
+      "https://based-news-eight.vercel.app/screenshot1.png",
+      "https://based-news-eight.vercel.app/screenshot2.png"
+    ],
+    "primaryCategory": "finance",
+    "tags": ["crypto", "news", "base", "defi", "trading", "charts"],
+    "noindex": true
+  }
+}

@@ -1,27 +1,26 @@
 import React from "react";
 
 export function ThemeToggleSimple() {
-  const [theme, setTheme] = React.useState('light');
+  const [theme, setTheme] = React.useState('base');
   const [isOpen, setIsOpen] = React.useState(false);
 
   React.useEffect(() => {
-    // Load saved theme
-    const savedTheme = localStorage.getItem('basedhub-theme') || 'light';
+    // Load saved theme, default to base theme for mini app
+    const savedTheme = localStorage.getItem('basedhub-theme') || 'base';
     setTheme(savedTheme);
-    document.documentElement.classList.remove('light', 'dark', 'base');
+    document.documentElement.classList.remove('dark', 'base');
     document.documentElement.classList.add(savedTheme);
   }, []);
 
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
-    document.documentElement.classList.remove('light', 'dark', 'base');
+    document.documentElement.classList.remove('dark', 'base');
     document.documentElement.classList.add(newTheme);
     localStorage.setItem('basedhub-theme', newTheme);
     setIsOpen(false);
   };
 
   const themes = [
-    { id: 'light', name: 'Light', icon: '☀️', description: 'Clean and bright' },
     { id: 'dark', name: 'Dark', icon: '🌙', description: 'Easy on the eyes' },
     { id: 'base', name: 'Base', icon: '🔵', description: 'Base.org official theme' }
   ];
@@ -36,8 +35,8 @@ export function ThemeToggleSimple() {
           left: '20px',
           zIndex: 1000,
           padding: '12px',
-          backgroundColor: theme === 'light' ? '#ffffff' : theme === 'dark' ? '#1f2937' : '#0052ff',
-          border: `2px solid ${theme === 'light' ? '#e5e7eb' : theme === 'dark' ? '#374151' : '#0066ff'}`,
+          backgroundColor: theme === 'dark' ? '#1f2937' : '#0052ff',
+          border: `2px solid ${theme === 'dark' ? '#374151' : '#0066ff'}`,
           borderRadius: '12px',
           cursor: 'pointer',
           fontSize: '18px',
@@ -46,7 +45,7 @@ export function ThemeToggleSimple() {
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          color: theme === 'light' ? '#1f2937' : '#ffffff'
+          color: '#ffffff'
         }}
         onMouseOver={(e) => {
           e.currentTarget.style.transform = 'scale(1.05)';
@@ -70,8 +69,8 @@ export function ThemeToggleSimple() {
             top: '80px',
             left: '20px',
             zIndex: 1001,
-            backgroundColor: theme === 'light' ? '#ffffff' : theme === 'dark' ? '#1f2937' : '#001a66',
-            border: `1px solid ${theme === 'light' ? '#e5e7eb' : theme === 'dark' ? '#374151' : '#0066ff'}`,
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#001a66',
+            border: `1px solid ${theme === 'dark' ? '#374151' : '#0066ff'}`,
             borderRadius: '12px',
             boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
             overflow: 'hidden',
@@ -91,16 +90,16 @@ export function ThemeToggleSimple() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                color: theme === 'light' ? '#1f2937' : '#ffffff',
+                color: '#ffffff',
                 transition: 'all 0.2s ease',
-                borderBottom: themeOption.id !== 'base' ? `1px solid ${theme === 'light' ? '#f3f4f6' : '#374151'}` : 'none'
+                borderBottom: themeOption.id !== 'base' ? `1px solid ${theme === 'dark' ? '#374151' : '#0066ff'}` : 'none'
               }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = theme === 'light' ? '#f9fafb' : theme === 'dark' ? '#374151' : '#0066ff';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
+                              onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = theme === 'dark' ? '#374151' : '#0066ff';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
             >
               <span style={{ fontSize: '20px' }}>{themeOption.icon}</span>
               <div style={{ textAlign: 'left' }}>
@@ -112,7 +111,7 @@ export function ThemeToggleSimple() {
                 </div>
                 <div style={{ 
                   fontSize: '12px', 
-                  color: theme === 'light' ? '#6b7280' : '#9ca3af',
+                  color: '#9ca3af',
                   marginTop: '2px'
                 }}>
                   {themeOption.description}
