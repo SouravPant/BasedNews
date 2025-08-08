@@ -740,8 +740,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             url: "https://example.com/news/ethereum-staking-rewards",
             source: "Crypto News",
             publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+            imageUrl: generateCryptoImage("Ethereum 2.0 Staking Rewards Hit Record High"),
             sentiment: "bullish",
-            summary: generateRandomSummary()
+            summary: generateContextualSummary("Ethereum 2.0 Staking Rewards Hit Record High")
           },
           {
             title: "DeFi TVL Surpasses $100 Billion Milestone",
@@ -749,8 +750,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             url: "https://example.com/news/defi-tvl-milestone",
             source: "Crypto News",
             publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+            imageUrl: generateCryptoImage("DeFi TVL Surpasses $100 Billion Milestone"),
             sentiment: "neutral",
-            summary: generateRandomSummary()
+            summary: generateContextualSummary("DeFi TVL Surpasses $100 Billion Milestone")
           },
           {
             title: "Major Bank Announces Bitcoin Treasury Strategy",
@@ -758,8 +760,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             url: "https://example.com/news/bank-bitcoin-treasury",
             source: "Crypto News",
             publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
+            imageUrl: generateCryptoImage("Major Bank Announces Bitcoin Treasury Strategy"),
             sentiment: "bullish",
-            summary: generateRandomSummary()
+            summary: generateContextualSummary("Major Bank Announces Bitcoin Treasury Strategy")
           },
           {
             title: "Solana Network Experiences Unprecedented Growth",
@@ -767,8 +770,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             url: "https://example.com/news/solana-growth",
             source: "Crypto News",
             publishedAt: new Date(Date.now() - 10 * 60 * 60 * 1000), // 10 hours ago
+            imageUrl: generateCryptoImage("Solana Network Experiences Unprecedented Growth"),
             sentiment: "bullish",
-            summary: generateRandomSummary()
+            summary: generateContextualSummary("Solana Network Experiences Unprecedented Growth")
           },
           {
             title: "Regulatory Clarity Boosts Institutional Crypto Interest",
@@ -776,8 +780,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             url: "https://example.com/news/regulatory-clarity",
             source: "Crypto News",
             publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
+            imageUrl: generateCryptoImage("Regulatory Clarity Boosts Institutional Crypto Interest"),
             sentiment: "bullish",
-            summary: generateRandomSummary()
+            summary: generateContextualSummary("Regulatory Clarity Boosts Institutional Crypto Interest")
           },
           {
             title: "Layer 2 Solutions Drive Ethereum Fee Reduction",
@@ -785,8 +790,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             url: "https://example.com/news/layer2-fees",
             source: "Crypto News",
             publishedAt: new Date(Date.now() - 14 * 60 * 60 * 1000), // 14 hours ago
+            imageUrl: generateCryptoImage("Layer 2 Solutions Drive Ethereum Fee Reduction"),
             sentiment: "neutral",
-            summary: generateRandomSummary()
+            summary: generateContextualSummary("Layer 2 Solutions Drive Ethereum Fee Reduction")
           },
           {
             title: "NFT Market Shows Signs of Recovery",
@@ -794,8 +800,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             url: "https://example.com/news/nft-recovery",
             source: "Crypto News",
             publishedAt: new Date(Date.now() - 16 * 60 * 60 * 1000), // 16 hours ago
+            imageUrl: generateCryptoImage("NFT Market Shows Signs of Recovery"),
             sentiment: "neutral",
-            summary: generateRandomSummary()
+            summary: generateContextualSummary("NFT Market Shows Signs of Recovery")
           },
           {
             title: "Cross-Chain Bridge Technology Reaches New Milestone",

@@ -67,22 +67,22 @@
   --background: hsl(216, 20%, 10%);
   --foreground: hsl(0, 0%, 98%);
   --muted: hsl(216, 15%, 20%);
-  --muted-foreground: hsl(216, 10%, 65%);
+  --muted-foreground: hsl(216, 10%, 75%);
   --popover: hsl(216, 25%, 8%);
   --popover-foreground: hsl(0, 0%, 98%);
   --card: hsl(216, 20%, 15%);
   --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(216, 15%, 25%);
-  --input: hsl(216, 15%, 25%);
-  --primary: hsl(221, 83%, 53%); /* Base blue #0052FF */
+  --border: hsl(216, 15%, 35%);
+  --input: hsl(216, 15%, 35%);
+  --primary: hsl(221, 83%, 55%); /* Base blue #0052FF */
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(216, 15%, 20%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(221, 83%, 53%);
+  --secondary: hsl(216, 15%, 25%);
+  --secondary-foreground: hsl(0, 0%, 90%);
+  --accent: hsl(221, 83%, 55%);
   --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive: hsl(0, 62.8%, 50%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(221, 83%, 53%);
+  --ring: hsl(221, 83%, 55%);
   --radius: 0.75rem;
 
   /* Base brand colors */
@@ -97,6 +97,15 @@
 .base {
   background: radial-gradient(ellipse at top, hsl(221, 83%, 8%) 0%, hsl(216, 20%, 10%) 50%, hsl(220, 20%, 5%) 100%);
   min-height: 100vh;
+}
+
+/* Ensure text visibility in base mode */
+.base h1, .base h2, .base h3, .base p, .base div, .base span {
+  color: var(--foreground) !important;
+}
+
+.base .text-muted-foreground {
+  color: hsl(216, 10%, 75%) !important;
 }
 
 /* Base mode header with brand blue gradient */
