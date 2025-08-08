@@ -1,100 +1,160 @@
 import { createRoot } from "react-dom/client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./index.css";
 
-// Extremely basic test component
-function TestApp() {
+// Minimal news app
+function SimpleNewsApp() {
+  const [news, setNews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/news')
+      .then(res => res.json())
+      .then(data => {
+        setNews(Array.isArray(data) ? data.slice(0, 6) : []);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+        <h1>BasedNews</h1>
+        <p>Loading news...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+        <h1>BasedNews</h1>
+        <p style={{ color: 'red' }}>Error loading news: {error}</p>
+      </div>
+    );
+  }
+
   return (
     <div style={{ 
       padding: '20px', 
       fontFamily: 'Arial, sans-serif',
-      minHeight: '100vh',
-      background: '#ffffff'
+      maxWidth: '1200px',
+      margin: '0 auto'
     }}>
-      <h1 style={{ color: '#000', fontSize: '32px', marginBottom: '20px' }}>
-        BasedNews Test Page
-      </h1>
-      <p style={{ color: '#333', fontSize: '18px', marginBottom: '20px' }}>
-        If you can see this, React is working correctly.
-      </p>
-      <div style={{ 
-        background: '#f5f5f5', 
-        padding: '15px', 
-        border: '1px solid #ddd',
-        borderRadius: '8px'
+      <header style={{ 
+        borderBottom: '2px solid #eee', 
+        paddingBottom: '20px', 
+        marginBottom: '30px' 
       }}>
-        <h2 style={{ color: '#000', fontSize: '24px', marginBottom: '10px' }}>
-          Debug Information:
+        <h1 style={{ 
+          color: '#2563eb', 
+          fontSize: '36px', 
+          marginBottom: '10px',
+          textAlign: 'center'
+        }}>
+          BasedNews
+        </h1>
+        <p style={{ 
+          color: '#666', 
+          fontSize: '18px',
+          textAlign: 'center'
+        }}>
+          Cryptocurrency News Aggregator
+        </p>
+      </header>
+
+      <main>
+        <h2 style={{ 
+          color: '#1f2937', 
+          fontSize: '24px', 
+          marginBottom: '20px' 
+        }}>
+          Latest News ({news.length} articles)
         </h2>
-        <p style={{ color: '#666', margin: '5px 0' }}>
-          • React version: {React.version}
-        </p>
-        <p style={{ color: '#666', margin: '5px 0' }}>
-          • Environment: {process.env.NODE_ENV || 'development'}
-        </p>
-        <p style={{ color: '#666', margin: '5px 0' }}>
-          • Timestamp: {new Date().toISOString()}
-        </p>
-      </div>
+        
+        <div style={{ 
+          display: 'grid', 
+          gap: '20px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))'
+        }}>
+          {news.map((article, index) => (
+            <article key={index} style={{
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '20px',
+              backgroundColor: '#ffffff',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h3 style={{
+                color: '#1f2937',
+                fontSize: '18px',
+                marginBottom: '10px',
+                lineHeight: '1.4'
+              }}>
+                {article.title}
+              </h3>
+              
+              {article.description && (
+                <p style={{
+                  color: '#6b7280',
+                  fontSize: '14px',
+                  lineHeight: '1.5',
+                  marginBottom: '15px'
+                }}>
+                  {article.description.substring(0, 150)}...
+                </p>
+              )}
+              
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                fontSize: '12px',
+                color: '#9ca3af'
+              }}>
+                <span>{article.source}</span>
+                {article.sentiment && (
+                  <span style={{
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    backgroundColor: article.sentiment === 'bullish' ? '#dcfce7' : 
+                                   article.sentiment === 'bearish' ? '#fef2f2' : '#f3f4f6',
+                    color: article.sentiment === 'bullish' ? '#166534' : 
+                           article.sentiment === 'bearish' ? '#dc2626' : '#374151'
+                  }}>
+                    {article.sentiment}
+                  </span>
+                )}
+              </div>
+              
+              {article.url && (
+                <a 
+                  href={article.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-block',
+                    marginTop: '10px',
+                    color: '#2563eb',
+                    textDecoration: 'none',
+                    fontSize: '14px'
+                  }}
+                >
+                  Read more →
+                </a>
+              )}
+            </article>
+          ))}
+        </div>
+      </main>
     </div>
   );
 }
 
-// Error boundary
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean; error?: Error }
-> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('React Error Boundary:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{ 
-          padding: '20px', 
-          fontFamily: 'Arial, sans-serif',
-          background: '#ffe6e6',
-          color: '#cc0000',
-          minHeight: '100vh'
-        }}>
-          <h1>React Error Detected</h1>
-          <p>Error: {this.state.error?.message}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            style={{ 
-              padding: '10px 20px', 
-              background: '#cc0000', 
-              color: 'white', 
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginTop: '20px'
-            }}
-          >
-            Reload Page
-          </button>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
 const root = createRoot(document.getElementById("root")!);
-root.render(
-  <ErrorBoundary>
-    <TestApp />
-  </ErrorBoundary>
-);
+root.render(<SimpleNewsApp />);
