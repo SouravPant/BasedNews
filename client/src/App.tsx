@@ -12,7 +12,7 @@ import NotFound from "@/pages/not-found";
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="basedhub-theme">
+      <ThemeProvider defaultTheme="base" storageKey="basedhub-theme">
         <MiniKitProvider>
           <TooltipProvider>
             <Toaster />

@@ -3,35 +3,27 @@
 @tailwind utilities;
 
 :root {
-  /* Base Dark Mode - Base.org inspired dark theme */
-  --background: hsl(221, 39%, 11%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(215, 28%, 17%);
-  --muted-foreground: hsl(215, 16%, 65%);
-  --popover: hsl(221, 39%, 11%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(215, 28%, 17%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(215, 28%, 20%);
-  --input: hsl(215, 28%, 17%);
+  /* Light theme as fallback */
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(221, 39%, 11%);
+  --muted: hsl(210, 40%, 98%);
+  --muted-foreground: hsl(215, 16%, 47%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(221, 39%, 11%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(221, 39%, 11%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
   --primary: hsl(221, 83%, 53%);
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(215, 28%, 17%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(215, 28%, 17%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 50.6%);
+  --secondary: hsl(210, 40%, 98%);
+  --secondary-foreground: hsl(221, 39%, 11%);
+  --accent: hsl(210, 40%, 98%);
+  --accent-foreground: hsl(221, 39%, 11%);
+  --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(221, 83%, 53%);
+  --ring: hsl(217, 91%, 60%);
   --radius: 0.5rem;
-  
-  /* Base-specific colors for dark theme */
-  --base-blue: hsl(221, 83%, 53%);
-  --base-blue-light: hsl(221, 83%, 60%);
-  --base-blue-dark: hsl(221, 39%, 11%);
-  --base-surface: hsl(215, 28%, 17%);
-  --base-background: hsl(221, 39%, 11%);
-  --base-border: hsl(215, 28%, 20%);
 }
 
 .light {
@@ -66,62 +58,102 @@
 }
 
 .base {
-  /* Base app inspired theme - Blue brand colors from Base.org */
-  --background: hsl(216, 20%, 10%);
+  /* Base app inspired dark theme - Base.org blue colors */
+  --background: hsl(220, 20%, 8%);
   --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(216, 15%, 20%);
-  --muted-foreground: hsl(216, 10%, 75%);
-  --popover: hsl(216, 25%, 8%);
+  --muted: hsl(220, 15%, 15%);
+  --muted-foreground: hsl(220, 15%, 75%);
+  --popover: hsl(220, 25%, 10%);
   --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(216, 20%, 15%);
+  --card: hsl(220, 18%, 12%);
   --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(216, 15%, 35%);
-  --input: hsl(216, 15%, 35%);
+  --border: hsl(220, 15%, 25%);
+  --input: hsl(220, 15%, 18%);
   --primary: hsl(221, 83%, 55%); /* Base blue #0052FF */
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(216, 15%, 25%);
-  --secondary-foreground: hsl(0, 0%, 90%);
+  --secondary: hsl(220, 15%, 20%);
+  --secondary-foreground: hsl(0, 0%, 95%);
   --accent: hsl(221, 83%, 55%);
   --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 50%);
+  --destructive: hsl(0, 62.8%, 55%);
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(221, 83%, 55%);
   --radius: 0.75rem;
 
   /* Base brand colors */
-  --based-primary: hsl(221, 83%, 53%); /* #0052FF */
-  --based-secondary: hsl(216, 15%, 20%);
-  --based-accent: hsl(0, 73%, 41%);
-  --based-surface: hsl(216, 20%, 15%);
-  --based-background: hsl(216, 20%, 10%);
+  --based-primary: hsl(221, 83%, 55%); /* #0052FF */
+  --based-secondary: hsl(220, 15%, 20%);
+  --based-accent: hsl(0, 73%, 50%);
+  --based-surface: hsl(220, 18%, 12%);
+  --based-background: hsl(220, 20%, 8%);
 }
 
-/* Base mode body styling */
+/* Base mode body styling with improved visibility */
 .base {
-  background: radial-gradient(ellipse at top, hsl(221, 83%, 8%) 0%, hsl(216, 20%, 10%) 50%, hsl(220, 20%, 5%) 100%);
+  background: radial-gradient(ellipse at top, hsl(221, 83%, 10%) 0%, hsl(220, 20%, 8%) 50%, hsl(220, 20%, 6%) 100%);
   min-height: 100vh;
 }
 
-/* Ensure text visibility in base mode */
-.base h1, .base h2, .base h3, .base p, .base div, .base span {
-  color: var(--foreground) !important;
+/* Enhanced text visibility in base mode */
+.base h1, .base h2, .base h3, .base h4, .base h5, .base h6 {
+  color: hsl(0, 0%, 98%) !important;
+  font-weight: 600;
+}
+
+.base p, .base div, .base span, .base button {
+  color: hsl(0, 0%, 95%) !important;
 }
 
 .base .text-muted-foreground {
-  color: hsl(216, 10%, 75%) !important;
+  color: hsl(220, 15%, 75%) !important;
 }
 
-/* Base mode header with brand blue gradient */
+.base .text-sm {
+  color: hsl(220, 15%, 80%) !important;
+}
+
+/* Enhanced card visibility */
+.base .card, .base [class*="card"] {
+  background-color: hsl(220, 18%, 12%) !important;
+  border: 1px solid hsl(220, 15%, 25%) !important;
+  color: hsl(0, 0%, 98%) !important;
+}
+
+/* Base mode header with improved contrast */
 .base header {
-  background: linear-gradient(135deg, hsl(221, 83%, 53%) 0%, hsl(221, 80%, 45%) 100%);
-  border-bottom: 1px solid hsl(221, 50%, 25%);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, hsl(221, 83%, 55%) 0%, hsl(221, 80%, 50%) 100%);
+  border-bottom: 1px solid hsl(221, 50%, 30%);
+  backdrop-filter: blur(15px);
 }
 
-/* Base mode footer */
+/* Base mode footer with better contrast */
 .base footer {
-  background: linear-gradient(135deg, hsl(216, 20%, 5%) 0%, hsl(216, 20%, 10%) 100%);
-  border-top: 1px solid hsl(216, 15%, 25%);
+  background: linear-gradient(135deg, hsl(220, 20%, 6%) 0%, hsl(220, 20%, 10%) 100%);
+  border-top: 1px solid hsl(220, 15%, 25%);
+}
+
+/* Button improvements for base mode */
+.base button {
+  background-color: hsl(220, 15%, 18%) !important;
+  border: 1px solid hsl(220, 15%, 30%) !important;
+  color: hsl(0, 0%, 98%) !important;
+}
+
+.base button:hover {
+  background-color: hsl(220, 15%, 25%) !important;
+  border-color: hsl(221, 83%, 55%) !important;
+}
+
+/* Input fields for base mode */
+.base input, .base textarea, .base select {
+  background-color: hsl(220, 15%, 18%) !important;
+  border: 1px solid hsl(220, 15%, 30%) !important;
+  color: hsl(0, 0%, 98%) !important;
+}
+
+.base input:focus, .base textarea:focus {
+  border-color: hsl(221, 83%, 55%) !important;
+  ring-color: hsl(221, 83%, 55%) !important;
 }
 
 /* Improved image loading and error states */
@@ -137,7 +169,7 @@
 }
 
 .base .image-loading {
-  background: linear-gradient(90deg, hsl(216, 20%, 15%) 25%, hsl(216, 25%, 20%) 50%, hsl(216, 20%, 15%) 75%);
+  background: linear-gradient(90deg, hsl(220, 18%, 12%) 25%, hsl(220, 20%, 18%) 50%, hsl(220, 18%, 12%) 75%);
   background-size: 200% 100%;
 }
 
