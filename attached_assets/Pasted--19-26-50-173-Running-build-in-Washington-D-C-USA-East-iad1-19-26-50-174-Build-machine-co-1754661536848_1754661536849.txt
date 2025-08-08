@@ -1,0 +1,52 @@
+[19:26:50.173] Running build in Washington, D.C., USA (East) – iad1
+[19:26:50.174] Build machine configuration: 2 cores, 8 GB
+[19:26:50.190] Cloning github.com/SouravPant/BasedNews (Branch: main, Commit: 2427cb3)
+[19:26:51.087] Cloning completed: 897.000ms
+[19:26:51.125] Found .vercelignore
+[19:26:51.147] Removed 127 ignored files defined in .vercelignore
+[19:26:51.147]   /.git/config
+[19:26:51.147]   /.git/description
+[19:26:51.147]   /.git/FETCH_HEAD
+[19:26:51.147]   /.git/HEAD
+[19:26:51.147]   /.git/hooks/applypatch-msg.sample
+[19:26:51.147]   /.git/hooks/commit-msg.sample
+[19:26:51.147]   /.git/hooks/fsmonitor-watchman.sample
+[19:26:51.147]   /.git/hooks/post-update.sample
+[19:26:51.147]   /.git/hooks/pre-applypatch.sample
+[19:26:51.148]   /.git/hooks/pre-commit.sample
+[19:26:52.504] Restored build cache from previous deployment (ESXxjNuC7ThUsef4yeGaVSzjx9Nj)
+[19:27:03.130] Running "vercel build"
+[19:27:03.581] Vercel CLI 44.7.3
+[19:27:04.636] Running "install" command: `npm ci`...
+[19:27:16.347] npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[19:27:16.373] npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[19:27:17.354] npm warn deprecated @paulmillr/qr@0.2.1: The package is now available as "qr": npm install qr
+[19:27:22.871] npm warn deprecated react-beautiful-dnd@13.1.1: react-beautiful-dnd is now deprecated. Context and options: https://github.com/atlassian/react-beautiful-dnd/issues/2672
+[19:28:00.649] 
+[19:28:00.650] added 1033 packages, and audited 1034 packages in 56s
+[19:28:00.651] 
+[19:28:00.651] 142 packages are looking for funding
+[19:28:00.651]   run `npm fund` for details
+[19:28:00.685] 
+[19:28:00.686] 8 vulnerabilities (6 moderate, 2 high)
+[19:28:00.686] 
+[19:28:00.686] To address all issues (including breaking changes), run:
+[19:28:00.686]   npm audit fix --force
+[19:28:00.686] 
+[19:28:00.687] Run `npm audit` for details.
+[19:28:01.006] 
+[19:28:01.006] > rest-express@1.0.0 build
+[19:28:01.007] > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+[19:28:01.007] 
+[19:28:01.433] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[19:28:01.482] transforming...
+[19:28:01.494] [32m✓[39m 2 modules transformed.
+[19:28:01.496] [31mx[39m Build failed in 39ms
+[19:28:01.496] [31merror during build:
+[19:28:01.496] [31mCould not resolve "./src/main.tsx" from "client/index.html"[31m
+[19:28:01.497] file: [36m/vercel/path0/client/index.html[31m
+[19:28:01.497]     at getRollupError (file:///vercel/path0/node_modules/rollup/dist/es/shared/parseAst.js:401:41)
+[19:28:01.497]     at error (file:///vercel/path0/node_modules/rollup/dist/es/shared/parseAst.js:397:42)
+[19:28:01.497]     at ModuleLoader.handleInvalidResolvedId (file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:21490:24)
+[19:28:01.497]     at file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:21450:26[39m
+[19:28:01.512] Error: Command "NODE_ENV=production npm run build" exited with 1
