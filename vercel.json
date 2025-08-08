@@ -1,8 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "NODE_ENV=production npm run build",
-  "outputDirectory": "dist/public",
-  "installCommand": "npm ci",
+  "buildCommand": "vite build --config vite.config.simple.ts && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/(.*)",
