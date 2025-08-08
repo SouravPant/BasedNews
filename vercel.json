@@ -2,11 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "vite build --config vite.config.simple.ts",
   "outputDirectory": "dist",
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "nodejs22.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
