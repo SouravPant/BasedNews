@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import React from "react";
 import "./index.css";
+import { SimpleCoins } from "./pages/simple-coins";
 
 function WorkingNewsApp() {
   const [news, setNews] = React.useState([]);
@@ -253,7 +254,61 @@ function WorkingNewsApp() {
   );
 }
 
-console.log('Starting WorkingNewsApp...');
+function App() {
+  const [currentPage, setCurrentPage] = React.useState('news');
+
+  React.useEffect(() => {
+    // Simple routing based on URL path
+    const path = window.location.pathname;
+    if (path === '/coins') {
+      setCurrentPage('coins');
+    } else {
+      setCurrentPage('news');
+    }
+
+    // Handle navigation
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path === '/coins') {
+        setCurrentPage('coins');
+      } else {
+        setCurrentPage('news');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Handle navigation clicks
+  React.useEffect(() => {
+    const handleNavClick = (e) => {
+      const link = e.target.closest('a');
+      if (link && (link.href.endsWith('/') || link.href.endsWith('/coins'))) {
+        e.preventDefault();
+        const path = new URL(link.href).pathname;
+        window.history.pushState({}, '', path);
+        
+        if (path === '/coins') {
+          setCurrentPage('coins');
+        } else {
+          setCurrentPage('news');
+        }
+      }
+    };
+
+    document.addEventListener('click', handleNavClick);
+    return () => document.removeEventListener('click', handleNavClick);
+  }, []);
+
+  if (currentPage === 'coins') {
+    return <SimpleCoins />;
+  }
+
+  return <WorkingNewsApp />;
+}
+
+console.log('Starting App...');
 const root = createRoot(document.getElementById("root")!);
-root.render(<WorkingNewsApp />);
-console.log('WorkingNewsApp rendered!');
+root.render(<App />);
+console.log('App rendered!');
