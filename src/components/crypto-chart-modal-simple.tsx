@@ -166,12 +166,24 @@ function WorkingChart({ data, coinName, days, actualPriceChange }: { data: Array
 
       </div>
       
-      <Chart 
-        options={chartOptions} 
-        series={series} 
-        type={chartType}
-        height={350} 
-      />
+      {series && series[0] && series[0].data && series[0].data.length > 0 ? (
+        <Chart 
+          options={chartOptions} 
+          series={series} 
+          type={chartType}
+          height={350} 
+        />
+      ) : (
+        <div style={{
+          height: '350px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--muted-foreground)'
+        }}>
+          <p>No chart data available</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -318,7 +330,40 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
     return `$${marketCap.toLocaleString()}`;
   };
 
-  if (!isOpen || !cryptocurrency) return null;
+  if (!isOpen) return null;
+  
+  // Debug logging
+  console.log('🔍 Modal opening with cryptocurrency:', cryptocurrency);
+  
+  if (!cryptocurrency) {
+    console.error('❌ No cryptocurrency data provided to modal');
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000
+      }}>
+        <div style={{
+          backgroundColor: 'var(--background)',
+          padding: '20px',
+          borderRadius: '16px',
+          color: 'var(--foreground)'
+        }}>
+          <p>Error: No coin data available</p>
+          <button onClick={onClose} style={{ marginTop: '10px', padding: '8px 16px' }}>
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Extract price data with fallbacks
   const currentPrice = cryptocurrency?.current_price || 
@@ -335,32 +380,42 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
                    currentPrice * 1000000; // Estimate market cap
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '20px',
-      backdropFilter: 'blur(4px)'
-    }}>
-      <div style={{
-        backgroundColor: 'var(--background)',
-        borderRadius: '16px',
-        maxWidth: '800px',
-        width: '100%',
-        maxHeight: '90vh',
-        border: '1px solid var(--border)',
-        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
         display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden'
-      }}>
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: '20px',
+        backdropFilter: 'blur(4px)'
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        style={{
+          backgroundColor: 'var(--background)',
+          borderRadius: '16px',
+          maxWidth: '800px',
+          width: '100%',
+          maxHeight: '90vh',
+          border: '1px solid var(--border)',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div style={{
           padding: '24px 24px 0 24px',
