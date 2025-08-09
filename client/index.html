@@ -13,49 +13,145 @@
     <meta property="fc:frame:button:1:action" content="link" />
     <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
     
-    <!-- Farcaster SDK Ready Script -->
+    <!-- Ultra Aggressive Farcaster Ready Script -->
     <script>
-      // Immediate SDK ready call
-      function callFarcasterReady() {
+      console.log('🔵 Based News: Ultra Aggressive Ready Script Starting...');
+      
+      let readyCallCount = 0;
+      const MAX_READY_CALLS = 200; // 40 seconds at 200ms intervals
+      
+      function ultraAggressiveReady() {
+        readyCallCount++;
+        
         try {
-          // Try postMessage communication
+          console.log(`🔵 Ready attempt #${readyCallCount}`);
+          
+          // Method 1: Direct postMessage to parent
           if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ type: 'ready' }, '*');
-            window.parent.postMessage({ type: 'frame-ready' }, '*');
-            window.parent.postMessage({ type: 'miniapp-ready' }, '*');
-            console.log('✅ Based News: Ready messages sent via postMessage');
+            const messages = [
+              { type: 'ready' },
+              { type: 'frame-ready' },
+              { type: 'miniapp-ready' },
+              { type: 'sdk-ready' },
+              { type: 'app-ready' },
+              { action: 'ready' },
+              { action: 'frame-ready' },
+              'ready',
+              'frame-ready',
+              'miniapp-ready'
+            ];
+            
+            messages.forEach(msg => {
+              window.parent.postMessage(msg, '*');
+            });
           }
           
-          // Try SDK methods
-          if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
-            window.sdk.actions.ready();
-            console.log('✅ Based News: sdk.actions.ready() called');
+          // Method 2: Try all possible SDK references
+          const sdkRefs = [
+            'sdk',
+            'frameSDK', 
+            'farcasterSDK',
+            'MiniKit',
+            'farcaster',
+            '__FARCASTER_SDK__'
+          ];
+          
+          sdkRefs.forEach(ref => {
+            try {
+              if (window[ref]?.actions?.ready) {
+                window[ref].actions.ready();
+                console.log(`✅ Called ${ref}.actions.ready()`);
+              }
+              if (window[ref]?.ready) {
+                window[ref].ready();
+                console.log(`✅ Called ${ref}.ready()`);
+              }
+            } catch (e) {
+              // Silent fail
+            }
+          });
+          
+          // Method 3: Try dynamic imports
+          try {
+            if (window.navigator && window.fetch) {
+              Promise.resolve().then(async () => {
+                try {
+                  const { default: sdk } = await import('@farcaster/frame-sdk');
+                  if (sdk?.actions?.ready) {
+                    await sdk.actions.ready();
+                    console.log('✅ Dynamic import SDK ready called');
+                  }
+                } catch (e) {
+                  // Silent fail
+                }
+              });
+            }
+          } catch (e) {
+            // Silent fail
           }
           
-          // Try MiniKit
-          if (window.MiniKit && window.MiniKit.ready) {
-            window.MiniKit.ready();
-            console.log('✅ Based News: MiniKit.ready() called');
-          }
+          // Method 4: Set global ready flags
+          window.__FARCASTER_READY__ = true;
+          window.__FRAME_READY__ = true;
+          window.__SDK_READY__ = true;
+          
+          // Method 5: Dispatch custom events
+          ['ready', 'frame-ready', 'farcaster-ready', 'sdk-ready'].forEach(eventType => {
+            try {
+              window.dispatchEvent(new CustomEvent(eventType, { detail: { source: 'based-news' } }));
+              document.dispatchEvent(new CustomEvent(eventType, { detail: { source: 'based-news' } }));
+            } catch (e) {
+              // Silent fail
+            }
+          });
+          
         } catch (error) {
-          console.log('⚠️ Based News: Ready call error:', error);
+          console.log(`⚠️ Ready attempt #${readyCallCount} error:`, error);
         }
       }
       
-      // Call immediately
-      callFarcasterReady();
+      // Immediate calls
+      ultraAggressiveReady();
+      ultraAggressiveReady();
+      ultraAggressiveReady();
       
-      // Call on DOM ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', callFarcasterReady);
+      // Fast interval for first 10 seconds
+      const fastInterval = setInterval(() => {
+        if (readyCallCount < 50) {
+          ultraAggressiveReady();
+        } else {
+          clearInterval(fastInterval);
+        }
+      }, 200);
+      
+      // Slower interval for next 30 seconds
+      setTimeout(() => {
+        const slowInterval = setInterval(() => {
+          if (readyCallCount < MAX_READY_CALLS) {
+            ultraAggressiveReady();
+          } else {
+            clearInterval(slowInterval);
+          }
+        }, 500);
+      }, 10000);
+      
+      // Event-based calls
+      ['DOMContentLoaded', 'load', 'readystatechange'].forEach(event => {
+        document.addEventListener(event, ultraAggressiveReady);
+        window.addEventListener(event, ultraAggressiveReady);
+      });
+      
+      // Mutation observer for dynamic content
+      if (window.MutationObserver) {
+        const observer = new MutationObserver(ultraAggressiveReady);
+        observer.observe(document.documentElement, { 
+          childList: true, 
+          subtree: true 
+        });
+        setTimeout(() => observer.disconnect(), 30000);
       }
       
-      // Call on window load
-      window.addEventListener('load', callFarcasterReady);
-      
-      // Periodic calls for the first 5 seconds
-      const readyInterval = setInterval(callFarcasterReady, 200);
-      setTimeout(() => clearInterval(readyInterval), 5000);
+      console.log('🔵 Based News: Ultra Aggressive Ready Script Initialized');
     </script>
   </head>
   <body>
