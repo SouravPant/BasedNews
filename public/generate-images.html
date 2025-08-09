@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Based News - Image Generator</title>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0052FF 0%, #1E3A8A 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+        .canvas-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        canvas {
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            background: white;
+        }
+        .download-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.2s;
+        }
+        .download-btn:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .base-emoji {
+            font-size: 2rem;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔵 Based News</h1>
+        <p class="subtitle">Generate Farcaster Manifest Images</p>
+        
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li>Click "Generate All Images" to create the image assets</li>
+                <li>Download each image using the download buttons</li>
+                <li>Upload the images to your <code>public/</code> folder</li>
+                <li>Deploy to make them available at the URLs in the manifest</li>
+            </ol>
+        </div>
+
+        <button onclick="generateAllImages()" class="download-btn">🎨 Generate All Images</button>
+
+        <div class="canvas-container" id="canvasContainer">
+            <!-- Canvases will be generated here -->
+        </div>
+
+        <div id="downloadButtons"></div>
+    </div>
+
+    <script>
+        const images = [
+            { name: 'icon', width: 256, height: 256, title: 'App Icon (256x256)' },
+            { name: 'preview', width: 1200, height: 630, title: 'Preview Image (1200x630)' },
+            { name: 'hero', width: 1200, height: 800, title: 'Hero Image (1200x800)' },
+            { name: 'screenshot1', width: 390, height: 844, title: 'Screenshot 1 (390x844)' },
+            { name: 'screenshot2', width: 390, height: 844, title: 'Screenshot 2 (390x844)' },
+            { name: 'screenshot3', width: 390, height: 844, title: 'Screenshot 3 (390x844)' },
+            { name: 'splash', width: 512, height: 512, title: 'Splash Screen (512x512)' },
+            { name: 'og-image', width: 1200, height: 630, title: 'OG Image (1200x630)' }
+        ];
+
+        function generateAllImages() {
+            const container = document.getElementById('canvasContainer');
+            const downloadContainer = document.getElementById('downloadButtons');
+            container.innerHTML = '';
+            downloadContainer.innerHTML = '';
+
+            images.forEach(img => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                canvas.id = img.name;
+                
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = `<h4>${img.title}</h4>`;
+                wrapper.appendChild(canvas);
+                container.appendChild(wrapper);
+
+                drawImage(canvas, img);
+                
+                // Create download button
+                const btn = document.createElement('button');
+                btn.className = 'download-btn';
+                btn.textContent = `📥 Download ${img.name}.png`;
+                btn.onclick = () => downloadImage(canvas, img.name);
+                downloadContainer.appendChild(btn);
+            });
+        }
+
+        function drawImage(canvas, config) {
+            const ctx = canvas.getContext('2d');
+            const { width, height, name } = config;
+            
+            // Base gradient background
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, '#0052FF');
+            gradient.addColorStop(1, '#1E3A8A');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Set text properties
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'white';
+
+            if (name === 'icon' || name === 'splash') {
+                // Icon/Splash: Large logo style
+                ctx.font = `bold ${width * 0.08}px Inter, sans-serif`;
+                ctx.fillText('🔵', width/2, height/2 - height * 0.1);
+                ctx.font = `bold ${width * 0.12}px Inter, sans-serif`;
+                ctx.fillText('Based', width/2, height/2 + height * 0.05);
+                ctx.font = `${width * 0.08}px Inter, sans-serif`;
+                ctx.fillText('News', width/2, height/2 + height * 0.15);
+            } else if (name.includes('screenshot')) {
+                // Screenshots: Mobile app mockup
+                ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                ctx.fillRect(width * 0.1, height * 0.1, width * 0.8, height * 0.8);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = `bold ${width * 0.06}px Inter, sans-serif`;
+                ctx.fillText('🔵 Based News', width/2, height * 0.2);
+                
+                ctx.font = `${width * 0.04}px Inter, sans-serif`;
+                ctx.fillText('Real-time crypto news', width/2, height * 0.3);
+                ctx.fillText('Base ecosystem tracking', width/2, height * 0.35);
+                ctx.fillText('Portfolio management', width/2, height * 0.4);
+                
+                // Mock content
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.font = `${width * 0.035}px Inter, sans-serif`;
+                for (let i = 0; i < 5; i++) {
+                    ctx.fillText(`📰 Breaking crypto news ${i + 1}`, width/2, height * (0.5 + i * 0.06));
+                }
+            } else {
+                // Hero/Preview/OG: Full promotional layout
+                ctx.font = `bold ${width * 0.08}px Inter, sans-serif`;
+                ctx.fillText('🔵 Based News', width/2, height * 0.3);
+                
+                ctx.font = `${width * 0.04}px Inter, sans-serif`;
+                ctx.fillText('Real-time crypto news & Base ecosystem tracking', width/2, height * 0.45);
+                
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.font = `${width * 0.025}px Inter, sans-serif`;
+                ctx.fillText('✨ AI-powered news summaries', width/2, height * 0.6);
+                ctx.fillText('🔵 100+ Base ecosystem tokens', width/2, height * 0.65);
+                ctx.fillText('💰 Wallet integration & portfolio tracking', width/2, height * 0.7);
+                ctx.fillText('📊 Real-time market data', width/2, height * 0.75);
+            }
+
+            // Add subtle border
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(1, 1, width-2, height-2);
+        }
+
+        function downloadImage(canvas, name) {
+            const link = document.createElement('a');
+            link.download = `${name}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // Auto-generate on page load
+        window.onload = () => {
+            setTimeout(generateAllImages, 500);
+        };
+    </script>
+</body>
+</html>

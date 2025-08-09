@@ -1,0 +1,26 @@
+{
+  "version": "1",
+  "name": "Based News",
+  "iconUrl": "https://based-news-eight.vercel.app/icon.png",
+  "subtitle": "Real-time crypto news & Base ecosystem tracking",
+  "description": "Stay ahead with real-time cryptocurrency news, Base ecosystem token tracking, and onchain analytics. Get AI-powered news summaries, explore 100+ Base tokens, and connect your wallet for portfolio tracking.",
+  "primaryCategory": "news",
+  "tags": ["crypto", "news", "base", "defi", "blockchain", "tokens", "portfolio"],
+  "tagline": "Your gateway to the Base ecosystem & crypto news",
+  "buttonTitle": "Open Based News",
+  "homeUrl": "https://based-news-eight.vercel.app",
+  "webhookUrl": "https://based-news-eight.vercel.app/api/webhook",
+  "imageUrl": "https://based-news-eight.vercel.app/preview.png",
+  "heroImageUrl": "https://based-news-eight.vercel.app/hero.png",
+  "screenshotUrls": [
+    "https://based-news-eight.vercel.app/screenshot1.png",
+    "https://based-news-eight.vercel.app/screenshot2.png",
+    "https://based-news-eight.vercel.app/screenshot3.png"
+  ],
+  "splashImageUrl": "https://based-news-eight.vercel.app/splash.png",
+  "splashBackgroundColor": "#0052FF",
+  "ogTitle": "Based News - Real-time Crypto News & Base Ecosystem",
+  "ogDescription": "Stay updated with real-time crypto news, explore 100+ Base ecosystem tokens, and track your portfolio with Based News.",
+  "ogImageUrl": "https://based-news-eight.vercel.app/og-image.png",
+  "castShareUrl": "https://warpcast.com/~/compose?text=Just%20discovered%20Based%20News%20-%20the%20ultimate%20crypto%20news%20and%20Base%20ecosystem%20tracker!%20%F0%9F%94%B5%20https://based-news-eight.vercel.app"
+}
