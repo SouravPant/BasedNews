@@ -12,12 +12,20 @@
       "destination": "/.well-known/$1"
     },
     {
+      "source": "/debug.html",
+      "destination": "/debug.html"
+    },
+    {
       "source": "/test.html",
       "destination": "/test.html"
     },
     {
       "source": "/fallback.html",
       "destination": "/fallback.html"
+    },
+    {
+      "source": "/(.*\\.(html|png|jpg|jpeg|gif|svg|json|css|js|ico))",
+      "destination": "/$1"
     },
     {
       "source": "/coins",
