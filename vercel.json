@@ -12,10 +12,6 @@
       "destination": "/.well-known/$1"
     },
     {
-      "source": "/(.*\\.(png|jpg|jpeg|gif|svg|json|html|css|js|ts|tsx|ico))",
-      "destination": "/$1"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
