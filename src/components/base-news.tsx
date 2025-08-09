@@ -188,7 +188,7 @@ export function BaseNews() {
 
         {/* Search and Filters */}
         <div style={{
-          padding: '16px 20px',
+          padding: '12px 16px',
           background: 'var(--card)',
           borderBottom: '1px solid var(--border)'
         }}>
@@ -317,7 +317,7 @@ export function BaseNews() {
 
       {/* News Feed */}
       <main style={{
-        padding: '16px 20px'
+        padding: '12px 16px'
       }}>
         <div style={{
           display: 'flex',

@@ -19,17 +19,18 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
       WebkitBackdropFilter: 'blur(20px)'
     }}>
       <div style={{
-        padding: '16px 20px',
+        padding: '12px 16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        maxWidth: '100%'
+        maxWidth: '100%',
+        gap: '8px'
       }}>
         {/* Left side - Logo and Title */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
+          gap: '8px',
           minWidth: 0,
           flex: 1
         }}>
@@ -53,12 +54,15 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
           
           <div style={{ minWidth: 0, flex: 1 }}>
             <h1 className="base-heading" style={{
-              fontSize: '24px',
+              fontSize: 'clamp(18px, 4vw, 24px)',
               fontWeight: '800',
               color: 'var(--foreground)',
               margin: 0,
               letterSpacing: '-0.02em',
-              lineHeight: '1.2'
+              lineHeight: '1.2',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
             }}>
               {title}
             </h1>
@@ -80,8 +84,9 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            marginLeft: '16px'
+            gap: '6px',
+            marginLeft: '8px',
+            flexShrink: 0
           }}>
             {actions}
           </div>
