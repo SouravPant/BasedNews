@@ -395,9 +395,83 @@ function WorkingNewsApp() {
   );
 }
 
+function App() {
+  const [currentPage, setCurrentPage] = React.useState('news');
 
+  React.useEffect(() => {
+    // Simple routing based on URL path
+    const path = window.location.pathname;
+    if (path === '/coins') {
+      setCurrentPage('coins');
+    } else if (path === '/dashboard') {
+      setCurrentPage('dashboard');
+    } else {
+      setCurrentPage('news');
+    }
 
-import App from './App';
+    // Handle navigation
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path === '/coins') {
+        setCurrentPage('coins');
+      } else if (path === '/dashboard') {
+        setCurrentPage('dashboard');
+      } else {
+        setCurrentPage('news');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Handle navigation clicks
+  React.useEffect(() => {
+    const handleNavClick = (e) => {
+      const link = e.target.closest('a');
+      if (link && (link.href.endsWith('/') || link.href.endsWith('/coins') || link.href.endsWith('/dashboard'))) {
+        e.preventDefault();
+        const path = new URL(link.href).pathname;
+        window.history.pushState({}, '', path);
+        
+        if (path === '/coins') {
+          setCurrentPage('coins');
+        } else if (path === '/dashboard') {
+          setCurrentPage('dashboard');
+        } else {
+          setCurrentPage('news');
+        }
+      }
+    };
+
+    document.addEventListener('click', handleNavClick);
+    return () => document.removeEventListener('click', handleNavClick);
+  }, []);
+
+  if (currentPage === 'coins') {
+    return (
+      <>
+        <ThemeToggleSimple />
+        <MobileBaseCoins />
+      </>
+    );
+  }
+
+  if (currentPage === 'dashboard') {
+    return (
+      <>
+        <ThemeToggleSimple />
+        <MiniAppDashboard />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <BaseNews />
+    </>
+  );
+}
 
 console.log('Starting App...');
 const root = createRoot(document.getElementById("root")!);
