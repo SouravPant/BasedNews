@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug</title>
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/icon.png" />
+    <meta property="fc:frame:button:1" content="Test" />
+</head>
+<body>
+    <h1>DEBUG PAGE WORKING</h1>
+    <p>Domain: based-news-eight.vercel.app</p>
+    <p>Time: <script>document.write(new Date())</script></p>
+    <p>URL: <script>document.write(location.href)</script></p>
+    <script>
+        if (window.parent !== window) {
+            window.parent.postMessage('ready', '*');
+            console.log('Ready sent from debug page');
+        }
+    </script>
+</body>
+</html>
