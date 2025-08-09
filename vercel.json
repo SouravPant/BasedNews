@@ -47,11 +47,6 @@
       ]
     }
   ],
-  "functions": {
-    "src/pages/api/**/*.{js,ts}": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "crons": [
     {
       "path": "/api/cron/news",
