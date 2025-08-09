@@ -8,6 +8,8 @@ export function ThemeToggleSimple() {
     return 'base';
   });
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isVisible, setIsVisible] = React.useState(true);
+  const [lastScrollY, setLastScrollY] = React.useState(0);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -15,6 +17,46 @@ export function ThemeToggleSimple() {
       localStorage.setItem('theme', theme);
     }
   }, [theme]);
+
+  // Handle scroll to show/hide theme toggle
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show when at very top (0-50px) or scrolling up
+      if (currentScrollY < 50) {
+        setIsVisible(true);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY + 10) {
+        // Scrolling down with some threshold
+        setIsVisible(false);
+        setIsOpen(false); // Close dropdown when hiding
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
+  }, [lastScrollY]);
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [isOpen]);
 
   const themes = [
     { id: 'light', name: 'Light', icon: '☀️', description: 'Clean & minimal' },
@@ -29,12 +71,19 @@ export function ThemeToggleSimple() {
       position: 'fixed',
       top: '20px',
       left: '20px',
-      zIndex: 1000
+      zIndex: 1000,
+      transform: `translateY(${isVisible ? '0' : '-100px'})`,
+      opacity: isVisible ? 1 : 0,
+      transition: 'all 0.3s ease-in-out',
+      pointerEvents: isVisible ? 'auto' : 'none'
     }}>
       <div style={{ position: 'relative' }}>
         {/* Theme Toggle Button */}
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(!isOpen);
+          }}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -74,24 +123,29 @@ export function ThemeToggleSimple() {
 
         {/* Theme Dropdown */}
         {isOpen && (
-          <div style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            marginTop: '8px',
-            backgroundColor: 'var(--popover)',
-            border: '1px solid var(--border)',
-            borderRadius: '12px',
-            padding: '8px',
-            minWidth: '200px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-            backdropFilter: 'blur(16px)',
-            zIndex: 1001
-          }}>
+          <div 
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              marginTop: '8px',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
+              borderRadius: '12px',
+              padding: '8px',
+              minWidth: '200px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+              backdropFilter: 'blur(16px)',
+              zIndex: 1001,
+              animation: 'dropdownFadeIn 0.2s ease-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {themes.map((themeOption) => (
               <button
                 key={themeOption.id}
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setTheme(themeOption.id);
                   setIsOpen(false);
                 }}
@@ -176,20 +230,19 @@ export function ThemeToggleSimple() {
         )}
       </div>
 
-      {/* Click outside to close */}
-      {isOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 999
-          }}
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes dropdownFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

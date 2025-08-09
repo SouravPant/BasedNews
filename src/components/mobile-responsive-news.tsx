@@ -162,7 +162,7 @@ export function MobileResponsiveNews() {
       <header style={{
         position: 'sticky',
         top: 0,
-        zIndex: 100,
+        zIndex: 50,
         backgroundColor: 'var(--background)',
         borderBottom: '1px solid var(--border)',
         padding: '12px 16px',
