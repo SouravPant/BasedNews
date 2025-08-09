@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import React from "react";
 import "./index.css";
 import { MobileBaseCoins } from "./pages/mobile-base-coins";
-import { MobileResponsiveNews } from "./components/mobile-responsive-news";
+import { BaseNews } from "./components/base-news";
 import { MiniAppDashboard } from "./components/mini-app-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 
@@ -468,7 +468,7 @@ function App() {
   return (
     <>
       <ThemeToggleSimple />
-      <MobileResponsiveNews />
+      <BaseNews />
     </>
   );
 }

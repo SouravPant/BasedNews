@@ -59,9 +59,9 @@ export function ThemeToggleSimple() {
   }, [isOpen]);
 
   const themes = [
-    { id: 'light', name: 'Light', icon: '☀️', description: 'Clean & minimal' },
-    { id: 'dark', name: 'Dark', icon: '🌙', description: 'Easy on eyes' },
-    { id: 'base', name: 'Base', icon: '🔵', description: 'Base ecosystem' }
+    { id: 'light', name: 'Light', icon: '☀️', description: 'Clean Base experience' },
+    { id: 'dark', name: 'Dark', icon: '🌙', description: 'Dark Base theme' },
+    { id: 'base', name: 'Base', icon: 'B', description: 'Official Base blue' }
   ];
 
   const currentTheme = themes.find(t => t.id === theme) || themes[2];
@@ -78,50 +78,69 @@ export function ThemeToggleSimple() {
       pointerEvents: isVisible ? 'auto' : 'none'
     }}>
       <div style={{ position: 'relative' }}>
-        {/* Theme Toggle Button */}
+        {/* Base-style Theme Toggle Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             setIsOpen(!isOpen);
           }}
+          className="base-button-secondary"
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
             padding: '10px 14px',
-            backgroundColor: 'var(--card)',
+            background: 'var(--card)',
             border: '1px solid var(--border)',
             borderRadius: '12px',
             cursor: 'pointer',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             color: 'var(--card-foreground)',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             transition: 'all 0.2s ease',
-            backdropFilter: 'blur(10px)'
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            fontFamily: '"Inter", system-ui, sans-serif'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-1px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 255, 0.15)';
+            e.currentTarget.style.borderColor = 'var(--base-blue)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateY(0)';
             e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+            e.currentTarget.style.borderColor = 'var(--border)';
           }}
         >
-          <span style={{ fontSize: '16px' }}>{currentTheme.icon}</span>
+          {/* Theme Icon */}
+          <div style={{
+            width: '20px',
+            height: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '4px',
+            background: currentTheme.id === 'base' ? 'var(--base-blue)' : 'transparent',
+            color: currentTheme.id === 'base' ? 'white' : 'var(--foreground)',
+            fontSize: currentTheme.id === 'base' ? '12px' : '16px',
+            fontWeight: currentTheme.id === 'base' ? '900' : '400'
+          }}>
+            {currentTheme.icon}
+          </div>
           <span>{currentTheme.name}</span>
-          <span style={{
+          <div style={{
             fontSize: '10px',
             color: 'var(--muted-foreground)',
             transition: 'transform 0.2s ease',
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
           }}>
             ▼
-          </span>
+          </div>
         </button>
 
-        {/* Theme Dropdown */}
+        {/* Base-style Theme Dropdown */}
         {isOpen && (
           <div 
             style={{
@@ -129,13 +148,14 @@ export function ThemeToggleSimple() {
               top: '100%',
               left: 0,
               marginTop: '8px',
-              backgroundColor: 'var(--popover)',
+              background: 'var(--popover)',
               border: '1px solid var(--border)',
-              borderRadius: '12px',
+              borderRadius: '16px',
               padding: '8px',
-              minWidth: '200px',
+              minWidth: '220px',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-              backdropFilter: 'blur(16px)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
               zIndex: 1001,
               animation: 'dropdownFadeIn 0.2s ease-out'
             }}
@@ -155,28 +175,47 @@ export function ThemeToggleSimple() {
                   gap: '12px',
                   width: '100%',
                   padding: '12px',
-                  backgroundColor: theme === themeOption.id ? 'var(--accent)' : 'transparent',
-                  color: theme === themeOption.id ? 'var(--accent-foreground)' : 'var(--popover-foreground)',
+                  background: theme === themeOption.id ? 'var(--base-blue)' : 'transparent',
+                  color: theme === themeOption.id ? 'white' : 'var(--popover-foreground)',
                   border: 'none',
-                  borderRadius: '8px',
+                  borderRadius: '12px',
                   cursor: 'pointer',
                   fontSize: '14px',
                   textAlign: 'left',
                   transition: 'all 0.2s ease',
-                  marginBottom: '4px'
+                  marginBottom: '4px',
+                  fontFamily: '"Inter", system-ui, sans-serif',
+                  fontWeight: '500'
                 }}
                 onMouseEnter={(e) => {
                   if (theme !== themeOption.id) {
-                    e.currentTarget.style.backgroundColor = 'var(--muted)';
+                    e.currentTarget.style.background = 'var(--muted)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (theme !== themeOption.id) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.background = 'transparent';
                   }
                 }}
               >
-                <span style={{ fontSize: '18px' }}>{themeOption.icon}</span>
+                {/* Theme Icon */}
+                <div style={{
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px',
+                  background: themeOption.id === 'base' ? 
+                    (theme === themeOption.id ? 'rgba(255,255,255,0.2)' : 'var(--base-blue)') : 
+                    'transparent',
+                  color: themeOption.id === 'base' ? 'white' : (theme === themeOption.id ? 'white' : 'var(--foreground)'),
+                  fontSize: themeOption.id === 'base' ? '14px' : '18px',
+                  fontWeight: themeOption.id === 'base' ? '900' : '400'
+                }}>
+                  {themeOption.icon}
+                </div>
+                
                 <div style={{ flex: 1 }}>
                   <div style={{
                     fontWeight: '600',
@@ -186,43 +225,58 @@ export function ThemeToggleSimple() {
                   </div>
                   <div style={{
                     fontSize: '12px',
-                    color: 'var(--muted-foreground)',
-                    opacity: 0.8
+                    color: theme === themeOption.id ? 'rgba(255,255,255,0.8)' : 'var(--muted-foreground)',
+                    opacity: 0.9
                   }}>
                     {themeOption.description}
                   </div>
                 </div>
+                
                 {theme === themeOption.id && (
-                  <span style={{
-                    fontSize: '12px',
-                    color: 'var(--primary)',
-                    fontWeight: '600'
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    background: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '10px',
+                    color: 'var(--base-blue)',
+                    fontWeight: '900'
                   }}>
                     ✓
-                  </span>
+                  </div>
                 )}
               </button>
             ))}
 
-            {/* Theme Info */}
+            {/* Base branding footer */}
             <div style={{
               marginTop: '8px',
               padding: '12px',
-              backgroundColor: 'var(--muted)',
-              borderRadius: '8px',
-              textAlign: 'center'
+              background: 'var(--muted)',
+              borderRadius: '12px',
+              textAlign: 'center',
+              border: '1px solid var(--border)'
             }}>
               <div style={{
                 fontSize: '12px',
                 color: 'var(--muted-foreground)',
-                lineHeight: '1.4'
+                lineHeight: '1.4',
+                fontWeight: '500'
               }}>
                 {theme === 'base' ? (
-                  <>🔵 Based on Base.org design system</>
+                  <>
+                    <div style={{ color: 'var(--base-blue)', fontWeight: '600', marginBottom: '2px' }}>
+                      🔵 Official Base Theme
+                    </div>
+                    Powered by Base's design system
+                  </>
                 ) : theme === 'dark' ? (
-                  <>🌙 Perfect for low-light reading</>
+                  <>Perfect for onchain experiences at night</> 
                 ) : (
-                  <>☀️ Clean and accessible design</>
+                  <>Clean Base interface for all conditions</>
                 )}
               </div>
             </div>

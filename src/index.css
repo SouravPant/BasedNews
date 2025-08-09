@@ -1,8 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Global Styles */
+/* Global Styles - Base Design System */
 @layer base {
   * {
     @apply border-border;
@@ -10,11 +11,14 @@
   
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* Light Theme */
+/* Light Theme - Base Official Light Mode */
 .light {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(240, 10%, 3.9%);
@@ -22,8 +26,11 @@
   --card-foreground: hsl(240, 10%, 3.9%);
   --popover: hsl(0, 0%, 100%);
   --popover-foreground: hsl(240, 10%, 3.9%);
-  --primary: hsl(240, 5.9%, 10%);
-  --primary-foreground: hsl(0, 0%, 98%);
+  
+  /* Official Base Blue - Primary Brand Color */
+  --primary: hsl(240, 100%, 50%); /* #0000FF - Official Base Blue */
+  --primary-foreground: hsl(0, 0%, 100%);
+  
   --secondary: hsl(240, 4.8%, 95.9%);
   --secondary-foreground: hsl(240, 5.9%, 10%);
   --muted: hsl(240, 4.8%, 95.9%);
@@ -34,11 +41,20 @@
   --destructive-foreground: hsl(0, 0%, 98%);
   --border: hsl(240, 5.9%, 90%);
   --input: hsl(240, 5.9%, 90%);
-  --ring: hsl(240, 5.9%, 10%);
+  --ring: hsl(240, 100%, 50%);
   --radius: 0.75rem;
+  
+  /* Base Brand Specific Colors */
+  --base-blue: hsl(240, 100%, 50%); /* #0000FF */
+  --base-blue-light: hsl(240, 100%, 97%); /* Very light blue background */
+  --base-gray: hsl(240, 6%, 10%);
+  --base-gray-light: hsl(240, 4%, 95%);
+  --success: hsl(142, 76%, 36%);
+  --warning: hsl(38, 92%, 50%);
+  --error: hsl(0, 84%, 60%);
 }
 
-/* Dark Theme */
+/* Dark Theme - Base Official Dark Mode */
 .dark {
   --background: hsl(240, 10%, 3.9%);
   --foreground: hsl(0, 0%, 98%);
@@ -46,8 +62,11 @@
   --card-foreground: hsl(0, 0%, 98%);
   --popover: hsl(240, 10%, 3.9%);
   --popover-foreground: hsl(0, 0%, 98%);
+  
+  /* In dark mode, Base uses white logo but keeps blue for accents */
   --primary: hsl(0, 0%, 98%);
   --primary-foreground: hsl(240, 5.9%, 10%);
+  
   --secondary: hsl(240, 3.7%, 15.9%);
   --secondary-foreground: hsl(0, 0%, 98%);
   --muted: hsl(240, 3.7%, 15.9%);
@@ -60,71 +79,174 @@
   --input: hsl(240, 3.7%, 15.9%);
   --ring: hsl(240, 4.9%, 83.9%);
   --radius: 0.75rem;
+  
+  /* Base Brand Colors for Dark Mode */
+  --base-blue: hsl(240, 100%, 50%); /* Still use blue for accents */
+  --base-blue-dark: hsl(240, 25%, 8%);
+  --base-gray: hsl(0, 0%, 98%);
+  --base-gray-dark: hsl(240, 6%, 10%);
+  --success: hsl(142, 76%, 36%);
+  --warning: hsl(38, 92%, 50%);
+  --error: hsl(0, 84%, 60%);
 }
 
-/* Base Theme - Enhanced Dark Theme with Base Blue Accents */
+/* Base Theme - Official Base App Styling */
 .base {
-  /* Deep dark background for premium feel */
-  --background: hsl(220, 25%, 6%);
+  /* Deep Base-branded dark theme */
+  --background: hsl(240, 25%, 6%); /* Very dark blue-black */
   --foreground: hsl(0, 0%, 98%);
-  
-  /* High contrast cards */
-  --card: hsl(220, 20%, 10%);
+  --card: hsl(240, 20%, 8%);
   --card-foreground: hsl(0, 0%, 98%);
-  
-  /* Modal/popover styling */
-  --popover: hsl(220, 25%, 8%);
+  --popover: hsl(240, 25%, 6%);
   --popover-foreground: hsl(0, 0%, 98%);
   
-  /* Base blue primary color */
-  --primary: hsl(221, 83%, 55%); /* Base brand blue #0052FF */
+  /* Official Base Blue as primary */
+  --primary: hsl(240, 100%, 50%); /* #0000FF */
   --primary-foreground: hsl(0, 0%, 100%);
   
-  /* High contrast secondary elements */
-  --secondary: hsl(220, 20%, 15%);
+  --secondary: hsl(240, 15%, 12%);
   --secondary-foreground: hsl(0, 0%, 98%);
-  
-  /* Muted elements with excellent readability */
-  --muted: hsl(220, 18%, 12%);
-  --muted-foreground: hsl(220, 10%, 75%);
-  
-  /* Accent using Base blue */
-  --accent: hsl(221, 83%, 55%);
+  --muted: hsl(240, 15%, 10%);
+  --muted-foreground: hsl(240, 10%, 70%);
+  --accent: hsl(240, 100%, 50%);
   --accent-foreground: hsl(0, 0%, 100%);
-  
-  /* Destructive elements */
   --destructive: hsl(0, 62.8%, 55%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  
-  /* Borders and inputs */
-  --border: hsl(220, 15%, 20%);
-  --input: hsl(220, 18%, 12%);
-  --ring: hsl(221, 83%, 55%);
+  --border: hsl(240, 15%, 15%);
+  --input: hsl(240, 15%, 10%);
+  --ring: hsl(240, 100%, 50%);
   --radius: 0.75rem;
   
-  /* Custom Base brand colors */
-  --based-primary: hsl(221, 83%, 55%); /* #0052FF */
-  --based-secondary: hsl(220, 20%, 15%);
-  --based-accent: hsl(0, 73%, 50%);
-  --based-surface: hsl(220, 20%, 10%);
-  --based-background: hsl(220, 25%, 6%);
+  /* Official Base Brand Colors */
+  --base-blue: hsl(240, 100%, 50%); /* #0000FF */
+  --base-blue-hover: hsl(240, 100%, 45%); /* Slightly darker for hover */
+  --base-blue-light: hsl(240, 100%, 97%);
+  --base-surface: hsl(240, 20%, 8%);
+  --base-surface-hover: hsl(240, 20%, 12%);
+  --success: hsl(142, 76%, 40%);
+  --warning: hsl(38, 92%, 55%);
+  --error: hsl(0, 84%, 60%);
   
-  /* Success/bullish green */
-  --success: hsl(142, 76%, 36%);
-  --success-foreground: hsl(0, 0%, 98%);
-  
-  /* Warning/bearish red */
-  --warning: hsl(0, 84%, 60%);
-  --warning-foreground: hsl(0, 0%, 98%);
+  /* Base-specific gradients */
+  --base-gradient: linear-gradient(135deg, hsl(240, 100%, 50%) 0%, hsl(240, 100%, 45%) 100%);
+  --base-gradient-subtle: linear-gradient(135deg, hsl(240, 25%, 6%) 0%, hsl(240, 20%, 8%) 100%);
 }
 
-/* Custom scrollbar for all themes */
+/* Base Component Styling */
+.base-button {
+  background: var(--base-blue);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.base-button:hover {
+  background: var(--base-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px hsla(240, 100%, 50%, 0.3);
+}
+
+.base-button:active {
+  transform: translateY(0);
+}
+
+.base-button-secondary {
+  background: var(--base-surface);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.base-button-secondary:hover {
+  background: var(--base-surface-hover);
+  border-color: var(--base-blue);
+}
+
+.base-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.2s ease;
+}
+
+.base-card:hover {
+  border-color: var(--base-blue);
+  box-shadow: 0 8px 25px rgba(0, 0, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.base-input {
+  background: var(--input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: var(--foreground);
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.base-input:focus {
+  outline: none;
+  border-color: var(--base-blue);
+  box-shadow: 0 0 0 3px hsla(240, 100%, 50%, 0.1);
+}
+
+/* Base Logo Styling */
+.base-logo {
+  width: 32px;
+  height: 32px;
+  background: var(--base-blue);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.dark .base-logo {
+  background: white;
+  color: var(--base-blue);
+}
+
+/* Base Typography */
+.base-heading {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--foreground);
+}
+
+.base-subtitle {
+  font-weight: 600;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+
+.base-text {
+  color: var(--foreground);
+  line-height: 1.6;
+}
+
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
   background: var(--muted);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -133,7 +255,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
+  background: var(--base-blue);
 }
 
 /* Smooth transitions for theme changes */
@@ -141,11 +263,11 @@
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-/* Focus styles */
+/* Focus styles with Base branding */
 button:focus,
 input:focus,
 select:focus {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--base-blue);
   outline-offset: 2px;
 }
 
@@ -154,19 +276,74 @@ select:focus {
   .mobile-optimized {
     font-size: 16px; /* Prevent zoom on iOS */
   }
+  
+  .base-button {
+    min-height: 44px; /* iOS touch target size */
+    padding: 12px 20px;
+  }
+  
+  .base-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
 }
 
-/* Base theme specific enhancements */
-.base button {
-  transition: all 0.2s ease;
+/* Base-specific animations */
+@keyframes baseGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px hsla(240, 100%, 50%, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px hsla(240, 100%, 50%, 0.6);
+  }
 }
 
-.base button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 82, 255, 0.2);
+.base-glow {
+  animation: baseGlow 2s ease-in-out infinite;
 }
 
-.base .card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 82, 255, 0.15);
+@keyframes basePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.base-pulse {
+  animation: basePulse 1s ease-in-out infinite;
+}
+
+/* Base Status Indicators */
+.base-status-online {
+  background: var(--success);
+  color: white;
+}
+
+.base-status-warning {
+  background: var(--warning);
+  color: white;
+}
+
+.base-status-error {
+  background: var(--error);
+  color: white;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .base {
+    --border: hsl(240, 15%, 25%);
+    --muted-foreground: hsl(240, 10%, 80%);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
