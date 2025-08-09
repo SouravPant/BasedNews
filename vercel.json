@@ -1,5 +1,4 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
@@ -12,20 +11,12 @@
       "destination": "/.well-known/$1"
     },
     {
+      "source": "/simple-frame.html",
+      "destination": "/simple-frame.html"
+    },
+    {
       "source": "/debug.html",
       "destination": "/debug.html"
-    },
-    {
-      "source": "/test.html",
-      "destination": "/test.html"
-    },
-    {
-      "source": "/fallback.html",
-      "destination": "/fallback.html"
-    },
-    {
-      "source": "/coins",
-      "destination": "/index.html"
     },
     {
       "source": "/(.*)",
@@ -39,30 +30,8 @@
         {
           "key": "X-Frame-Options",
           "value": "ALLOWALL"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
         }
       ]
-    }
-  ],
-  "crons": [
-    {
-      "path": "/api/cron/news",
-      "schedule": "0 9 * * *"
     }
   ]
 }

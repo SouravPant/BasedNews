@@ -4,21 +4,11 @@
     "payload": "eyJkb21haW4iOiJiYXNlZC1uZXdzLWVpZ2h0LnZlcmNlbC5hcHAifQ",
     "signature": "P0DJ885+3YB//OyF65xXcMFEP+No78tw1Rc9lfsLMcAiN9d6yfLDZ5/ZmyL52u50hHnbcv3wBEUxbF74qk620hw="
   },
-  "miniapp": {
+  "frame": {
     "version": "1",
     "name": "Based News",
     "homeUrl": "https://based-news-eight.vercel.app",
     "iconUrl": "https://based-news-eight.vercel.app/icon.png",
-    "subtitle": "Crypto news and Base ecosystem",
-    "description": "Real-time cryptocurrency news and Base ecosystem token tracking",
-    "buttonTitle": "Open Based News",
-    "primaryCategory": "news-media",
-    "tags": [
-      "crypto",
-      "base",
-      "news",
-      "defi",
-      "blockchain"
-    ]
+    "description": "Real-time cryptocurrency news and Base ecosystem token tracking"
   }
 }

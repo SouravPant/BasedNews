@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Based News - Simple Frame</title>
+    
+    <!-- Basic Farcaster Frame Meta Tags -->
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/preview.png" />
+    <meta property="fc:frame:button:1" content="Visit Based News" />
+    <meta property="fc:frame:button:1:action" content="link" />
+    <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Based News" />
+    <meta property="og:description" content="Crypto news and Base ecosystem tracking" />
+    <meta property="og:image" content="https://based-news-eight.vercel.app/preview.png" />
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0052FF;
+            color: white;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .frame-container {
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+        }
+        .logo {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 48px;
+            margin: 20px 0;
+        }
+        p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        .button {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .button:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        .status {
+            background: rgba(0,255,0,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="frame-container">
+        <div class="logo">⬜</div>
+        <h1>Based News</h1>
+        <p>Real-time crypto news & Base ecosystem tracking</p>
+        
+        <div class="status">✅ Simple Farcaster Frame</div>
+        <div class="status">✅ Basic fc:frame meta tags</div>
+        <div class="status">✅ Working preview</div>
+        
+        <a href="https://based-news-eight.vercel.app" class="button">
+            Open Full App
+        </a>
+        
+        <div style="margin-top: 30px; font-size: 12px; opacity: 0.7;">
+            <p>Frame URL: <span id="url"></span></p>
+            <p>Timestamp: <span id="time"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Simple frame info
+        document.getElementById('url').textContent = window.location.href;
+        document.getElementById('time').textContent = new Date().toISOString();
+        
+        console.log('🔵 Simple Farcaster Frame Loaded:', {
+            url: window.location.href,
+            timestamp: new Date().toISOString(),
+            isFrame: true
+        });
+    </script>
+</body>
+</html>
