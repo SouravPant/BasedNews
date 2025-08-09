@@ -201,6 +201,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
   const [chartData, setChartData] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [timeframe, setTimeframe] = React.useState('7');
+  const [coinDescription, setCoinDescription] = React.useState('');
 
   React.useEffect(() => {
     if (isOpen && cryptocurrency?.id) {
@@ -251,6 +252,26 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
         });
     }
   }, [isOpen, cryptocurrency?.id, timeframe]);
+
+  // Fetch coin description from CoinGecko
+  React.useEffect(() => {
+    if (isOpen && cryptocurrency?.id) {
+      console.log(`🔍 Fetching description for ${cryptocurrency.id}`);
+      fetch(`https://api.coingecko.com/api/v3/coins/${cryptocurrency.id}`)
+        .then(res => res.json())
+        .then(data => {
+          const description = data?.description?.en || '';
+          // Remove HTML tags and limit length
+          const cleanDescription = description.replace(/<[^>]*>/g, '').substring(0, 300);
+          setCoinDescription(cleanDescription + (cleanDescription.length >= 300 ? '...' : ''));
+          console.log(`✅ Description fetched for ${cryptocurrency.id}`);
+        })
+        .catch(error => {
+          console.error('❌ Error fetching coin description:', error);
+          setCoinDescription('Description not available for this cryptocurrency.');
+        });
+    }
+  }, [isOpen, cryptocurrency?.id]);
 
   // Enhanced fallback data generation using cryptocurrency data
   const generateFallbackData = (coinId: string, days: number) => {
@@ -626,7 +647,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
             color: 'var(--foreground)',
             margin: '0 0 12px 0'
           }}>
-            🔵 Base Ecosystem Analysis
+            💡 About {cryptocurrency?.name || 'This Token'}
           </h3>
           <p style={{
             fontSize: '14px',
@@ -634,8 +655,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
             margin: 0,
             lineHeight: '1.5'
           }}>
-            {cryptocurrency?.name} is part of the Base ecosystem, offering seamless onchain experiences. 
-            Monitor price movements and stay updated with the latest Base network developments.
+            {coinDescription || 'Loading description...'}
           </p>
         </div>
       </div>

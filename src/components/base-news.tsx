@@ -177,11 +177,9 @@ export function BaseNews() {
         title="Base News" 
         subtitle="Latest onchain updates"
         actions={
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <ThemeToggleSimple inlineMode={true} />
             <BaseNetworkBadge />
-            <BaseStatusBadge status="online">
-              {news.length} total articles
-            </BaseStatusBadge>
           </div>
         }
       />
@@ -326,6 +324,10 @@ export function BaseNews() {
           flexDirection: 'column',
           gap: '16px'
         }}>
+          {/* Debug: Articles to render */}
+          <div style={{ display: 'none' }}>
+            {console.log('🎯 Rendering', filteredNews.length, 'articles on screen')}
+          </div>
           {filteredNews.map((article, index) => (
             <article
               key={index}
@@ -596,16 +598,7 @@ export function BaseNews() {
 
       </main>
 
-      {/* Theme Toggle - After Articles, Before Navigation */}
-      <div style={{
-        padding: '16px 20px',
-        display: 'flex',
-        justifyContent: 'center',
-        background: 'var(--background)',
-        borderTop: '1px solid var(--border)'
-      }}>
-        <ThemeToggleSimple inlineMode={true} />
-      </div>
+      
 
              {/* Base Bottom Navigation */}
        <nav style={{
