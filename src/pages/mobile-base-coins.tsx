@@ -1,5 +1,5 @@
 import React from "react";
-import { CryptoChartModalSimple } from "../components/crypto-chart-modal-simple";
+import { SimpleCoinModal } from "../components/simple-coin-modal";
 
 interface Coin {
   id: string;
@@ -668,11 +668,11 @@ export function MobileBaseCoins() {
       </nav>
 
       {/* Chart Modal */}
-      <CryptoChartModalSimple
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        cryptocurrency={selectedCoin}
-      />
+              <SimpleCoinModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          coin={selectedCoin}
+        />
 
       {/* Info Modal */}
       {isInfoModalOpen && selectedCoinInfo && (

@@ -60,23 +60,41 @@ export function BaseWalletConnect({ showInPortfolio = false }: WalletConnectProp
 
   const fetchPortfolioValue = async (address: string) => {
     try {
-      console.log('🔍 Fetching portfolio for:', address);
+      console.log('🔍 Fetching real portfolio for:', address);
       
-      if (window.ethereum) {
-        const ethBalance = await window.ethereum.request({
-          method: 'eth_getBalance',
-          params: [address, 'latest']
-        });
+      if (!window.ethereum) {
+        setPortfolioValue('0.00');
+        return;
+      }
+
+      // Get ETH balance
+      const ethBalance = await window.ethereum.request({
+        method: 'eth_getBalance',
+        params: [address, 'latest']
+      });
+      
+      const ethValue = parseInt(ethBalance, 16) / Math.pow(10, 18);
+      
+      // Fetch real ETH price from CoinGecko
+      try {
+        const ethPriceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+        const ethPriceData = await ethPriceResponse.json();
+        const ethPrice = ethPriceData.ethereum?.usd || 3400; // Fallback price
         
-        const ethValue = parseInt(ethBalance, 16) / Math.pow(10, 18);
+        const portfolioValue = ethValue * ethPrice;
         
-        // Mock portfolio calculation for demo
-        // In production, fetch real token balances from Base network
-        const mockTokenValue = Math.random() * 1000;
-        const totalValue = (ethValue * 3400) + mockTokenValue; // ETH price * amount + tokens
-        
-        setPortfolioValue(totalValue.toFixed(2));
-        console.log('💰 Portfolio value:', totalValue.toFixed(2));
+        // If wallet has 0 ETH, show 0.00
+        if (ethValue === 0) {
+          setPortfolioValue('0.00');
+          console.log('💰 Empty wallet - Portfolio: $0.00');
+        } else {
+          setPortfolioValue(portfolioValue.toFixed(2));
+          console.log('💰 Real portfolio value:', portfolioValue.toFixed(2), `(${ethValue} ETH × $${ethPrice})`);
+        }
+      } catch (priceError) {
+        console.error('Error fetching ETH price:', priceError);
+        // Fallback to just showing ETH amount if price fetch fails
+        setPortfolioValue((ethValue * 3400).toFixed(2));
       }
     } catch (error) {
       console.error('Error fetching portfolio value:', error);
