@@ -3,105 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Based News - Image Generator</title>
+    <title>Based News - Professional Image Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --base-blue: #0000FF;
+            --base-blue-light: #0033FF;
+            --base-gray: #8B8B8B;
+            --base-dark: #1A1A1A;
+            --white: #FFFFFF;
+            --black: #000000;
+        }
+        
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: linear-gradient(135deg, #0052FF 0%, #1E3A8A 100%);
-            color: white;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--base-blue) 0%, var(--base-blue-light) 100%);
+            color: var(--white);
             margin: 0;
             padding: 20px;
             min-height: 100vh;
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
         }
+        
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             text-align: center;
         }
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-        .subtitle {
-            font-size: 1.5rem;
-            opacity: 0.9;
+        
+        .header {
             margin-bottom: 40px;
         }
+        
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .base-square {
+            width: 48px;
+            height: 48px;
+            background: var(--white);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--base-blue);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin: 10px 0 40px 0;
+            font-weight: 400;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 40px 0;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .instructions ol {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .instructions code {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        
         .canvas-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 40px 0;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin: 60px 0;
         }
+        
+        .canvas-wrapper {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .canvas-wrapper h4 {
+            color: var(--base-dark);
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
         canvas {
-            border: 2px solid rgba(255,255,255,0.2);
             border-radius: 12px;
-            background: white;
+            width: 100%;
+            height: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        .download-btn {
-            background: #22c55e;
-            color: white;
+        
+        .generate-btn {
+            background: var(--white);
+            color: var(--base-blue);
             border: none;
-            padding: 10px 20px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 20px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .download-btn {
+            background: var(--base-blue);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            margin: 10px;
-            transition: all 0.2s;
+            margin: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
         }
+        
         .download-btn:hover {
-            background: #16a34a;
-            transform: translateY(-2px);
+            background: var(--base-blue-light);
+            transform: translateY(-1px);
         }
-        .instructions {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-            text-align: left;
+        
+        .download-section {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
         }
-        .base-emoji {
-            font-size: 2rem;
-            margin: 0 10px;
+        
+        .quality-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔵 Based News</h1>
-        <p class="subtitle">Generate Farcaster Manifest Images</p>
+        <div class="header">
+            <div class="logo">
+                <div class="base-square">⬜</div>
+                <h1>Based News</h1>
+            </div>
+            <p class="subtitle">Professional Farcaster Manifest Images</p>
+            <div class="quality-badge">
+                ✨ Base Brand Compliant
+            </div>
+        </div>
         
         <div class="instructions">
-            <h3>📋 Instructions:</h3>
+            <h3>🎨 Professional Image Generation</h3>
+            <p>Generate high-quality, Base-compliant images for your Farcaster manifest. All images follow official Base branding guidelines:</p>
+            <ul>
+                <li><strong>Base Blue (#0000FF)</strong> primary color</li>
+                <li><strong>Inter font family</strong> for optimal readability</li>
+                <li><strong>Professional layouts</strong> with proper spacing</li>
+                <li><strong>High-resolution output</strong> for all platforms</li>
+                <li><strong>Brand consistency</strong> across all assets</li>
+            </ul>
+            
             <ol>
-                <li>Click "Generate All Images" to create the image assets</li>
-                <li>Download each image using the download buttons</li>
-                <li>Upload the images to your <code>public/</code> folder</li>
-                <li>Deploy to make them available at the URLs in the manifest</li>
+                <li>Click "Generate Professional Images" below</li>
+                <li>Review each generated image for quality</li>
+                <li>Download all images using the download buttons</li>
+                <li>Upload to your <code>public/</code> folder and deploy</li>
             </ol>
         </div>
 
-        <button onclick="generateAllImages()" class="download-btn">🎨 Generate All Images</button>
+        <button onclick="generateAllImages()" class="generate-btn">
+            🎨 Generate Professional Images
+        </button>
 
         <div class="canvas-container" id="canvasContainer">
             <!-- Canvases will be generated here -->
         </div>
 
-        <div id="downloadButtons"></div>
+        <div class="download-section" id="downloadButtons"></div>
     </div>
 
     <script>
         const images = [
-            { name: 'icon', width: 256, height: 256, title: 'App Icon (256x256)' },
-            { name: 'preview', width: 1200, height: 630, title: 'Preview Image (1200x630)' },
-            { name: 'hero', width: 1200, height: 800, title: 'Hero Image (1200x800)' },
-            { name: 'screenshot1', width: 390, height: 844, title: 'Screenshot 1 (390x844)' },
-            { name: 'screenshot2', width: 390, height: 844, title: 'Screenshot 2 (390x844)' },
-            { name: 'screenshot3', width: 390, height: 844, title: 'Screenshot 3 (390x844)' },
-            { name: 'splash', width: 512, height: 512, title: 'Splash Screen (512x512)' },
-            { name: 'og-image', width: 1200, height: 630, title: 'OG Image (1200x630)' }
+            { name: 'icon', width: 512, height: 512, title: 'App Icon (512×512)', type: 'icon' },
+            { name: 'preview', width: 1200, height: 630, title: 'Preview Image (1200×630)', type: 'social' },
+            { name: 'hero', width: 1200, height: 800, title: 'Hero Image (1200×800)', type: 'hero' },
+            { name: 'screenshot1', width: 390, height: 844, title: 'Screenshot 1 - News Feed', type: 'screenshot' },
+            { name: 'screenshot2', width: 390, height: 844, title: 'Screenshot 2 - Base Coins', type: 'screenshot' },
+            { name: 'screenshot3', width: 390, height: 844, title: 'Screenshot 3 - Dashboard', type: 'screenshot' },
+            { name: 'splash', width: 512, height: 512, title: 'Splash Screen (512×512)', type: 'splash' },
+            { name: 'og-image', width: 1200, height: 630, title: 'Open Graph Image (1200×630)', type: 'social' }
         ];
+
+        // Base brand colors
+        const colors = {
+            baseBlue: '#0000FF',
+            baseBlueDark: '#0000CC',
+            white: '#FFFFFF',
+            black: '#000000',
+            gray: '#8B8B8B',
+            lightGray: '#F8F9FA',
+            success: '#22c55e',
+            warning: '#f59e0b'
+        };
 
         function generateAllImages() {
             const container = document.getElementById('canvasContainer');
@@ -110,104 +260,413 @@
             downloadContainer.innerHTML = '';
 
             images.forEach(img => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'canvas-wrapper';
+                
+                const title = document.createElement('h4');
+                title.textContent = img.title;
+                wrapper.appendChild(title);
+
                 const canvas = document.createElement('canvas');
                 canvas.width = img.width;
                 canvas.height = img.height;
                 canvas.id = img.name;
-                
-                const wrapper = document.createElement('div');
-                wrapper.innerHTML = `<h4>${img.title}</h4>`;
                 wrapper.appendChild(canvas);
+                
                 container.appendChild(wrapper);
 
-                drawImage(canvas, img);
+                drawProfessionalImage(canvas, img);
                 
                 // Create download button
                 const btn = document.createElement('button');
                 btn.className = 'download-btn';
-                btn.textContent = `📥 Download ${img.name}.png`;
+                btn.innerHTML = `📥 ${img.name}.png`;
                 btn.onclick = () => downloadImage(canvas, img.name);
                 downloadContainer.appendChild(btn);
             });
         }
 
-        function drawImage(canvas, config) {
+        function drawProfessionalImage(canvas, config) {
             const ctx = canvas.getContext('2d');
-            const { width, height, name } = config;
+            const { width, height, name, type } = config;
             
-            // Base gradient background
-            const gradient = ctx.createLinearGradient(0, 0, width, height);
-            gradient.addColorStop(0, '#0052FF');
-            gradient.addColorStop(1, '#1E3A8A');
+            // Enable anti-aliasing
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            if (type === 'icon' || type === 'splash') {
+                drawIconImage(ctx, width, height, name);
+            } else if (type === 'screenshot') {
+                drawScreenshotImage(ctx, width, height, name);
+            } else if (type === 'social') {
+                drawSocialImage(ctx, width, height, name);
+            } else if (type === 'hero') {
+                drawHeroImage(ctx, width, height, name);
+            }
+        }
+
+        function drawIconImage(ctx, width, height, name) {
+            // Base blue gradient background
+            const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/2);
+            gradient.addColorStop(0, colors.baseBlue);
+            gradient.addColorStop(1, colors.baseBlueDark);
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
 
-            // Set text properties
+            // White rounded square (Base logo style)
+            const squareSize = width * 0.5;
+            const x = (width - squareSize) / 2;
+            const y = (height - squareSize) / 2;
+            const radius = squareSize * 0.12;
+
+            ctx.fillStyle = colors.white;
+            ctx.beginPath();
+            ctx.roundRect(x, y, squareSize, squareSize, radius);
+            ctx.fill();
+
+            // Base blue symbol inside
+            ctx.fillStyle = colors.baseBlue;
+            ctx.font = `900 ${width * 0.15}px Inter, sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle = 'white';
+            ctx.fillText('Ξ', width/2, height/2);
 
-            if (name === 'icon' || name === 'splash') {
-                // Icon/Splash: Large logo style
-                ctx.font = `bold ${width * 0.08}px Inter, sans-serif`;
-                ctx.fillText('🔵', width/2, height/2 - height * 0.1);
-                ctx.font = `bold ${width * 0.12}px Inter, sans-serif`;
-                ctx.fillText('Based', width/2, height/2 + height * 0.05);
-                ctx.font = `${width * 0.08}px Inter, sans-serif`;
-                ctx.fillText('News', width/2, height/2 + height * 0.15);
-            } else if (name.includes('screenshot')) {
-                // Screenshots: Mobile app mockup
-                ctx.fillStyle = 'rgba(255,255,255,0.1)';
-                ctx.fillRect(width * 0.1, height * 0.1, width * 0.8, height * 0.8);
+            // Subtle outer glow
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+            ctx.shadowBlur = 20;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawScreenshotImage(ctx, width, height, name) {
+            // Background
+            ctx.fillStyle = colors.lightGray;
+            ctx.fillRect(0, 0, width, height);
+
+            // Status bar
+            ctx.fillStyle = colors.white;
+            ctx.fillRect(0, 0, width, 44);
+            
+            ctx.fillStyle = colors.black;
+            ctx.font = '600 14px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('9:41', width/2, 28);
+
+            // Header
+            ctx.fillStyle = colors.baseBlue;
+            ctx.fillRect(0, 44, width, 80);
+            
+            // Base logo in header
+            const logoSize = 32;
+            ctx.fillStyle = colors.white;
+            ctx.beginPath();
+            ctx.roundRect(20, 44 + 24, logoSize, logoSize, 6);
+            ctx.fill();
+            
+            ctx.fillStyle = colors.baseBlue;
+            ctx.font = '800 16px Inter, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('⬜', 22, 44 + 42);
+
+            // App title
+            ctx.fillStyle = colors.white;
+            ctx.font = '700 20px Inter, sans-serif';
+            ctx.fillText('Based News', 65, 44 + 42);
+
+            // Content area
+            ctx.fillStyle = colors.white;
+            ctx.fillRect(16, 140, width - 32, height - 180);
+
+            // Content based on screenshot type
+            if (name === 'screenshot1') {
+                drawNewsContent(ctx, width, height);
+            } else if (name === 'screenshot2') {
+                drawCoinsContent(ctx, width, height);
+            } else if (name === 'screenshot3') {
+                drawDashboardContent(ctx, width, height);
+            }
+        }
+
+        function drawNewsContent(ctx, width, height) {
+            const contentX = 32;
+            let contentY = 160;
+
+            // News items
+            for (let i = 0; i < 4; i++) {
+                // News item background
+                ctx.fillStyle = i % 2 === 0 ? colors.white : '#FAFAFA';
+                ctx.fillRect(contentX, contentY, width - 64, 100);
+
+                // News title
+                ctx.fillStyle = colors.black;
+                ctx.font = '600 16px Inter, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(`Breaking: ${['Bitcoin', 'Ethereum', 'Base', 'DeFi'][i]} News Update`, contentX + 16, contentY + 30);
+
+                // News snippet
+                ctx.fillStyle = colors.gray;
+                ctx.font = '400 14px Inter, sans-serif';
+                ctx.fillText('Latest developments in the crypto space...', contentX + 16, contentY + 55);
                 
-                ctx.fillStyle = 'white';
-                ctx.font = `bold ${width * 0.06}px Inter, sans-serif`;
-                ctx.fillText('🔵 Based News', width/2, height * 0.2);
-                
-                ctx.font = `${width * 0.04}px Inter, sans-serif`;
-                ctx.fillText('Real-time crypto news', width/2, height * 0.3);
-                ctx.fillText('Base ecosystem tracking', width/2, height * 0.35);
-                ctx.fillText('Portfolio management', width/2, height * 0.4);
-                
-                // Mock content
-                ctx.fillStyle = 'rgba(255,255,255,0.8)';
-                ctx.font = `${width * 0.035}px Inter, sans-serif`;
-                for (let i = 0; i < 5; i++) {
-                    ctx.fillText(`📰 Breaking crypto news ${i + 1}`, width/2, height * (0.5 + i * 0.06));
-                }
-            } else {
-                // Hero/Preview/OG: Full promotional layout
-                ctx.font = `bold ${width * 0.08}px Inter, sans-serif`;
-                ctx.fillText('🔵 Based News', width/2, height * 0.3);
-                
-                ctx.font = `${width * 0.04}px Inter, sans-serif`;
-                ctx.fillText('Real-time crypto news & Base ecosystem tracking', width/2, height * 0.45);
-                
-                ctx.fillStyle = 'rgba(255,255,255,0.8)';
-                ctx.font = `${width * 0.025}px Inter, sans-serif`;
-                ctx.fillText('✨ AI-powered news summaries', width/2, height * 0.6);
-                ctx.fillText('🔵 100+ Base ecosystem tokens', width/2, height * 0.65);
-                ctx.fillText('💰 Wallet integration & portfolio tracking', width/2, height * 0.7);
-                ctx.fillText('📊 Real-time market data', width/2, height * 0.75);
+                // Sentiment badge
+                const sentiment = ['🟢 Bullish', '🔴 Bearish', '🟡 Neutral', '🟢 Bullish'][i];
+                ctx.fillStyle = colors.lightGray;
+                ctx.fillRect(contentX + 16, contentY + 70, 80, 20);
+                ctx.fillStyle = colors.baseBlue;
+                ctx.font = '500 12px Inter, sans-serif';
+                ctx.fillText(sentiment, contentX + 20, contentY + 82);
+
+                contentY += 110;
+            }
+        }
+
+        function drawCoinsContent(ctx, width, height) {
+            const contentX = 32;
+            let contentY = 160;
+
+            const coins = [
+                { name: 'Bitcoin', symbol: 'BTC', price: '$117,603', change: '+2.4%', color: colors.success },
+                { name: 'Ethereum', symbol: 'ETH', price: '$4,227', change: '+1.8%', color: colors.success },
+                { name: 'DEGEN', symbol: 'DEGEN', price: '$0.0234', change: '+12.5%', color: colors.success },
+                { name: 'Base Brett', symbol: 'BRETT', price: '$0.156', change: '-3.2%', color: '#ef4444' }
+            ];
+
+            coins.forEach((coin, i) => {
+                // Coin item background
+                ctx.fillStyle = colors.white;
+                ctx.fillRect(contentX, contentY, width - 64, 80);
+
+                // Coin icon (colored circle)
+                ctx.fillStyle = colors.baseBlue;
+                ctx.beginPath();
+                ctx.arc(contentX + 30, contentY + 40, 20, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Coin symbol
+                ctx.fillStyle = colors.white;
+                ctx.font = '700 14px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(coin.symbol.slice(0, 3), contentX + 30, contentY + 45);
+
+                // Coin name
+                ctx.fillStyle = colors.black;
+                ctx.font = '600 16px Inter, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(coin.name, contentX + 60, contentY + 35);
+
+                // Price
+                ctx.fillStyle = colors.black;
+                ctx.font = '700 16px Inter, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(coin.price, width - 48, contentY + 35);
+
+                // Change
+                ctx.fillStyle = coin.color;
+                ctx.font = '600 14px Inter, sans-serif';
+                ctx.fillText(coin.change, width - 48, contentY + 55);
+
+                contentY += 90;
+            });
+        }
+
+        function drawDashboardContent(ctx, width, height) {
+            const contentX = 32;
+            let contentY = 160;
+
+            // Portfolio value card
+            ctx.fillStyle = colors.baseBlue;
+            ctx.fillRect(contentX, contentY, width - 64, 100);
+
+            ctx.fillStyle = colors.white;
+            ctx.font = '400 14px Inter, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Total Portfolio Value', contentX + 20, contentY + 30);
+
+            ctx.font = '700 32px Inter, sans-serif';
+            ctx.fillText('$12,456.78', contentX + 20, contentY + 65);
+
+            ctx.font = '600 14px Inter, sans-serif';
+            ctx.fillStyle = colors.success;
+            ctx.fillText('+$1,234.56 (11.2%)', contentX + 20, contentY + 85);
+
+            contentY += 120;
+
+            // Watchlist section
+            ctx.fillStyle = colors.black;
+            ctx.font = '700 18px Inter, sans-serif';
+            ctx.fillText('Watchlist', contentX, contentY);
+
+            contentY += 30;
+
+            // Watchlist items
+            const watchlist = ['ETH', 'BTC', 'DEGEN', 'BRETT'];
+            watchlist.forEach((symbol, i) => {
+                ctx.fillStyle = colors.white;
+                ctx.fillRect(contentX, contentY, width - 64, 60);
+
+                ctx.fillStyle = colors.baseBlue;
+                ctx.beginPath();
+                ctx.arc(contentX + 25, contentY + 30, 15, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.fillStyle = colors.white;
+                ctx.font = '600 12px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(symbol, contentX + 25, contentY + 35);
+
+                ctx.fillStyle = colors.black;
+                ctx.font = '600 16px Inter, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(['Ethereum', 'Bitcoin', 'Degen', 'Brett'][i], contentX + 50, contentY + 35);
+
+                contentY += 70;
+            });
+        }
+
+        function drawSocialImage(ctx, width, height, name) {
+            // Gradient background
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, colors.baseBlue);
+            gradient.addColorStop(1, colors.baseBlueDark);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Large Base square logo
+            const logoSize = Math.min(width, height) * 0.15;
+            const logoX = width * 0.1;
+            const logoY = height * 0.2;
+            
+            ctx.fillStyle = colors.white;
+            ctx.beginPath();
+            ctx.roundRect(logoX, logoY, logoSize, logoSize, logoSize * 0.12);
+            ctx.fill();
+
+            // Logo symbol
+            ctx.fillStyle = colors.baseBlue;
+            ctx.font = `900 ${logoSize * 0.4}px Inter, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('⬜', logoX + logoSize/2, logoY + logoSize/2);
+
+            // Main title
+            ctx.fillStyle = colors.white;
+            ctx.font = `800 ${width * 0.08}px Inter, sans-serif`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText('Based News', logoX + logoSize + 30, logoY);
+
+            // Subtitle
+            ctx.font = `400 ${width * 0.03}px Inter, sans-serif`;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillText('Real-time crypto news & Base ecosystem tracking', logoX, logoY + logoSize + 40);
+
+            // Feature bullets
+            const features = [
+                '✨ AI-powered news summaries',
+                '🔵 100+ Base ecosystem tokens',
+                '💰 Wallet integration & portfolio tracking',
+                '📊 Real-time market data from CoinGecko'
+            ];
+
+            ctx.font = `500 ${width * 0.025}px Inter, sans-serif`;
+            features.forEach((feature, i) => {
+                ctx.fillText(feature, logoX, logoY + logoSize + 100 + (i * 40));
+            });
+
+            // QR code placeholder (decorative)
+            const qrSize = height * 0.25;
+            const qrX = width - qrSize - 60;
+            const qrY = height - qrSize - 60;
+            
+            ctx.fillStyle = colors.white;
+            ctx.fillRect(qrX, qrY, qrSize, qrSize);
+            
+            ctx.fillStyle = colors.baseBlue;
+            ctx.font = `600 ${qrSize * 0.15}px Inter, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('Scan to', qrX + qrSize/2, qrY + qrSize * 0.4);
+            ctx.fillText('Open App', qrX + qrSize/2, qrY + qrSize * 0.6);
+        }
+
+        function drawHeroImage(ctx, width, height, name) {
+            // Gradient background with more sophisticated colors
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, colors.baseBlue);
+            gradient.addColorStop(0.5, '#0033FF');
+            gradient.addColorStop(1, colors.baseBlueDark);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Geometric background elements
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            for (let i = 0; i < 20; i++) {
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const size = Math.random() * 100 + 20;
+                ctx.beginPath();
+                ctx.roundRect(x, y, size, size, size * 0.2);
+                ctx.fill();
             }
 
-            // Add subtle border
-            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(1, 1, width-2, height-2);
+            // Main content
+            ctx.fillStyle = colors.white;
+            ctx.font = `900 ${width * 0.1}px Inter, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Based News', width/2, height * 0.3);
+
+            ctx.font = `400 ${width * 0.04}px Inter, sans-serif`;
+            ctx.fillText('The ultimate crypto news & Base ecosystem tracker', width/2, height * 0.45);
+
+            // Feature grid
+            const gridY = height * 0.6;
+            const features = [
+                { icon: '📰', text: 'Real-time News' },
+                { icon: '🔵', text: 'Base Ecosystem' },
+                { icon: '💰', text: 'Portfolio Tracking' },
+                { icon: '📊', text: 'Market Analytics' }
+            ];
+
+            const featureWidth = width / 4;
+            features.forEach((feature, i) => {
+                const x = i * featureWidth + featureWidth/2;
+                
+                ctx.font = `${width * 0.05}px Inter, sans-serif`;
+                ctx.fillText(feature.icon, x, gridY);
+                
+                ctx.font = `500 ${width * 0.025}px Inter, sans-serif`;
+                ctx.fillText(feature.text, x, gridY + 60);
+            });
         }
 
         function downloadImage(canvas, name) {
             const link = document.createElement('a');
             link.download = `${name}.png`;
-            link.href = canvas.toDataURL();
+            link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
         }
 
         // Auto-generate on page load
         window.onload = () => {
-            setTimeout(generateAllImages, 500);
+            setTimeout(generateAllImages, 800);
         };
+
+        // Add canvas rounded rectangle support for older browsers
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                this.beginPath();
+                this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + w, y, r);
+                this.closePath();
+                return this;
+            };
+        }
     </script>
 </body>
 </html>
