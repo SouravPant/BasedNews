@@ -2,264 +2,171 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Light theme as fallback */
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(221, 39%, 11%);
-  --muted: hsl(210, 40%, 98%);
-  --muted-foreground: hsl(215, 16%, 47%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(221, 39%, 11%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(221, 39%, 11%);
-  --border: hsl(214, 32%, 91%);
-  --input: hsl(214, 32%, 91%);
-  --primary: hsl(221, 83%, 53%);
-  --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(210, 40%, 98%);
-  --secondary-foreground: hsl(221, 39%, 11%);
-  --accent: hsl(210, 40%, 98%);
-  --accent-foreground: hsl(221, 39%, 11%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(217, 91%, 60%);
-  --radius: 0.5rem;
-}
-
-.light {
-  /* Light mode variant for Base theme */
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(221, 39%, 11%);
-  --muted: hsl(210, 40%, 98%);
-  --muted-foreground: hsl(215, 16%, 47%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(221, 39%, 11%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(221, 39%, 11%);
-  --border: hsl(214, 32%, 91%);
-  --input: hsl(214, 32%, 91%);
-  --primary: hsl(221, 83%, 53%);
-  --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(210, 40%, 98%);
-  --secondary-foreground: hsl(221, 39%, 11%);
-  --accent: hsl(210, 40%, 98%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(217, 91%, 60%);
-  --radius: 0.5rem;
-
-  /* Based-specific colors - Blue and Black theme */
-  --based-primary: hsl(217, 91%, 60%);
-  --based-secondary: hsl(142, 76%, 36%);
-  --based-accent: hsl(0, 73%, 41%);
-  --based-surface: hsl(220, 50%, 8%);
-  --based-background: hsl(220, 100%, 4%);
-}
-
-.base {
-  /* Base app inspired dark theme - Base.org blue colors with high contrast */
-  --background: hsl(220, 20%, 8%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(220, 15%, 15%);
-  --muted-foreground: hsl(220, 15%, 85%); /* Increased contrast */
-  --popover: hsl(220, 25%, 10%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(220, 18%, 12%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(220, 15%, 30%); /* Lighter border for better visibility */
-  --input: hsl(220, 15%, 18%);
-  --primary: hsl(221, 83%, 55%); /* Base blue #0052FF */
-  --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(220, 15%, 25%); /* Lighter secondary for better contrast */
-  --secondary-foreground: hsl(0, 0%, 98%); /* Higher contrast text */
-  --accent: hsl(221, 83%, 55%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 55%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(221, 83%, 55%);
-  --radius: 0.75rem;
-
-  /* Base brand colors */
-  --based-primary: hsl(221, 83%, 55%); /* #0052FF */
-  --based-secondary: hsl(220, 15%, 20%);
-  --based-accent: hsl(0, 73%, 50%);
-  --based-surface: hsl(220, 18%, 12%);
-  --based-background: hsl(220, 20%, 8%);
-}
-
-/* Base mode body styling with improved visibility */
-.base {
-  background: radial-gradient(ellipse at top, hsl(221, 83%, 10%) 0%, hsl(220, 20%, 8%) 50%, hsl(220, 20%, 6%) 100%);
-  min-height: 100vh;
-}
-
-/* Enhanced text visibility in base mode */
-.base h1, .base h2, .base h3, .base h4, .base h5, .base h6 {
-  color: hsl(0, 0%, 98%) !important;
-  font-weight: 600;
-}
-
-.base p, .base div, .base span, .base button {
-  color: hsl(0, 0%, 95%) !important;
-}
-
-.base .text-muted-foreground {
-  color: hsl(220, 15%, 75%) !important;
-}
-
-.base .text-sm {
-  color: hsl(220, 15%, 80%) !important;
-}
-
-/* Enhanced card visibility */
-.base .card, .base [class*="card"] {
-  background-color: hsl(220, 18%, 12%) !important;
-  border: 1px solid hsl(220, 15%, 25%) !important;
-  color: hsl(0, 0%, 98%) !important;
-}
-
-/* Base mode header with improved contrast */
-.base header {
-  background: linear-gradient(135deg, hsl(221, 83%, 55%) 0%, hsl(221, 80%, 50%) 100%);
-  border-bottom: 1px solid hsl(221, 50%, 30%);
-  backdrop-filter: blur(15px);
-}
-
-/* Base mode footer with better contrast */
-.base footer {
-  background: linear-gradient(135deg, hsl(220, 20%, 6%) 0%, hsl(220, 20%, 10%) 100%);
-  border-top: 1px solid hsl(220, 15%, 25%);
-}
-
-/* Button improvements for base mode */
-.base button {
-  background-color: hsl(220, 15%, 18%) !important;
-  border: 1px solid hsl(220, 15%, 30%) !important;
-  color: hsl(0, 0%, 98%) !important;
-}
-
-.base button:hover {
-  background-color: hsl(220, 15%, 25%) !important;
-  border-color: hsl(221, 83%, 55%) !important;
-}
-
-/* Input fields for base mode */
-.base input, .base textarea, .base select {
-  background-color: hsl(220, 15%, 18%) !important;
-  border: 1px solid hsl(220, 15%, 30%) !important;
-  color: hsl(0, 0%, 98%) !important;
-}
-
-.base input:focus, .base textarea:focus {
-  border-color: hsl(221, 83%, 55%) !important;
-  ring-color: hsl(221, 83%, 55%) !important;
-}
-
-/* Improved image loading and error states */
-.image-loading {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-}
-
-.dark .image-loading {
-  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
-  background-size: 200% 100%;
-}
-
-.base .image-loading {
-  background: linear-gradient(90deg, hsl(220, 18%, 12%) 25%, hsl(220, 20%, 18%) 50%, hsl(220, 18%, 12%) 75%);
-  background-size: 200% 100%;
-}
-
-@keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
+/* Global Styles */
 @layer base {
   * {
     @apply border-border;
   }
-
+  
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-@layer utilities {
-  .bg-based-background {
-    background-color: var(--based-background);
-  }
+/* Light Theme */
+.light {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(240, 10%, 3.9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(240, 10%, 3.9%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(240, 10%, 3.9%);
+  --primary: hsl(240, 5.9%, 10%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(240, 4.8%, 95.9%);
+  --secondary-foreground: hsl(240, 5.9%, 10%);
+  --muted: hsl(240, 4.8%, 95.9%);
+  --muted-foreground: hsl(240, 3.8%, 46.1%);
+  --accent: hsl(240, 4.8%, 95.9%);
+  --accent-foreground: hsl(240, 5.9%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 5.9%, 90%);
+  --input: hsl(240, 5.9%, 90%);
+  --ring: hsl(240, 5.9%, 10%);
+  --radius: 0.75rem;
+}
+
+/* Dark Theme */
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --primary: hsl(0, 0%, 98%);
+  --primary-foreground: hsl(240, 5.9%, 10%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.75rem;
+}
+
+/* Base Theme - Enhanced Dark Theme with Base Blue Accents */
+.base {
+  /* Deep dark background for premium feel */
+  --background: hsl(220, 25%, 6%);
+  --foreground: hsl(0, 0%, 98%);
   
-  .bg-based-surface {
-    background-color: var(--based-surface);
-  }
+  /* High contrast cards */
+  --card: hsl(220, 20%, 10%);
+  --card-foreground: hsl(0, 0%, 98%);
   
-  .text-based-primary {
-    color: var(--based-primary);
-  }
+  /* Modal/popover styling */
+  --popover: hsl(220, 25%, 8%);
+  --popover-foreground: hsl(0, 0%, 98%);
   
-  .text-based-secondary {
-    color: var(--based-secondary);
-  }
+  /* Base blue primary color */
+  --primary: hsl(221, 83%, 55%); /* Base brand blue #0052FF */
+  --primary-foreground: hsl(0, 0%, 100%);
   
-  .text-based-accent {
-    color: var(--based-accent);
-  }
+  /* High contrast secondary elements */
+  --secondary: hsl(220, 20%, 15%);
+  --secondary-foreground: hsl(0, 0%, 98%);
   
-  .border-based-surface {
-    border-color: var(--based-surface);
-  }
+  /* Muted elements with excellent readability */
+  --muted: hsl(220, 18%, 12%);
+  --muted-foreground: hsl(220, 10%, 75%);
+  
+  /* Accent using Base blue */
+  --accent: hsl(221, 83%, 55%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  
+  /* Destructive elements */
+  --destructive: hsl(0, 62.8%, 55%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  
+  /* Borders and inputs */
+  --border: hsl(220, 15%, 20%);
+  --input: hsl(220, 18%, 12%);
+  --ring: hsl(221, 83%, 55%);
+  --radius: 0.75rem;
+  
+  /* Custom Base brand colors */
+  --based-primary: hsl(221, 83%, 55%); /* #0052FF */
+  --based-secondary: hsl(220, 20%, 15%);
+  --based-accent: hsl(0, 73%, 50%);
+  --based-surface: hsl(220, 20%, 10%);
+  --based-background: hsl(220, 25%, 6%);
+  
+  /* Success/bullish green */
+  --success: hsl(142, 76%, 36%);
+  --success-foreground: hsl(0, 0%, 98%);
+  
+  /* Warning/bearish red */
+  --warning: hsl(0, 84%, 60%);
+  --warning-foreground: hsl(0, 0%, 98%);
+}
 
-  /* Modern UI enhancements */
-  .glass-effect {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.1);
-  }
+/* Custom scrollbar for all themes */
+::-webkit-scrollbar {
+  width: 8px;
+}
 
-  .hover-lift {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
 
-  .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
 
-  /* Enhanced typography */
-  .font-display {
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
 
-  /* Search animations */
-  .search-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
 
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: .5;
-    }
+/* Focus styles */
+button:focus,
+input:focus,
+select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .mobile-optimized {
+    font-size: 16px; /* Prevent zoom on iOS */
   }
 }
 
-.animate-pulse-green {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  color: var(--based-secondary);
+/* Base theme specific enhancements */
+.base button {
+  transition: all 0.2s ease;
 }
 
-.animate-pulse-red {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  color: var(--based-accent);
+.base button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 82, 255, 0.2);
+}
+
+.base .card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 82, 255, 0.15);
 }

@@ -1,11 +1,10 @@
 import { createRoot } from "react-dom/client";
 import React from "react";
 import "./index.css";
-import { EnhancedCoins } from "./pages/enhanced-coins";
+import { MobileBaseCoins } from "./pages/mobile-base-coins";
 import { MobileResponsiveNews } from "./components/mobile-responsive-news";
 import { MiniAppDashboard } from "./components/mini-app-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
-import { WalletConnect } from "./components/wallet-connect";
 
 function WorkingNewsApp() {
   const [news, setNews] = React.useState([]);
@@ -452,8 +451,7 @@ function App() {
     return (
       <>
         <ThemeToggleSimple />
-        <WalletConnect />
-        <EnhancedCoins />
+        <MobileBaseCoins />
       </>
     );
   }
@@ -462,7 +460,6 @@ function App() {
     return (
       <>
         <ThemeToggleSimple />
-        <WalletConnect />
         <MiniAppDashboard />
       </>
     );
@@ -471,7 +468,6 @@ function App() {
   return (
     <>
       <ThemeToggleSimple />
-      <WalletConnect />
       <MobileResponsiveNews />
     </>
   );
