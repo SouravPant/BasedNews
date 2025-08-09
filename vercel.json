@@ -8,7 +8,11 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/((?!api|farcaster\\.json|icon\\.png|preview\\.png|hero\\.png|screenshot.*\\.png|splash\\.png|og-image\\.png|generate-images\\.html).*)",
+      "source": "/.well-known/(.*)",
+      "destination": "/.well-known/$1"
+    },
+    {
+      "source": "/((?!api|\\.well-known|farcaster\\.json|icon\\.png|preview\\.png|hero\\.png|screenshot.*\\.png|splash\\.png|og-image\\.png|generate-images\\.html).*)",
       "destination": "/index.html"
     }
   ],

@@ -1,21 +1,41 @@
 {
   "frame": {
+    "name": "Based News",
     "version": "1",
-    "name": "BasedNews",
-    "subtitle": "Base Ecosystem News & Crypto Tracker",
-    "description": "Real-time cryptocurrency news aggregator and market data for the Base ecosystem. Track prices, view charts, and stay updated with the latest crypto news - all in one mini app.",
     "iconUrl": "https://based-news-eight.vercel.app/icon.png",
     "homeUrl": "https://based-news-eight.vercel.app",
+    "imageUrl": "https://based-news-eight.vercel.app/preview.png",
+    "buttonTitle": "Open Based News",
     "splashImageUrl": "https://based-news-eight.vercel.app/splash.png",
-    "splashBackgroundColor": "#0052ff",
-    "heroImageUrl": "https://based-news-eight.vercel.app/hero.png",
-    "tagline": "Your Base ecosystem crypto companion",
+    "splashBackgroundColor": "#0000FF",
+    "webhookUrl": "https://based-news-eight.vercel.app/api/webhook",
+    "subtitle": "Real-time crypto news & Base ecosystem tracking",
+    "description": "Stay ahead with real-time cryptocurrency news, Base ecosystem token tracking, and onchain analytics. Get AI-powered news summaries, explore 100+ Base tokens, and connect your wallet for portfolio tracking.",
+    "primaryCategory": "news",
     "screenshotUrls": [
       "https://based-news-eight.vercel.app/screenshot1.png",
-      "https://based-news-eight.vercel.app/screenshot2.png"
+      "https://based-news-eight.vercel.app/screenshot2.png",
+      "https://based-news-eight.vercel.app/screenshot3.png"
     ],
-    "primaryCategory": "finance",
-    "tags": ["crypto", "news", "base", "defi", "trading", "charts"],
-    "noindex": true
+    "heroImageUrl": "https://based-news-eight.vercel.app/hero.png",
+    "tags": [
+      "crypto",
+      "news",
+      "base",
+      "defi",
+      "blockchain",
+      "tokens",
+      "portfolio"
+    ],
+    "tagline": "Your gateway to the Base ecosystem & crypto news",
+    "ogTitle": "Based News - Real-time Crypto News & Base Ecosystem",
+    "ogDescription": "Stay updated with real-time crypto news, explore 100+ Base ecosystem tokens, and track your portfolio with Based News.",
+    "ogImageUrl": "https://based-news-eight.vercel.app/og-image.png",
+    "castShareUrl": "https://warpcast.com/~/compose?text=Just%20discovered%20Based%20News%20-%20the%20ultimate%20crypto%20news%20and%20Base%20ecosystem%20tracker!%20🔵%20https://based-news-eight.vercel.app"
+  },
+  "accountAssociation": {
+    "header": "eyJmaWQiOjIzNDU1OSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweGI4NDEyQTEyYzE2NDE3QmJCMmREMGI1YzlFMDhkQzdiZjNBMjQ4RjYifQ",
+    "payload": "eyJkb21haW4iOiJiYXNlZC1uZXdzLWVpZ2h0LnZlcmNlbC5hcHAifQ",
+    "signature": "P0DJ885+3YB//OyF65xXcMFEP+No78tw1Rc9lfsLMcAiN9d6yfLDZ5/ZmyL52u50hHnbcv3wBEUxbF74qk620hw="
   }
 }

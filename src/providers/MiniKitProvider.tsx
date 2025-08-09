@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { sdk } from '@farcaster/frame-sdk';
 
 interface User {
   fid?: number;
@@ -47,23 +48,35 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
   const [isInBaseApp, setIsInBaseApp] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [wallet, setWallet] = useState<WalletInfo | null>(null);
+  const [isAppLoaded, setIsAppLoaded] = useState(false);
 
   const setFrameReady = () => {
-    setIsFrameReadyState(true);
+    if (!isFrameReady) {
+      console.log('🔵 Based News: Setting frame ready...');
+      setIsFrameReadyState(true);
+      
+      // Call Farcaster SDK ready when frame is ready
+      try {
+        sdk.actions.ready();
+        console.log('✅ Based News: Farcaster SDK ready() called successfully');
+      } catch (error) {
+        console.log('⚠️ Based News: Not in Farcaster environment or SDK not available:', error);
+      }
+    }
   };
 
   const connectWallet = async () => {
     try {
-      // Check if we're in Base App environment
-      if (isInBaseApp && context?.user) {
-        // Use Base App's native wallet
-        const mockWallet: WalletInfo = {
-          address: '0x' + Math.random().toString(16).substring(2, 42),
+      // Check if we're in Farcaster environment and try to use context
+      if (context?.user) {
+        // Use Farcaster context data
+        const contextWallet: WalletInfo = {
+          address: context.user.address || '0x' + Math.random().toString(16).substring(2, 42),
           balance: '1.234',
           chainId: 8453, // Base mainnet
           isConnected: true
         };
-        setWallet(mockWallet);
+        setWallet(contextWallet);
         return;
       }
 
@@ -127,7 +140,7 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
 
   const signInWithBase = async (): Promise<{ success: boolean; user?: User; error?: string }> => {
     try {
-      // If already authenticated in Base App
+      // If already authenticated in Farcaster context
       if (context?.user) {
         const baseUser: User = {
           fid: context.user.fid,
@@ -166,36 +179,82 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
     }
   };
 
+  // Initialize Farcaster SDK and detect environment
   useEffect(() => {
-    // Check if we're running in a Base App or Farcaster environment
-    const checkEnvironment = () => {
-      // Check for Farcaster SDK or Base App context
-      const isFarcaster = typeof window !== 'undefined' && 
-        (window.location.href.includes('farcaster') || 
-         window.location.href.includes('warpcast') ||
-         window.location.search.includes('baseapp=true') ||
-         window.parent !== window);
-      
-      setIsInBaseApp(isFarcaster);
-      
-      if (isFarcaster) {
-        // Mock context for testing - in real implementation this would come from SDK
-        setContext({
-          user: {
-            fid: 12345,
-            username: 'baseuser',
-            displayName: 'Base User',
-            pfpUrl: 'https://avatar.tobi.sh/base.svg'
+    const initializeFarcasterSDK = async () => {
+      try {
+        console.log('🔵 Based News: Initializing Farcaster environment...');
+        
+        // Check if we're in a Farcaster frame
+        const isInFrame = window.parent !== window;
+        const hasFrameParams = window.location.search.includes('fid=') || 
+                             window.location.search.includes('frameData=') ||
+                             window.location.href.includes('farcaster') ||
+                             window.location.href.includes('warpcast');
+        
+        if (isInFrame || hasFrameParams) {
+          console.log('🔵 Based News: Detected Farcaster environment');
+          setIsInBaseApp(true);
+          
+          // Try to get context from Farcaster SDK
+          try {
+            const frameContext = await sdk.context;
+            console.log('🔵 Based News: Farcaster context:', frameContext);
+            setContext(frameContext);
+          } catch (error) {
+            console.log('⚠️ Based News: Could not get Farcaster context, using fallback');
+            // Use fallback context for testing
+            setContext({
+              user: {
+                fid: 12345,
+                username: 'baseuser',
+                displayName: 'Base User',
+                pfpUrl: 'https://avatar.tobi.sh/base.svg'
+              }
+            });
           }
-        });
+        } else {
+          console.log('🔵 Based News: Not in Farcaster environment, running standalone');
+        }
+        
+        // Mark app as loaded after environment detection
+        setIsAppLoaded(true);
+        
+      } catch (error) {
+        console.log('⚠️ Based News: Farcaster SDK not available, running in standalone mode');
+        setIsAppLoaded(true);
       }
     };
 
-    checkEnvironment();
-    
-    // Listen for messages from parent frame
+    initializeFarcasterSDK();
+  }, []);
+
+  // Set frame ready when app is loaded and DOM is ready
+  useEffect(() => {
+    if (isAppLoaded && !isFrameReady) {
+      // Wait a bit for DOM to be fully rendered
+      const timer = setTimeout(() => {
+        console.log('🔵 Based News: App loaded, setting frame ready');
+        setFrameReady();
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isAppLoaded, isFrameReady]);
+
+  // Auto-connect if in Farcaster environment
+  useEffect(() => {
+    if (isInBaseApp && context?.user && !user) {
+      console.log('🔵 Based News: Auto-connecting user in Farcaster environment');
+      signInWithBase();
+    }
+  }, [isInBaseApp, context, user]);
+
+  // Listen for messages from parent frame
+  useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'base-app-context') {
+      if (event.data?.type === 'farcaster-frame-context') {
+        console.log('🔵 Based News: Received Farcaster frame context:', event.data);
         setIsInBaseApp(true);
         setContext(event.data.context);
       }
@@ -204,13 +263,6 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, []);
-
-  // Auto-connect if in Base App
-  useEffect(() => {
-    if (isInBaseApp && context?.user && !user) {
-      signInWithBase();
-    }
-  }, [isInBaseApp, context, user]);
 
   const value: MiniKitContextType = {
     setFrameReady,
