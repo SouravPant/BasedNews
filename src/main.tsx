@@ -2,7 +2,8 @@ import { createRoot } from "react-dom/client";
 import React from "react";
 import "./index.css";
 import { EnhancedCoins } from "./pages/enhanced-coins";
-import { EnhancedNews } from "./components/enhanced-news";
+import { MobileResponsiveNews } from "./components/mobile-responsive-news";
+import { MiniAppDashboard } from "./components/mini-app-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 import { WalletConnect } from "./components/wallet-connect";
 
@@ -402,6 +403,8 @@ function App() {
     const path = window.location.pathname;
     if (path === '/coins') {
       setCurrentPage('coins');
+    } else if (path === '/dashboard') {
+      setCurrentPage('dashboard');
     } else {
       setCurrentPage('news');
     }
@@ -411,6 +414,8 @@ function App() {
       const path = window.location.pathname;
       if (path === '/coins') {
         setCurrentPage('coins');
+      } else if (path === '/dashboard') {
+        setCurrentPage('dashboard');
       } else {
         setCurrentPage('news');
       }
@@ -424,13 +429,15 @@ function App() {
   React.useEffect(() => {
     const handleNavClick = (e) => {
       const link = e.target.closest('a');
-      if (link && (link.href.endsWith('/') || link.href.endsWith('/coins'))) {
+      if (link && (link.href.endsWith('/') || link.href.endsWith('/coins') || link.href.endsWith('/dashboard'))) {
         e.preventDefault();
         const path = new URL(link.href).pathname;
         window.history.pushState({}, '', path);
         
         if (path === '/coins') {
           setCurrentPage('coins');
+        } else if (path === '/dashboard') {
+          setCurrentPage('dashboard');
         } else {
           setCurrentPage('news');
         }
@@ -451,11 +458,21 @@ function App() {
     );
   }
 
+  if (currentPage === 'dashboard') {
+    return (
+      <>
+        <ThemeToggleSimple />
+        <WalletConnect />
+        <MiniAppDashboard />
+      </>
+    );
+  }
+
   return (
     <>
       <ThemeToggleSimple />
       <WalletConnect />
-      <EnhancedNews />
+      <MobileResponsiveNews />
     </>
   );
 }
