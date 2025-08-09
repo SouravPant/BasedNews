@@ -8,17 +8,19 @@ interface CryptoChartModalProps {
 }
 
 // ApexCharts component - same as the working version
-function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; price: number }>, coinName: string, days: number }) {
+function WorkingChart({ data, coinName, days, actualPriceChange }: { data: Array<{ time: string; price: number }>, coinName: string, days: number, actualPriceChange?: number }) {
   const [chartType, setChartType] = React.useState<'line' | 'area'>('area');
 
   if (!data || data.length === 0) return null;
 
-  // Calculate price change
-  const firstPrice = data[0]?.price || 0;
-  const lastPrice = data[data.length - 1]?.price || 0;
-  const priceChange = lastPrice - firstPrice;
-  const priceChangePercentage = firstPrice > 0 ? ((priceChange / firstPrice) * 100) : 0;
-  const isPositive = priceChange >= 0;
+  // Use actual price change if provided, otherwise calculate from chart data
+  const priceChangePercentage = actualPriceChange !== undefined ? actualPriceChange : (() => {
+    const firstPrice = data[0]?.price || 0;
+    const lastPrice = data[data.length - 1]?.price || 0;
+    const priceChange = lastPrice - firstPrice;
+    return firstPrice > 0 ? ((priceChange / firstPrice) * 100) : 0;
+  })();
+  const isPositive = priceChangePercentage >= 0;
 
   // Prepare chart data
   const chartData = data.map(point => ({
@@ -530,6 +532,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
               data={chartData.data} 
               coinName={cryptocurrency?.name || 'Unknown'}
               days={1}
+              actualPriceChange={priceChange24h}
             />
           ) : (
             <div style={{

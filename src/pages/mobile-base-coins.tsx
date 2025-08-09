@@ -330,14 +330,39 @@ export function MobileBaseCoins() {
             alignItems: 'center',
             gap: '8px'
           }}>
-            🔵 Base Ecosystem
+            <div style={{
+              width: '24px',
+              height: '24px',
+              background: 'linear-gradient(135deg, #0052FF 0%, #0066FF 100%)',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: '900',
+              fontFamily: '"Inter", system-ui, sans-serif',
+              boxShadow: '0 2px 8px rgba(0, 82, 255, 0.3)'
+            }}>
+              B
+            </div>
+            Base Ecosystem
           </h1>
           <div style={{
             fontSize: '12px',
             color: 'var(--muted-foreground)',
-            textAlign: 'right'
+            textAlign: 'right',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
           }}>
-            <div>{filteredCoins.length} coins</div>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              background: '#22c55e',
+              borderRadius: '50%',
+              animation: 'pulse 2s infinite'
+            }}></div>
             <div>Live prices</div>
           </div>
         </div>
@@ -729,11 +754,15 @@ export function MobileBaseCoins() {
         </div>
       )}
 
-      {/* Spinner Animation */}
+      {/* Animations */}
       <style jsx>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
         }
       `}</style>
     </div>
