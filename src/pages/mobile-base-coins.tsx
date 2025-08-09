@@ -197,9 +197,9 @@ export function MobileBaseCoins() {
         id: coin.id,
         name: coin.name,
         symbol: coin.symbol,
-        current_price: coin.current_price || coin.currentPrice,
-        price_change_percentage_24h: coin.price_change_percentage_24h || coin.priceChangePercentage24h,
-        market_cap: coin.market_cap || coin.marketCap,
+        current_price: Number(coin.current_price || coin.currentPrice || 0),
+        price_change_percentage_24h: Number(coin.price_change_percentage_24h || coin.priceChangePercentage24h || 0),
+        market_cap: Number(coin.market_cap || coin.marketCap || 0),
         image: coin.image,
         rank: index + 1
       }));
@@ -255,32 +255,44 @@ export function MobileBaseCoins() {
     coin.symbol.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const formatPrice = (price: number) => {
-    if (price >= 1) {
+  const formatPrice = (price: any) => {
+    const numPrice = Number(price);
+    if (isNaN(numPrice) || numPrice === null || numPrice === undefined) {
+      return '$0.00';
+    }
+    if (numPrice >= 1) {
       return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
-      }).format(price);
+      }).format(numPrice);
     }
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 4,
       maximumFractionDigits: 8
-    }).format(price);
+    }).format(numPrice);
   };
 
-  const formatMarketCap = (marketCap: number) => {
-    if (marketCap >= 1e12) return `$${(marketCap / 1e12).toFixed(1)}T`;
-    if (marketCap >= 1e9) return `$${(marketCap / 1e9).toFixed(1)}B`;
-    if (marketCap >= 1e6) return `$${(marketCap / 1e6).toFixed(1)}M`;
-    return `$${marketCap.toLocaleString()}`;
+  const formatMarketCap = (marketCap: any) => {
+    const numMarketCap = Number(marketCap);
+    if (isNaN(numMarketCap) || numMarketCap === null || numMarketCap === undefined) {
+      return 'N/A';
+    }
+    if (numMarketCap >= 1e12) return `$${(numMarketCap / 1e12).toFixed(1)}T`;
+    if (numMarketCap >= 1e9) return `$${(numMarketCap / 1e9).toFixed(1)}B`;
+    if (numMarketCap >= 1e6) return `$${(numMarketCap / 1e6).toFixed(1)}M`;
+    return `$${numMarketCap.toLocaleString()}`;
   };
 
-  const formatPercentage = (percentage: number) => {
-    return `${percentage >= 0 ? '+' : ''}${percentage.toFixed(2)}%`;
+  const formatPercentage = (percentage: any) => {
+    const numPercentage = Number(percentage);
+    if (isNaN(numPercentage) || numPercentage === null || numPercentage === undefined) {
+      return '0.00%';
+    }
+    return `${numPercentage >= 0 ? '+' : ''}${numPercentage.toFixed(2)}%`;
   };
 
   const handleCoinClick = (coin: Coin) => {
