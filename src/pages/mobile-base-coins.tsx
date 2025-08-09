@@ -164,26 +164,21 @@ export function MobileBaseCoins() {
     try {
       console.log('🔍 Fetching Base ecosystem coins...');
       
-      // Use our own API endpoint first, then fallback to CoinGecko
-      let response;
-      try {
-        response = await fetch('/api/cryptocurrencies?limit=50');
-        if (!response.ok) throw new Error('API endpoint failed');
-      } catch (apiError) {
-        console.log('📡 API endpoint failed, trying CoinGecko directly...');
-        
-        // Fallback to CoinGecko with smaller batch
-        const essentialCoins = [
-          'ethereum', 'usd-coin', 'wrapped-bitcoin', 'dai', 'tether',
-          'aerodrome-finance', 'compound', 'uniswap', 'aave', 'curve-dao-token',
-          'balancer', 'sushiswap', 'pancakeswap', 'yearn-finance', 'maker',
-          'degen-base', 'coinbase-wrapped-staked-eth', 'frax', 'liquity', 'origin-protocol'
-        ].join(',');
-        
-        response = await fetch(
-          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${essentialCoins}&order=market_cap_desc&per_page=25&page=1&sparkline=false&price_change_percentage=24h`
-        );
-      }
+      // Always use CoinGecko for Base ecosystem coins only
+      console.log('📡 Fetching Base ecosystem coins from CoinGecko...');
+      
+      const baseCoins = [
+        'ethereum', 'usd-coin', 'wrapped-bitcoin', 'dai', 'tether',
+        'aerodrome-finance', 'compound', 'uniswap', 'aave', 'curve-dao-token',
+        'balancer', 'sushiswap', 'pancakeswap', 'yearn-finance', 'maker',
+        'degen-base', 'coinbase-wrapped-staked-eth', 'frax', 'liquity', 'origin-protocol',
+        'convex-finance', 'lido-dao', 'rocket-pool', 'staked-ether', 'morpho',
+        'seamless-protocol', 'moonwell', 'extra-finance', 'based-brett'
+      ].join(',');
+      
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${baseCoins}&order=market_cap_desc&per_page=30&page=1&sparkline=false&price_change_percentage=24h`
+      );
       
       if (!response.ok) {
         throw new Error('Failed to fetch cryptocurrency data');
@@ -243,6 +238,26 @@ export function MobileBaseCoins() {
           market_cap: 32456789123,
           image: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png',
           rank: 3
+        },
+        {
+          id: 'aerodrome-finance',
+          name: 'Aerodrome Finance',
+          symbol: 'aero',
+          current_price: 1.25,
+          price_change_percentage_24h: 5.67,
+          market_cap: 1234567890,
+          image: 'https://assets.coingecko.com/coins/images/31745/large/token.png',
+          rank: 4
+        },
+        {
+          id: 'degen-base',
+          name: 'Degen',
+          symbol: 'degen',
+          current_price: 0.0123,
+          price_change_percentage_24h: -2.34,
+          market_cap: 987654321,
+          image: 'https://assets.coingecko.com/coins/images/34515/large/degen.png',
+          rank: 5
         }
       ]);
     } finally {
