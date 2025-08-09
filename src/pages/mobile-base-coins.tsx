@@ -14,6 +14,7 @@ interface Coin {
 }
 
 export function MobileBaseCoins() {
+  console.log('🚀 MobileBaseCoins component rendering...');
   const [coins, setCoins] = React.useState<Coin[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
