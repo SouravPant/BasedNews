@@ -10,6 +10,7 @@ export function ThemeToggleSimple() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isVisible, setIsVisible] = React.useState(true);
   const [lastScrollY, setLastScrollY] = React.useState(0);
+  const [currentPage, setCurrentPage] = React.useState('');
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -18,9 +19,25 @@ export function ThemeToggleSimple() {
     }
   }, [theme]);
 
-  // Handle scroll to show/hide theme toggle
+  // Track current page to conditionally show theme toggle
+  React.useEffect(() => {
+    const updateCurrentPage = () => {
+      const path = window.location.pathname;
+      setCurrentPage(path);
+    };
+
+    updateCurrentPage();
+    window.addEventListener('popstate', updateCurrentPage);
+    
+    return () => window.removeEventListener('popstate', updateCurrentPage);
+  }, []);
+
+  // Handle scroll to show/hide theme toggle (only on homepage)
   React.useEffect(() => {
     const handleScroll = () => {
+      // Only apply scroll logic on homepage
+      if (currentPage !== '/' && currentPage !== '') return;
+      
       const currentScrollY = window.scrollY;
       
       // Show when at very top (0-50px) or scrolling up
@@ -42,7 +59,7 @@ export function ThemeToggleSimple() {
       window.addEventListener('scroll', handleScroll, { passive: true });
       return () => window.removeEventListener('scroll', handleScroll);
     }
-  }, [lastScrollY]);
+  }, [lastScrollY, currentPage]);
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -65,6 +82,13 @@ export function ThemeToggleSimple() {
   ];
 
   const currentTheme = themes.find(t => t.id === theme) || themes[2];
+
+  // Hide theme toggle on dashboard and coins pages to prevent text overlap
+  const shouldHideOnPage = currentPage === '/dashboard' || currentPage === '/coins';
+  
+  if (shouldHideOnPage) {
+    return null; // Don't render theme toggle on these pages
+  }
 
   return (
     <div style={{
@@ -271,7 +295,7 @@ export function ThemeToggleSimple() {
                     <div style={{ color: 'var(--base-blue)', fontWeight: '600', marginBottom: '2px' }}>
                       🔵 Official Base Theme
                     </div>
-                    Powered by Base's design system
+                    Only visible on Base News homepage
                   </>
                 ) : theme === 'dark' ? (
                   <>Perfect for onchain experiences at night</> 

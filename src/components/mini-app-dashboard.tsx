@@ -1,4 +1,5 @@
 import React from "react";
+import { BaseWalletConnect } from "./base-wallet-connect";
 
 interface Coin {
   id: string;
@@ -173,16 +174,24 @@ export function MiniAppDashboard() {
         </div>
       </header>
 
-      {/* Portfolio Overview */}
-      <section style={{ padding: '16px' }}>
-        <h2 style={{
-          fontSize: '18px',
-          fontWeight: '600',
-          color: 'var(--foreground)',
-          marginBottom: '12px'
-        }}>
-          💼 Portfolio Overview
-        </h2>
+              {/* Portfolio Overview */}
+        <section style={{ padding: '16px' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '16px'
+          }}>
+            <h2 style={{
+              fontSize: '18px',
+              fontWeight: '600',
+              color: 'var(--foreground)',
+              margin: 0
+            }}>
+              💼 Portfolio Overview
+            </h2>
+            <BaseWalletConnect showInPortfolio={true} />
+          </div>
         
         <div style={{
           backgroundColor: 'var(--card)',
