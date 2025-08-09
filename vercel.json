@@ -24,10 +24,6 @@
       "destination": "/fallback.html"
     },
     {
-      "source": "/(.*\\.(html|png|jpg|jpeg|gif|svg|json|css|js|ico))",
-      "destination": "/$1"
-    },
-    {
       "source": "/coins",
       "destination": "/index.html"
     },
