@@ -169,25 +169,36 @@ export function BaseNews() {
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <BaseNetworkBadge />
             <BaseStatusBadge status="online">
-              {filteredNews.length} articles
+              {news.length} total articles
             </BaseStatusBadge>
           </div>
         }
       />
 
-      {/* Search and Filters */}
-      <div style={{
-        padding: '16px 20px',
-        background: 'var(--card)',
-        borderBottom: '1px solid var(--border)'
-      }}>
-        {/* Search Bar */}
+              {/* Theme Toggle - Below Base Mainnet text, above articles */}
         <div style={{
+          padding: '16px 20px',
+          background: 'var(--card)',
+          borderBottom: '1px solid var(--border)',
           display: 'flex',
-          gap: '8px',
-          alignItems: 'center',
-          marginBottom: '12px'
+          justifyContent: 'center'
         }}>
+          <ThemeToggleSimple inlineMode={true} />
+        </div>
+
+        {/* Search and Filters */}
+        <div style={{
+          padding: '16px 20px',
+          background: 'var(--card)',
+          borderBottom: '1px solid var(--border)'
+        }}>
+          {/* Search Bar */}
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            alignItems: 'center',
+            marginBottom: '12px'
+          }}>
           <input
             type="text"
             placeholder="🔍 Search Base news..."
@@ -581,15 +592,6 @@ export function BaseNews() {
           </div>
         )}
 
-        {/* Theme Toggle - Only on Homepage Below Articles */}
-        <div style={{
-          marginTop: '40px',
-          padding: '20px',
-          display: 'flex',
-          justifyContent: 'center'
-        }}>
-          <ThemeToggleSimple inlineMode={true} />
-        </div>
       </main>
 
              {/* Base Bottom Navigation */}

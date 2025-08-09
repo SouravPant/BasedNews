@@ -468,7 +468,6 @@ function App() {
 
   return (
     <>
-      <BaseWalletConnect />
       <BaseNews />
     </>
   );
