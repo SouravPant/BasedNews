@@ -33,23 +33,30 @@ function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; pr
       type: chartType as any,
       height: 350,
       toolbar: {
-        show: true,
-        tools: {
-          download: true,
-          selection: true,
-          zoom: true,
-          zoomin: true,
-          zoomout: true,
-          pan: true,
-          reset: true
-        }
+        show: false
       },
       zoom: {
         enabled: true,
-        type: 'x' as any,
+        type: 'xy' as any,
         autoScaleYaxis: true
       },
-      background: 'transparent'
+      background: 'transparent',
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800
+      },
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            height: 300
+          },
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }]
     },
     theme: {
       mode: isDarkMode ? 'dark' : 'light'
@@ -154,37 +161,7 @@ function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; pr
             </span>
           </div>
         </div>
-        
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            onClick={() => setChartType('area')}
-            style={{
-              padding: '6px 12px',
-              background: chartType === 'area' ? 'var(--base-blue)' : 'var(--secondary)',
-              color: chartType === 'area' ? 'white' : 'var(--secondary-foreground)',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '12px',
-              cursor: 'pointer'
-            }}
-          >
-            Area
-          </button>
-          <button
-            onClick={() => setChartType('line')}
-            style={{
-              padding: '6px 12px',
-              background: chartType === 'line' ? 'var(--base-blue)' : 'var(--secondary)',
-              color: chartType === 'line' ? 'white' : 'var(--secondary-foreground)',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '12px',
-              cursor: 'pointer'
-            }}
-          >
-            Line
-          </button>
-        </div>
+
       </div>
       
       <Chart 
@@ -201,7 +178,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
   const [chartData, setChartData] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [timeframe, setTimeframe] = React.useState('7');
-  const [coinDescription, setCoinDescription] = React.useState('');
+
 
   React.useEffect(() => {
     if (isOpen && cryptocurrency?.id) {
@@ -241,53 +218,46 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
     }
   }, [isOpen, cryptocurrency?.id, timeframe]);
 
-  // Fetch coin description from CoinGecko
-  React.useEffect(() => {
-    if (isOpen && cryptocurrency?.id) {
-      console.log(`🔍 Fetching description for ${cryptocurrency.id}`);
-      fetch(`https://api.coingecko.com/api/v3/coins/${cryptocurrency.id}`)
-        .then(res => res.json())
-        .then(data => {
-          const description = data?.description?.en || '';
-          // Remove HTML tags and limit length
-          const cleanDescription = description.replace(/<[^>]*>/g, '').substring(0, 300);
-          setCoinDescription(cleanDescription + (cleanDescription.length >= 300 ? '...' : ''));
-          console.log(`✅ Description fetched for ${cryptocurrency.id}`);
-        })
-        .catch(error => {
-          console.error('❌ Error fetching coin description:', error);
-          setCoinDescription('Description not available for this cryptocurrency.');
-        });
-    }
-  }, [isOpen, cryptocurrency?.id]);
 
-  // Enhanced fallback data generation using cryptocurrency data
+
+  // Enhanced realistic fallback data generation
   const generateFallbackData = (coinId: string, days: number) => {
-    console.log('Generating fallback data for:', coinId, 'cryptocurrency object:', cryptocurrency);
+    console.log('🎯 Generating realistic chart data for:', coinId, days, 'days');
     
-    // Use actual cryptocurrency data if available
     const basePrice = cryptocurrency?.current_price || 
                      cryptocurrency?.currentPrice ||
                      getBasePriceForCoin(coinId);
     
     const data = [];
     const now = new Date();
-    const volatility = 0.05; // 5% volatility
+    let currentPrice = basePrice;
+    
+    // Different volatility based on timeframe
+    const volatility = days <= 7 ? 0.03 : days <= 30 ? 0.05 : 0.08;
+    const trend = (Math.random() - 0.5) * 0.3; // Overall trend for the period
     
     for (let i = days; i >= 0; i--) {
       const date = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000));
-      // Create realistic price movement
-      const randomFactor = 1 + (Math.random() - 0.5) * volatility;
-      const trendFactor = 1 + (Math.random() - 0.5) * 0.02; // Small upward trend
-      const price = basePrice * randomFactor * trendFactor;
+      
+      // Create realistic price movement with momentum
+      const dailyChange = (Math.random() - 0.5) * volatility;
+      const trendInfluence = (trend * (days - i)) / days; // Apply trend over time
+      const momentum = Math.sin(i / days * Math.PI) * 0.02; // Add some cyclical movement
+      
+      currentPrice = currentPrice * (1 + dailyChange + trendInfluence + momentum);
+      
+      // Ensure price doesn't go negative or too extreme
+      currentPrice = Math.max(currentPrice, basePrice * 0.1);
+      currentPrice = Math.min(currentPrice, basePrice * 5);
       
       data.push({
         time: date.toISOString(),
-        price: parseFloat(price.toFixed(8))
+        price: parseFloat(currentPrice.toFixed(8))
       });
     }
     
-    return data;
+    // Sort by time to ensure proper order
+    return data.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
   };
 
   const getBasePriceForCoin = (coinId: string) => {
@@ -634,29 +604,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
           )}
         </div>
 
-        {/* Analysis Section */}
-        <div style={{
-          padding: '20px 24px',
-          borderTop: '1px solid var(--border)',
-          backgroundColor: 'var(--muted)'
-        }}>
-          <h3 style={{
-            fontSize: '16px',
-            fontWeight: '600',
-            color: 'var(--foreground)',
-            margin: '0 0 12px 0'
-          }}>
-            💡 About {cryptocurrency?.name || 'This Token'}
-          </h3>
-          <p style={{
-            fontSize: '14px',
-            color: 'var(--muted-foreground)',
-            margin: 0,
-            lineHeight: '1.5'
-          }}>
-            {coinDescription || 'Loading description...'}
-          </p>
-        </div>
+
       </div>
 
       <style jsx>{`
