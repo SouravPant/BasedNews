@@ -4,27 +4,167 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>Based News</title>
-    <meta name="description" content="Real-time cryptocurrency news, Base ecosystem tracking, and onchain analytics" />
+    <meta name="description" content="Real-time cryptocurrency news and Base ecosystem token tracking" />
     
-    <!-- Farcaster Mini App Meta Tags -->
+    <!-- Farcaster Frame Meta Tags for Embed Validation -->
     <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:miniapp" content="true" />
-    <meta property="fc:frame:miniapp:manifest" content="https://based-news-eight.vercel.app/.well-known/farcaster.json" />
-    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/preview.png" />
+    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/icon.png" />
+    <meta property="fc:frame:image:aspect_ratio" content="1.91:1" />
     <meta property="fc:frame:button:1" content="Open Based News" />
     <meta property="fc:frame:button:1:action" content="link" />
     <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
     
-    <!-- Open Graph Tags -->
-    <meta property="og:title" content="Based News - Real-time Crypto News & Base Ecosystem" />
-    <meta property="og:description" content="Stay updated with real-time crypto news, explore 100+ Base ecosystem tokens, and track your portfolio with Based News." />
-    <meta property="og:image" content="https://based-news-eight.vercel.app/og-image.png" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://based-news-eight.vercel.app" />
+    <!-- Mini App Meta Tag -->
+    <meta name="fc:frame:miniapp:manifest" content="https://based-news-eight.vercel.app/.well-known/farcaster.json" />
     
-    <!-- Mini App Configuration -->
-    <meta name="fc:frame:miniapp:domain" content="based-news-eight.vercel.app" />
-    <meta name="theme-color" content="#0000FF" />
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="Based News" />
+    <meta property="og:description" content="Real-time cryptocurrency news and Base ecosystem token tracking" />
+    <meta property="og:image" content="https://based-news-eight.vercel.app/icon.png" />
+    <meta property="og:url" content="https://based-news-eight.vercel.app" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Ultra Aggressive Farcaster Ready Script -->
+    <script>
+      console.log('🔵 Based News: Ultra Aggressive Ready Script Starting...');
+      
+      let readyCallCount = 0;
+      const MAX_READY_CALLS = 200; // 40 seconds at 200ms intervals
+      
+      function ultraAggressiveReady() {
+        readyCallCount++;
+        
+        try {
+          console.log(`🔵 Ready attempt #${readyCallCount}`);
+          
+          // Method 1: Direct postMessage to parent
+          if (window.parent && window.parent !== window) {
+            const messages = [
+              { type: 'ready' },
+              { type: 'frame-ready' },
+              { type: 'miniapp-ready' },
+              { type: 'sdk-ready' },
+              { type: 'app-ready' },
+              { action: 'ready' },
+              { action: 'frame-ready' },
+              'ready',
+              'frame-ready',
+              'miniapp-ready'
+            ];
+            
+            messages.forEach(msg => {
+              window.parent.postMessage(msg, '*');
+            });
+          }
+          
+          // Method 2: Try all possible SDK references
+          const sdkRefs = [
+            'sdk',
+            'frameSDK', 
+            'farcasterSDK',
+            'MiniKit',
+            'farcaster',
+            '__FARCASTER_SDK__'
+          ];
+          
+          sdkRefs.forEach(ref => {
+            try {
+              if (window[ref] && window[ref].actions && window[ref].actions.ready) {
+                window[ref].actions.ready();
+                console.log(`✅ Called ${ref}.actions.ready()`);
+              }
+              if (window[ref] && window[ref].ready) {
+                window[ref].ready();
+                console.log(`✅ Called ${ref}.ready()`);
+              }
+            } catch (e) {
+              // Silent fail
+            }
+          });
+          
+          // Method 3: Try dynamic SDK loading (runtime only)
+          if (typeof window !== 'undefined' && window.navigator && window.fetch) {
+            Promise.resolve().then(() => {
+              return new Promise(async (resolve) => {
+                try {
+                  // Try to dynamically import the SDK
+                  const modulePath = '@farcaster/frame-sdk';
+                  const module = await import(modulePath);
+                  if (module && module.default && module.default.actions && module.default.actions.ready) {
+                    await module.default.actions.ready();
+                    console.log('✅ Dynamic import SDK ready called');
+                  }
+                } catch (e) {
+                  console.log('⚠️ Dynamic import failed:', e);
+                }
+                resolve();
+              });
+            });
+          }
+          
+          // Method 4: Set global ready flags
+          window.__FARCASTER_READY__ = true;
+          window.__FRAME_READY__ = true;
+          window.__SDK_READY__ = true;
+          
+          // Method 5: Dispatch custom events
+          ['ready', 'frame-ready', 'farcaster-ready', 'sdk-ready'].forEach(eventType => {
+            try {
+              window.dispatchEvent(new CustomEvent(eventType, { detail: { source: 'based-news' } }));
+              document.dispatchEvent(new CustomEvent(eventType, { detail: { source: 'based-news' } }));
+            } catch (e) {
+              // Silent fail
+            }
+          });
+          
+        } catch (error) {
+          console.log(`⚠️ Ready attempt #${readyCallCount} error:`, error);
+        }
+      }
+      
+      // Immediate calls
+      ultraAggressiveReady();
+      ultraAggressiveReady();
+      ultraAggressiveReady();
+      
+      // Fast interval for first 10 seconds
+      const fastInterval = setInterval(() => {
+        if (readyCallCount < 50) {
+          ultraAggressiveReady();
+        } else {
+          clearInterval(fastInterval);
+        }
+      }, 200);
+      
+      // Slower interval for next 30 seconds
+      setTimeout(() => {
+        const slowInterval = setInterval(() => {
+          if (readyCallCount < MAX_READY_CALLS) {
+            ultraAggressiveReady();
+          } else {
+            clearInterval(slowInterval);
+          }
+        }, 500);
+      }, 10000);
+      
+      // Event-based calls
+      ['DOMContentLoaded', 'load', 'readystatechange'].forEach(event => {
+        document.addEventListener(event, ultraAggressiveReady);
+        window.addEventListener(event, ultraAggressiveReady);
+      });
+      
+      // Mutation observer for dynamic content
+      if (window.MutationObserver) {
+        const observer = new MutationObserver(ultraAggressiveReady);
+        observer.observe(document.documentElement, { 
+          childList: true, 
+          subtree: true 
+        });
+        setTimeout(() => observer.disconnect(), 30000);
+      }
+      
+      console.log('🔵 Based News: Ultra Aggressive Ready Script Initialized');
+    </script>
   </head>
   <body>
     <div id="root"></div>

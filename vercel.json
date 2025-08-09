@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "vite build --config vite.config.simple.ts",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
     {
@@ -12,8 +12,27 @@
       "destination": "/.well-known/$1"
     },
     {
-      "source": "/((?!api|\\.well-known|farcaster\\.json|icon\\.png|preview\\.png|hero\\.png|screenshot.*\\.png|splash\\.png|og-image\\.png|generate-images\\.html).*)",
+      "source": "/(.*\\.(png|jpg|jpeg|gif|svg|json|html|css|js|ts|tsx|ico))",
+      "destination": "/$1"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "ALLOWALL"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
     }
   ],
   "crons": [
