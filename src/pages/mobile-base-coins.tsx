@@ -19,9 +19,7 @@ export function MobileBaseCoins() {
   const [selectedCoin, setSelectedCoin] = React.useState<Coin | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [selectedCoinInfo, setSelectedCoinInfo] = React.useState(null);
-  const [isInfoModalOpen, setIsInfoModalOpen] = React.useState(false);
-  const [coinDescription, setCoinDescription] = React.useState('');
+
 
   // Base ecosystem coins - comprehensive list of 100 Base tokens and projects
   const baseEcosystemCoins = [
@@ -162,34 +160,53 @@ export function MobileBaseCoins() {
     setError(null);
     
     try {
-      // Fetch specific Base ecosystem coins
-      const coinIds = baseEcosystemCoins.join(',');
-      const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinIds}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`
-      );
+      console.log('🔍 Fetching Base ecosystem coins...');
+      
+      // Use our own API endpoint first, then fallback to CoinGecko
+      let response;
+      try {
+        response = await fetch('/api/cryptocurrencies?limit=50');
+        if (!response.ok) throw new Error('API endpoint failed');
+      } catch (apiError) {
+        console.log('📡 API endpoint failed, trying CoinGecko directly...');
+        
+        // Fallback to CoinGecko with smaller batch
+        const essentialCoins = [
+          'ethereum', 'usd-coin', 'wrapped-bitcoin', 'dai', 'tether',
+          'aerodrome-finance', 'compound', 'uniswap', 'aave', 'curve-dao-token',
+          'balancer', 'sushiswap', 'pancakeswap', 'yearn-finance', 'maker',
+          'degen-base', 'coinbase-wrapped-staked-eth', 'frax', 'liquity', 'origin-protocol'
+        ].join(',');
+        
+        response = await fetch(
+          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${essentialCoins}&order=market_cap_desc&per_page=25&page=1&sparkline=false&price_change_percentage=24h`
+        );
+      }
       
       if (!response.ok) {
         throw new Error('Failed to fetch cryptocurrency data');
       }
       
       const data = await response.json();
+      console.log('✅ Successfully fetched', data.length, 'coins');
       
       // Add rank based on market cap order and format data
       const formattedCoins = data.map((coin: any, index: number) => ({
         id: coin.id,
         name: coin.name,
         symbol: coin.symbol,
-        current_price: coin.current_price,
-        price_change_percentage_24h: coin.price_change_percentage_24h,
-        market_cap: coin.market_cap,
+        current_price: coin.current_price || coin.currentPrice,
+        price_change_percentage_24h: coin.price_change_percentage_24h || coin.priceChangePercentage24h,
+        market_cap: coin.market_cap || coin.marketCap,
         image: coin.image,
         rank: index + 1
       }));
       
       setCoins(formattedCoins);
+      setLoading(false);
     } catch (err) {
-      console.error('Error fetching Base coins:', err);
-      setError('Failed to load Base ecosystem coins');
+      console.error('❌ Error fetching Base coins:', err);
+      setError(null); // Don't show error, use fallback instead
       
       // Fallback demo data
       setCoins([
@@ -272,30 +289,7 @@ export function MobileBaseCoins() {
     setSelectedCoin(null);
   };
 
-  const handleInfoClick = (coin: Coin) => {
-    setSelectedCoinInfo(coin);
-    setIsInfoModalOpen(true);
-    
-    // Fetch description from CoinGecko
-    console.log(`🔍 Fetching description for ${coin.id}`);
-    fetch(`https://api.coingecko.com/api/v3/coins/${coin.id}`)
-      .then(res => res.json())
-      .then(data => {
-        const description = data?.description?.en || '';
-        const cleanDescription = description.replace(/<[^>]*>/g, '').substring(0, 300);
-        setCoinDescription(cleanDescription + (cleanDescription.length >= 300 ? '...' : ''));
-      })
-      .catch(error => {
-        console.error('❌ Error fetching coin description:', error);
-        setCoinDescription('Description not available for this cryptocurrency.');
-      });
-  };
 
-  const handleCloseInfoModal = () => {
-    setIsInfoModalOpen(false);
-    setSelectedCoinInfo(null);
-    setCoinDescription('');
-  };
 
   return (
     <div style={{
@@ -558,31 +552,7 @@ export function MobileBaseCoins() {
                   </div>
                 </div>
 
-                {/* Info Icon */}
-                <div 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleInfoClick(coin);
-                  }}
-                  style={{
-                    marginLeft: '8px',
-                    fontSize: '14px',
-                    color: 'var(--primary)',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--primary-foreground)',
-                    border: '1px solid var(--primary)',
-                    width: '20px',
-                    height: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold'
-                  }}
-                >
-                  i
-                </div>
+                
               </div>
             ))}
           </div>
@@ -674,85 +644,7 @@ export function MobileBaseCoins() {
           coin={selectedCoin}
         />
 
-      {/* Info Modal */}
-      {isInfoModalOpen && selectedCoinInfo && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '20px'
-        }}>
-          <div style={{
-            backgroundColor: 'var(--background)',
-            borderRadius: '16px',
-            maxWidth: '400px',
-            width: '100%',
-            maxHeight: '70vh',
-            border: '1px solid var(--border)',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              padding: '20px',
-              borderBottom: '1px solid var(--border)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <img 
-                  src={selectedCoinInfo.image}
-                  alt={selectedCoinInfo.name}
-                  style={{ width: '32px', height: '32px', borderRadius: '50%' }}
-                />
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
-                    {selectedCoinInfo.name}
-                  </h3>
-                  <p style={{ margin: 0, fontSize: '14px', color: 'var(--muted-foreground)' }}>
-                    {selectedCoinInfo.symbol.toUpperCase()}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={handleCloseInfoModal}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  backgroundColor: 'var(--muted)',
-                  border: '1px solid var(--border)',
-                  color: 'var(--muted-foreground)',
-                  fontSize: '18px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold'
-                }}
-              >
-                ×
-              </button>
-            </div>
-            <div style={{ padding: '20px', overflowY: 'auto', maxHeight: '50vh' }}>
-              <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '600' }}>
-                About
-              </h4>
-              <p style={{
-                margin: 0,
-                fontSize: '14px',
-                lineHeight: '1.5',
-                color: 'var(--muted-foreground)'
-              }}>
-                {coinDescription || 'Loading description...'}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      
 
       {/* Animations */}
       <style jsx>{`
