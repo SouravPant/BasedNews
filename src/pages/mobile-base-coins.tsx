@@ -1,5 +1,6 @@
 import React from "react";
 import { SimpleCoinModal } from "../components/simple-coin-modal";
+import { ErrorBoundary } from "../components/error-boundary";
 
 interface Coin {
   id: string;
@@ -208,7 +209,9 @@ export function MobileBaseCoins() {
       console.error('❌ Error fetching Base coins:', err);
       setError(null); // Don't show error, use fallback instead
       
-      // Fallback demo data
+      console.log('📋 Using fallback demo data due to API issues');
+      
+      // Comprehensive fallback demo data - always ensure coins are available
       setCoins([
         {
           id: 'ethereum',
@@ -292,13 +295,14 @@ export function MobileBaseCoins() {
 
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: 'var(--background)',
-      color: 'var(--foreground)',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      paddingBottom: '80px' // Space for bottom nav
-    }}>
+    <ErrorBoundary>
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: 'var(--background)',
+        color: 'var(--foreground)',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        paddingBottom: '80px' // Space for bottom nav
+      }}>
       {/* Mobile Header */}
       <header style={{
         position: 'sticky',
@@ -657,6 +661,7 @@ export function MobileBaseCoins() {
           50% { opacity: 0.5; }
         }
       `}</style>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

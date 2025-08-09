@@ -7,23 +7,28 @@ import { MiniKitProvider } from "@/providers/MiniKitProvider";
 import { NewsAggregator } from "@/pages/news-aggregator";
 import { Coins } from "@/pages/coins";
 import NotFound from "@/pages/not-found";
+import { ErrorBoundary } from "./components/error-boundary";
 
 function App() {
   return (
-    <div className="light" style={{ minHeight: '100vh', background: 'var(--background, #ffffff)' }}>
-      <QueryClientProvider client={queryClient}>
-        <MiniKitProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Switch>
-              <Route path="/" component={NewsAggregator} />
-              <Route path="/coins" component={Coins} />
-              <Route component={NotFound} />
-            </Switch>
-          </TooltipProvider>
-        </MiniKitProvider>
-      </QueryClientProvider>
-    </div>
+    <ErrorBoundary>
+      <div className="light" style={{ minHeight: '100vh', background: 'var(--background, #ffffff)' }}>
+        <QueryClientProvider client={queryClient}>
+          <MiniKitProvider>
+            <TooltipProvider>
+              <ErrorBoundary>
+                <Toaster />
+                <Switch>
+                  <Route path="/" component={NewsAggregator} />
+                  <Route path="/coins" component={Coins} />
+                  <Route component={NotFound} />
+                </Switch>
+              </ErrorBoundary>
+            </TooltipProvider>
+          </MiniKitProvider>
+        </QueryClientProvider>
+      </div>
+    </ErrorBoundary>
   );
 }
 

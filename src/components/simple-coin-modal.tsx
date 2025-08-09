@@ -9,6 +9,7 @@ interface SimpleCoinModalProps {
 export function SimpleCoinModal({ isOpen, onClose, coin }: SimpleCoinModalProps) {
   const [coinData, setCoinData] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   // Helper function to format market cap
   const formatMarketCap = (marketCap: number) => {
@@ -26,28 +27,129 @@ export function SimpleCoinModal({ isOpen, onClose, coin }: SimpleCoinModalProps)
   React.useEffect(() => {
     if (isOpen && coin?.id) {
       setLoading(true);
+      setError(null);
+      setCoinData(null);
+      
       console.log('🔍 Fetching coin data for:', coin.id);
       
-      // Fetch basic coin data only
-      fetch(`https://api.coingecko.com/api/v3/coins/${coin.id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`)
-        .then(res => res.json())
+      // Create fallback data immediately
+      const fallbackData = {
+        id: coin.id,
+        name: coin.name || 'Unknown Coin',
+        symbol: coin.symbol || 'UNK',
+        image: { large: coin.image || 'https://via.placeholder.com/64' },
+        market_data: {
+          current_price: { usd: coin.current_price || 0 },
+          price_change_percentage_24h: coin.price_change_percentage_24h || 0,
+          market_cap: { usd: coin.market_cap || 0 }
+        },
+        description: { en: 'Description temporarily unavailable. This coin is part of the Base ecosystem.' }
+      };
+      
+      // Set fallback data immediately to prevent blank screen
+      setCoinData(fallbackData);
+      
+      // Try to fetch real data
+      const fetchWithTimeout = (url: string, timeout = 10000) => {
+        return Promise.race([
+          fetch(url),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Request timeout')), timeout)
+          )
+        ]);
+      };
+      
+      fetchWithTimeout(`https://api.coingecko.com/api/v3/coins/${coin.id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          }
+          return res.json();
+        })
         .then(data => {
-          console.log('✅ Coin data received:', data);
-          setCoinData(data);
+          console.log('✅ Real coin data received:', data);
+          if (data && data.market_data) {
+            setCoinData(data);
+            setError(null);
+          } else {
+            console.warn('⚠️ Invalid data structure, using fallback');
+            setError('Using cached data');
+          }
           setLoading(false);
         })
         .catch(error => {
           console.error('❌ Error fetching coin data:', error);
+          setError(`Unable to fetch live data: ${error.message}`);
           setLoading(false);
+          // Keep fallback data, don't clear it
         });
     }
   }, [isOpen, coin?.id]);
 
   if (!isOpen) return null;
 
+  // Safety check for coin data
+  if (!coin) {
+    console.error('❌ No coin data provided to modal');
+    return (
+      <div 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}
+        onClick={onClose}
+      >
+        <div style={{
+          backgroundColor: 'var(--background)',
+          borderRadius: '16px',
+          padding: '30px',
+          textAlign: 'center',
+          border: '1px solid var(--border)',
+          color: 'var(--foreground)'
+        }}>
+          <h3 style={{ margin: '0 0 16px 0', color: '#ef4444' }}>⚠️ Error</h3>
+          <p style={{ margin: '0 0 20px 0', color: 'var(--muted-foreground)' }}>
+            No coin data available
+          </p>
+          <button
+            onClick={onClose}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: 'var(--primary)',
+              color: 'var(--primary-foreground)',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer'
+            }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
+    }
+  };
+
+  // Safe data extraction with fallbacks
+  const safeGetValue = (obj: any, path: string, fallback: any = 'N/A') => {
+    try {
+      return path.split('.').reduce((o, p) => o?.[p], obj) ?? fallback;
+    } catch {
+      return fallback;
     }
   };
 
@@ -91,16 +193,19 @@ export function SimpleCoinModal({ isOpen, onClose, coin }: SimpleCoinModalProps)
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <img 
-              src={coin?.image || coinData?.image?.large} 
-              alt={coin?.name}
+              src={safeGetValue(coin, 'image') || safeGetValue(coinData, 'image.large') || 'https://via.placeholder.com/64'} 
+              alt={safeGetValue(coin, 'name', 'Unknown')}
               style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/64';
+              }}
             />
             <div>
               <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600' }}>
-                {coin?.name || coinData?.name}
+                {safeGetValue(coin, 'name') || safeGetValue(coinData, 'name', 'Unknown Coin')}
               </h2>
               <p style={{ margin: 0, fontSize: '14px', color: 'var(--muted-foreground)' }}>
-                {coin?.symbol?.toUpperCase() || coinData?.symbol?.toUpperCase()}
+                {(safeGetValue(coin, 'symbol') || safeGetValue(coinData, 'symbol', 'UNK')).toUpperCase()}
               </p>
             </div>
           </div>
@@ -151,7 +256,7 @@ export function SimpleCoinModal({ isOpen, onClose, coin }: SimpleCoinModalProps)
                     Current Price
                   </div>
                   <div style={{ fontSize: '16px', fontWeight: '600' }}>
-                    ${coinData.market_data?.current_price?.usd?.toFixed(6) || 'N/A'}
+                    ${safeGetValue(coinData, 'market_data.current_price.usd', 0).toFixed(6)}
                   </div>
                 </div>
                 
@@ -166,9 +271,9 @@ export function SimpleCoinModal({ isOpen, onClose, coin }: SimpleCoinModalProps)
                   <div style={{ 
                     fontSize: '16px', 
                     fontWeight: '600',
-                    color: (coinData.market_data?.price_change_percentage_24h || 0) >= 0 ? '#22c55e' : '#ef4444'
+                    color: safeGetValue(coinData, 'market_data.price_change_percentage_24h', 0) >= 0 ? '#22c55e' : '#ef4444'
                   }}>
-                    {(coinData.market_data?.price_change_percentage_24h || 0).toFixed(2)}%
+                    {safeGetValue(coinData, 'market_data.price_change_percentage_24h', 0).toFixed(2)}%
                   </div>
                 </div>
 
@@ -181,8 +286,10 @@ export function SimpleCoinModal({ isOpen, onClose, coin }: SimpleCoinModalProps)
                     Market Cap
                   </div>
                   <div style={{ fontSize: '16px', fontWeight: '600' }}>
-                    {coinData.market_data?.market_cap?.usd ? 
-                      formatMarketCap(coinData.market_data.market_cap.usd) : 'N/A'}
+                    {(() => {
+                      const marketCap = safeGetValue(coinData, 'market_data.market_cap.usd', 0);
+                      return marketCap > 0 ? formatMarketCap(marketCap) : 'N/A';
+                    })()}
                   </div>
                 </div>
               </div>
@@ -190,22 +297,39 @@ export function SimpleCoinModal({ isOpen, onClose, coin }: SimpleCoinModalProps)
 
 
               {/* Description */}
-              {coinData.description?.en && (
-                <div>
-                  <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>
-                    About {coinData.name}
-                  </h3>
-                  <p style={{
-                    fontSize: '14px',
-                    lineHeight: '1.5',
-                    color: 'var(--muted-foreground)',
-                    margin: 0
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>
+                  About {safeGetValue(coinData, 'name', 'this coin')}
+                </h3>
+                <p style={{
+                  fontSize: '14px',
+                  lineHeight: '1.5',
+                  color: 'var(--muted-foreground)',
+                  margin: 0
+                }}>
+                  {(() => {
+                    const description = safeGetValue(coinData, 'description.en', '');
+                    if (description && description.length > 10) {
+                      const cleanDescription = description.replace(/<[^>]*>/g, '').substring(0, 300);
+                      return cleanDescription + (cleanDescription.length >= 300 ? '...' : '');
+                    } else {
+                      return `${safeGetValue(coinData, 'name', 'This coin')} is part of the Base ecosystem. Real-time price data and market information are displayed above.`;
+                    }
+                  })()}
+                </p>
+                {error && (
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '8px 12px',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    color: '#ef4444'
                   }}>
-                    {coinData.description.en.replace(/<[^>]*>/g, '').substring(0, 300)}
-                    {coinData.description.en.length > 300 ? '...' : ''}
-                  </p>
-                </div>
-              )}
+                    ⚠️ {error}
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div style={{
