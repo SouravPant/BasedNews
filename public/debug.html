@@ -3,19 +3,17 @@
 <head>
     <title>Based News Debug</title>
     
-    <!-- Farcaster Frame Meta Tags -->
-    <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/preview.png" />
-    <meta property="fc:frame:image:aspect_ratio" content="1.5:1" />
-    <meta property="fc:frame:button:1" content="Open Based News" />
-    <meta property="fc:frame:button:1:action" content="link" />
-    <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
+    <!-- Correct Farcaster Frame Meta Tags (using name= not property=) -->
+    <meta name="fc:frame" content="vNext" />
+    <meta name="fc:frame:image" content="https://based-news-eight.vercel.app/preview.png" />
+    <meta name="fc:frame:button:1" content="Open Based News" />
+    <meta name="fc:frame:button:1:action" content="link" />
+    <meta name="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
     
-    <!-- Farcaster Mini App Meta Tag -->
-    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://based-news-eight.vercel.app/preview.png","button":{"title":"Open Based News","action":{"type":"launch_miniapp","url":"https://based-news-eight.vercel.app","name":"Based News","splashImageUrl":"https://based-news-eight.vercel.app/splash.png","splashBackgroundColor":"#0052FF"}}}' />
-    
-    <!-- Manifest Reference -->
-    <meta name="fc:frame:miniapp:manifest" content="https://based-news-eight.vercel.app/.well-known/farcaster.json" />
+    <!-- Open Graph -->
+    <meta property="og:title" content="Based News Debug" />
+    <meta property="og:description" content="Debug page for Farcaster frame testing" />
+    <meta property="og:image" content="https://based-news-eight.vercel.app/preview.png" />
     
     <style>
         body {
@@ -48,9 +46,8 @@
     <div class="container">
         <h1>🔵 Based News Debug</h1>
         <div class="status">✅ DEBUG PAGE WORKING</div>
-        <div class="status">✅ Proper Farcaster meta tags included</div>
-        <div class="status">✅ fc:miniapp JSON structure added</div>
-        <div class="status">✅ Ready for embed validation</div>
+        <div class="status">✅ Corrected Farcaster meta tags (name=)</div>
+        <div class="status">✅ Ready for frame validation</div>
         
         <p><strong>Domain:</strong> based-news-eight.vercel.app</p>
         <p><strong>Time:</strong> <script>document.write(new Date())</script></p>
@@ -77,9 +74,6 @@
             const messages = [
                 { type: 'ready' },
                 { type: 'frame-ready' },
-                { type: 'miniapp-ready' },
-                { type: 'sdk-ready' },
-                { action: 'ready' },
                 'ready'
             ];
             
@@ -91,10 +85,6 @@
                     console.log('❌ Failed to send message:', msg, e);
                 }
             });
-            
-            // Set ready flags
-            window.__FARCASTER_READY__ = true;
-            window.__FRAME_READY__ = true;
             
             console.log('🔵 Ready signals sent from debug page');
         }

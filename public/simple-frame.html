@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Based News - Simple Frame</title>
     
-    <!-- Basic Farcaster Frame Meta Tags -->
-    <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/preview.png" />
-    <meta property="fc:frame:button:1" content="Visit Based News" />
-    <meta property="fc:frame:button:1:action" content="link" />
-    <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
+    <!-- Correct Farcaster Frame Meta Tags (using name= not property=) -->
+    <meta name="fc:frame" content="vNext" />
+    <meta name="fc:frame:image" content="https://based-news-eight.vercel.app/preview.png" />
+    <meta name="fc:frame:button:1" content="Visit Based News" />
+    <meta name="fc:frame:button:1:action" content="link" />
+    <meta name="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
     
-    <!-- Open Graph -->
-    <meta property="og:title" content="Based News" />
+    <!-- Open Graph (using property=) -->
+    <meta property="og:title" content="Based News - Simple Frame" />
     <meta property="og:description" content="Crypto news and Base ecosystem tracking" />
     <meta property="og:image" content="https://based-news-eight.vercel.app/preview.png" />
     
@@ -70,23 +70,40 @@
             margin: 10px 0;
             font-size: 14px;
         }
+        .meta-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
     <div class="frame-container">
         <div class="logo">⬜</div>
         <h1>Based News</h1>
-        <p>Real-time crypto news & Base ecosystem tracking</p>
+        <p>Simple Farcaster Frame Test</p>
         
-        <div class="status">✅ Simple Farcaster Frame</div>
-        <div class="status">✅ Basic fc:frame meta tags</div>
-        <div class="status">✅ Working preview</div>
+        <div class="status">✅ Correct Farcaster Frame meta tags (name=)</div>
+        <div class="status">✅ Valid fc:frame structure</div>
+        <div class="status">✅ Ready for Farcaster preview</div>
         
         <a href="https://based-news-eight.vercel.app" class="button">
-            Open Full App
+            Visit Full App
         </a>
         
-        <div style="margin-top: 30px; font-size: 12px; opacity: 0.7;">
+        <div class="meta-info">
+            <strong>Frame Meta Tags:</strong><br/>
+            • fc:frame: vNext<br/>
+            • fc:frame:image: preview.png<br/>
+            • fc:frame:button:1: Visit Based News<br/>
+            • fc:frame:button:1:action: link<br/>
+            • fc:frame:button:1:target: app URL
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 12px; opacity: 0.7;">
             <p>Frame URL: <span id="url"></span></p>
             <p>Timestamp: <span id="time"></span></p>
         </div>
@@ -100,7 +117,12 @@
         console.log('🔵 Simple Farcaster Frame Loaded:', {
             url: window.location.href,
             timestamp: new Date().toISOString(),
-            isFrame: true
+            metaTags: {
+                frame: 'vNext',
+                image: 'preview.png',
+                button: 'Visit Based News',
+                action: 'link'
+            }
         });
     </script>
 </body>
