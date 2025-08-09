@@ -576,65 +576,83 @@ export function MiniAppDashboard() {
         </div>
       )}
 
-      {/* Bottom Navigation */}
-      <nav style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: 'var(--background)',
-        borderTop: '1px solid var(--border)',
-        padding: '12px 16px',
-        display: 'flex',
-        justifyContent: 'space-around',
-        backdropFilter: 'blur(10px)'
-      }}>
-        <a
-          href="/"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textDecoration: 'none',
-            color: 'var(--muted-foreground)',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}
-        >
-          <span style={{ fontSize: '20px', marginBottom: '2px' }}>📰</span>
-          News
-        </a>
-        <a
-          href="/dashboard"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textDecoration: 'none',
-            color: 'var(--primary)',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}
-        >
-          <span style={{ fontSize: '20px', marginBottom: '2px' }}>📊</span>
-          Dashboard
-        </a>
-        <a
-          href="/coins"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textDecoration: 'none',
-            color: 'var(--muted-foreground)',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}
-        >
-          <span style={{ fontSize: '20px', marginBottom: '2px' }}>💰</span>
-          Coins
-        </a>
-      </nav>
+             {/* Bottom Navigation */}
+       <nav style={{
+         position: 'fixed',
+         bottom: 0,
+         left: 0,
+         right: 0,
+         backgroundColor: 'var(--background)',
+         borderTop: '1px solid var(--border)',
+         padding: '12px 16px',
+         display: 'flex',
+         justifyContent: 'space-around',
+         backdropFilter: 'blur(10px)'
+       }}>
+         <a
+           href="/"
+           style={{
+             display: 'flex',
+             flexDirection: 'column',
+             alignItems: 'center',
+             textDecoration: 'none',
+             color: 'var(--muted-foreground)',
+             fontSize: '12px',
+             fontWeight: '600'
+           }}
+         >
+           <svg style={{ width: '20px', height: '20px', marginBottom: '2px', fill: 'var(--muted-foreground)' }} viewBox="0 0 24 24">
+             <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+           </svg>
+           News
+         </a>
+         <a
+           href="/dashboard"
+           style={{
+             display: 'flex',
+             flexDirection: 'column',
+             alignItems: 'center',
+             textDecoration: 'none',
+             color: 'var(--primary)',
+             fontSize: '12px',
+             fontWeight: '600'
+           }}
+         >
+           <svg style={{ width: '20px', height: '20px', marginBottom: '2px', fill: 'var(--primary)' }} viewBox="0 0 24 24">
+             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+           </svg>
+           Dashboard
+         </a>
+         <a
+           href="/coins"
+           style={{
+             display: 'flex',
+             flexDirection: 'column',
+             alignItems: 'center',
+             textDecoration: 'none',
+             color: 'var(--muted-foreground)',
+             fontSize: '12px',
+             fontWeight: '600'
+           }}
+         >
+           <div style={{
+             width: '20px',
+             height: '20px',
+             background: 'var(--muted-foreground)',
+             borderRadius: '4px',
+             display: 'flex',
+             alignItems: 'center',
+             justifyContent: 'center',
+             fontSize: '10px',
+             fontWeight: '900',
+             color: 'var(--background)',
+             marginBottom: '2px'
+           }}>
+             B
+           </div>
+           Coins
+         </a>
+       </nav>
     </div>
   );
 }

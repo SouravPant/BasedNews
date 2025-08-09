@@ -38,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             params: {
               q: 'bitcoin OR cryptocurrency OR blockchain OR ethereum OR crypto',
               sortBy: 'publishedAt',
-              pageSize: 15,
+              pageSize: 20,
               language: 'en',
               apiKey: newsApiKey
             },

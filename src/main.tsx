@@ -468,7 +468,6 @@ function App() {
 
   return (
     <>
-      <ThemeToggleSimple />
       <BaseWalletConnect />
       <BaseNews />
     </>

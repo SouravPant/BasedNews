@@ -1,6 +1,10 @@
 import React from "react";
 
-export function ThemeToggleSimple() {
+interface ThemeToggleProps {
+  inlineMode?: boolean;
+}
+
+export function ThemeToggleSimple({ inlineMode = false }: ThemeToggleProps) {
   const [theme, setTheme] = React.useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') || 'base';
@@ -92,14 +96,14 @@ export function ThemeToggleSimple() {
 
   return (
     <div style={{
-      position: 'fixed',
-      top: '20px',
-      left: '20px',
-      zIndex: 1000,
-      transform: `translateY(${isVisible ? '0' : '-100px'})`,
-      opacity: isVisible ? 1 : 0,
-      transition: 'all 0.3s ease-in-out',
-      pointerEvents: isVisible ? 'auto' : 'none'
+      position: inlineMode ? 'relative' : 'fixed',
+      top: inlineMode ? 'auto' : '20px',
+      left: inlineMode ? 'auto' : '20px',
+      zIndex: inlineMode ? 'auto' : 1000,
+      transform: inlineMode ? 'none' : `translateY(${isVisible ? '0' : '-100px'})`,
+      opacity: inlineMode ? 1 : (isVisible ? 1 : 0),
+      transition: inlineMode ? 'none' : 'all 0.3s ease-in-out',
+      pointerEvents: inlineMode ? 'auto' : (isVisible ? 'auto' : 'none')
     }}>
       <div style={{ position: 'relative' }}>
         {/* Base-style Theme Toggle Button */}

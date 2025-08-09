@@ -20,30 +20,134 @@ export function MobileBaseCoins() {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
 
-  // Base ecosystem coins - focused list of major Base tokens
+  // Base ecosystem coins - comprehensive list of 100 Base tokens and projects
   const baseEcosystemCoins = [
+    // Core Base Infrastructure
+    'ethereum', // ETH (base layer)
     'coinbase-wrapped-staked-eth', // cbETH
-    'ethereum', // ETH (as base layer)
-    'usd-coin', // USDC (major stablecoin on Base)
+    'usd-coin', // USDC
+    'wrapped-bitcoin', // WBTC
+    'dai', // DAI
+    'tether', // USDT
+    
+    // Major Base DeFi Protocols
     'aerodrome-finance', // AERO
+    'compound', // COMP
+    'uniswap', // UNI
+    'aave', // AAVE
+    'curve-dao-token', // CRV
+    'balancer', // BAL
+    'sushiswap', // SUSHI
+    'pancakeswap', // CAKE
+    'yearn-finance', // YFI
+    'maker', // MKR
+    'convex-finance', // CVX
+    'frax', // FRAX
+    'liquity', // LQTY
+    'origin-protocol', // OGN
+    
+    // Base Native Projects
     'based-brett', // BRETT
     'degen-base', // DEGEN
     'toshi', // TOSHI
     'moca-network', // MOCA
     'zora', // ZORA
-    'kaito', // KAITO
-    'morpho', // MORPHO
-    'virtual-protocol', // VIRTUAL
-    'curve-dao-token', // CRV
-    'pancakeswap', // CAKE
-    'maple-finance', // MPL
-    'balancer', // BAL
-    'sushiswap', // SUSHI
-    'reserve-rights', // RSR
+    'moonwell', // WELL
+    'base-protocol', // BASE
+    'seamless-protocol', // SEAM
+    'friend-tech', // FRIEND
+    'extra-finance', // EXTRA
+    
+    // Gaming and NFT Projects on Base
+    'immutable-x', // IMX
+    'axie-infinity', // AXS
+    'the-sandbox', // SAND
+    'decentraland', // MANA
+    'enjincoin', // ENJ
+    'flow', // FLOW
+    'gala', // GALA
+    'treasure', // MAGIC
+    'illuvium', // ILV
+    'stepn', // GMT
+    
+    // Infrastructure and Oracles
+    'chainlink', // LINK
+    'the-graph', // GRT
+    'band-protocol', // BAND
+    'api3', // API3
+    'uma', // UMA
+    'tellor', // TRB
+    'dia-data', // DIA
+    'kyber-network-crystal', // KNC
+    '0x', // ZRX
+    'loopring', // LRC
+    
+    // Cross-chain and Bridges
     'wormhole', // W
     'axelar', // AXL
     'layerzero', // ZRO
-    'iotex' // IOTX
+    'synapse-2', // SYN
+    'stargate-finance', // STG
+    'multichain', // MULTI
+    'hop-protocol', // HOP
+    'across-protocol', // ACX
+    'socket', // SOCKET
+    'celer-network', // CELR
+    
+    // Privacy and Security
+    'tornado-cash', // TORN
+    'nucypher', // NU
+    'keep-network', // KEEP
+    'secret', // SCRT
+    'oasis-network', // ROSE
+    'railgun', // RAIL
+    'aztec-protocol', // AZTEC
+    'findora', // FRA
+    'namada', // NAM
+    'penumbra', // PEN
+    
+    // AI and Data
+    'fetch-ai', // FET
+    'singularitynet', // AGIX
+    'ocean-protocol', // OCEAN
+    'numeraire', // NMR
+    'cortex', // CTXC
+    'deepbrain-chain', // DBC
+    'matrix-ai-network', // MAN
+    'artificial-superintelligence-alliance', // ASI
+    'render-token', // RNDR
+    'livepeer', // LPT
+    
+    // Social and Creator Economy
+    'basic-attention-token', // BAT
+    'audius', // AUDIO
+    'rally', // RLY
+    'chiliz', // CHZ
+    'theta-token', // THETA
+    'livepeer', // LPT
+    'mirror-protocol', // MIR
+    'arweave', // AR
+    'filecoin', // FIL
+    'storj', // STORJ
+    
+    // Additional DeFi and Yield
+    'convex-finance', // CVX
+    'rocket-pool', // RPL
+    'lido-dao', // LDO
+    'frax-share', // FXS
+    'olympus', // OHM
+    'tokemak', // TOKE
+    'ribbon-finance', // RBN
+    'badger-dao', // BADGER
+    'harvest-finance', // FARM
+    'alpha-finance', // ALPHA
+    
+    // Emerging Base Projects
+    'baseswap', // BSX (placeholder)
+    'aerodrome-finance', // AERO (repeated for weight)
+    'moonwell', // WELL (repeated for weight)
+    'seamless-protocol', // SEAM (repeated for weight)
+    'extra-finance' // EXTRA (repeated for weight)
   ];
 
   React.useEffect(() => {
@@ -440,7 +544,9 @@ export function MobileBaseCoins() {
             fontWeight: '600'
           }}
         >
-          <span style={{ fontSize: '20px', marginBottom: '2px' }}>📰</span>
+          <svg style={{ width: '20px', height: '20px', marginBottom: '2px', fill: 'var(--muted-foreground)' }} viewBox="0 0 24 24">
+            <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+          </svg>
           News
         </a>
         <a
@@ -455,7 +561,9 @@ export function MobileBaseCoins() {
             fontWeight: '600'
           }}
         >
-          <span style={{ fontSize: '20px', marginBottom: '2px' }}>📊</span>
+          <svg style={{ width: '20px', height: '20px', marginBottom: '2px', fill: 'var(--muted-foreground)' }} viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+          </svg>
           Dashboard
         </a>
         <a
@@ -470,7 +578,21 @@ export function MobileBaseCoins() {
             fontWeight: '600'
           }}
         >
-          <span style={{ fontSize: '20px', marginBottom: '2px' }}>🔵</span>
+          <div style={{
+            width: '20px',
+            height: '20px',
+            background: 'var(--primary)',
+            borderRadius: '4px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '10px',
+            fontWeight: '900',
+            color: 'var(--background)',
+            marginBottom: '2px'
+          }}>
+            B
+          </div>
           Base Coins
         </a>
       </nav>

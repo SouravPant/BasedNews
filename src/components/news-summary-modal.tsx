@@ -352,26 +352,18 @@ export function NewsSummaryModal({ isOpen, onClose, article }: NewsSummaryModalP
               </div>
             ) : (
               <div>
-                <p style={{
-                  fontSize: '16px',
-                  lineHeight: '1.6',
-                  color: 'var(--foreground)',
-                  margin: '0 0 12px 0',
-                  padding: '16px',
-                  backgroundColor: 'var(--muted)',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border)'
-                }}>
-                  {summary}
-                </p>
-                <div style={{
-                  fontSize: '12px',
-                  color: 'var(--muted-foreground)',
-                  textAlign: 'right',
-                  fontStyle: 'italic'
-                }}>
-                  {summary ? `${summary.split(/\s+/).length} words` : ''}
-                </div>
+                                       <p style={{
+                         fontSize: '16px',
+                         lineHeight: '1.6',
+                         color: 'var(--foreground)',
+                         margin: '0 0 12px 0',
+                         padding: '16px',
+                         backgroundColor: 'var(--muted)',
+                         borderRadius: '8px',
+                         border: '1px solid var(--border)'
+                       }}>
+                         {summary}
+                       </p>
               </div>
             )}
           </div>
