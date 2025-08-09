@@ -3,8 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Based Dashboard</title>
-    <meta name="description" content="Real-time market data, news, and social sentiment tracking dashboard" />
+    <title>Based News</title>
+    <meta name="description" content="Real-time cryptocurrency news and Base ecosystem token tracking" />
+    
+    <!-- Farcaster Frame Meta Tags -->
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/icon.png" />
+    <meta property="fc:frame:button:1" content="Open Based News" />
+    <meta property="fc:frame:button:1:action" content="link" />
+    <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
+    
+    <!-- Farcaster SDK Ready Script -->
+    <script>
+      // Immediate SDK ready call
+      function callFarcasterReady() {
+        try {
+          // Try postMessage communication
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'ready' }, '*');
+            window.parent.postMessage({ type: 'frame-ready' }, '*');
+            window.parent.postMessage({ type: 'miniapp-ready' }, '*');
+            console.log('✅ Based News: Ready messages sent via postMessage');
+          }
+          
+          // Try SDK methods
+          if (window.sdk && window.sdk.actions && window.sdk.actions.ready) {
+            window.sdk.actions.ready();
+            console.log('✅ Based News: sdk.actions.ready() called');
+          }
+          
+          // Try MiniKit
+          if (window.MiniKit && window.MiniKit.ready) {
+            window.MiniKit.ready();
+            console.log('✅ Based News: MiniKit.ready() called');
+          }
+        } catch (error) {
+          console.log('⚠️ Based News: Ready call error:', error);
+        }
+      }
+      
+      // Call immediately
+      callFarcasterReady();
+      
+      // Call on DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', callFarcasterReady);
+      }
+      
+      // Call on window load
+      window.addEventListener('load', callFarcasterReady);
+      
+      // Periodic calls for the first 5 seconds
+      const readyInterval = setInterval(callFarcasterReady, 200);
+      setTimeout(() => clearInterval(readyInterval), 5000);
+    </script>
   </head>
   <body>
     <div id="root"></div>
