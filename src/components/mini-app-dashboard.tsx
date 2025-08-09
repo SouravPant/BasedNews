@@ -63,21 +63,36 @@ export function MiniAppDashboard() {
     }
   }, [portfolio]);
 
-  // Search for coins
+  // Search for coins or load popular coins
   const searchCoins = React.useCallback(async (query: string) => {
-    if (query.length < 2) {
-      setSearchResults([]);
-      return;
-    }
-
     try {
-      const response = await fetch(`/api/cryptocurrencies?search=${encodeURIComponent(query)}&per_page=5`);
-      const data = await response.json();
-      setSearchResults(data);
+      if (query.length === 0) {
+        // Load popular coins when no search query
+        const response = await fetch(`/api/cryptocurrencies?per_page=20`);
+        const data = await response.json();
+        setSearchResults(data.slice(0, 15)); // Show top 15 popular coins
+        return;
+      }
+
+      if (query.length >= 1) {
+        const response = await fetch(`/api/cryptocurrencies?search=${encodeURIComponent(query)}&per_page=10`);
+        const data = await response.json();
+        setSearchResults(data);
+      } else {
+        setSearchResults([]);
+      }
     } catch (error) {
       console.error('Search error:', error);
+      setSearchResults([]);
     }
   }, []);
+
+  // Load popular coins when modal opens
+  React.useEffect(() => {
+    if (isAddingCoin && searchQuery === '') {
+      searchCoins('');
+    }
+  }, [isAddingCoin, searchCoins]);
 
   const addToWatchlist = (coin: Coin) => {
     const newWatchlist = [...watchlist, coin];
@@ -522,7 +537,7 @@ export function MiniAppDashboard() {
 
             <input
               type="text"
-              placeholder="Search cryptocurrencies..."
+              placeholder="Search from 100+ cryptocurrencies (Bitcoin, Ethereum, Base tokens...)"
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -537,14 +552,50 @@ export function MiniAppDashboard() {
                 outline: 'none',
                 backgroundColor: 'var(--background)',
                 color: 'var(--foreground)',
-                marginBottom: '16px'
+                marginBottom: '8px'
               }}
             />
 
+            {searchQuery === '' && searchResults.length > 0 && (
+              <p style={{
+                fontSize: '12px',
+                color: 'var(--muted-foreground)',
+                margin: '0 0 16px 0',
+                textAlign: 'center'
+              }}>
+                🔥 Popular cryptocurrencies • Type to search from 100+ coins
+              </p>
+            )}
+
+            {searchQuery !== '' && searchResults.length > 0 && (
+              <p style={{
+                fontSize: '12px',
+                color: 'var(--muted-foreground)',
+                margin: '0 0 16px 0',
+                textAlign: 'center'
+              }}>
+                Found {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} for "{searchQuery}"
+              </p>
+            )}
+
+            {searchQuery !== '' && searchResults.length === 0 && (
+              <p style={{
+                fontSize: '12px',
+                color: 'var(--muted-foreground)',
+                margin: '0 0 16px 0',
+                textAlign: 'center'
+              }}>
+                No cryptocurrencies found. Try "BTC", "ETH", "DEGEN", or "Base"
+              </p>
+            )}
+
             {searchResults.length > 0 && (
               <div style={{
-                maxHeight: '200px',
-                overflowY: 'auto'
+                maxHeight: '300px',
+                overflowY: 'auto',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                backgroundColor: 'var(--background)'
               }}>
                 {searchResults.map((coin) => (
                   <div
@@ -577,7 +628,7 @@ export function MiniAppDashboard() {
                         }}
                       />
                     )}
-                    <div>
+                    <div style={{ flex: 1 }}>
                       <div style={{
                         fontSize: '14px',
                         fontWeight: '600',
@@ -593,12 +644,25 @@ export function MiniAppDashboard() {
                       </div>
                     </div>
                     <div style={{
-                      marginLeft: 'auto',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: 'var(--foreground)'
+                      textAlign: 'right'
                     }}>
-                      {formatPrice(coin.currentPrice)}
+                      <div style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: 'var(--foreground)',
+                        marginBottom: '2px'
+                      }}>
+                        {formatPrice(coin.currentPrice)}
+                      </div>
+                      {parseFloat(coin.priceChangePercentage24h) !== 0 && (
+                        <div style={{
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          color: parseFloat(coin.priceChangePercentage24h) >= 0 ? '#22c55e' : '#ef4444'
+                        }}>
+                          {parseFloat(coin.priceChangePercentage24h) >= 0 ? '+' : ''}{parseFloat(coin.priceChangePercentage24h).toFixed(2)}%
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
