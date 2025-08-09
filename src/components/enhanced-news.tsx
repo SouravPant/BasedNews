@@ -147,7 +147,8 @@ export function EnhancedNews() {
     <div style={{
       padding: '20px',
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      backgroundColor: '#ffffff',
+      backgroundColor: 'var(--background)',
+      color: 'var(--foreground)',
       minHeight: '100vh',
       maxWidth: '1200px',
       margin: '0 auto'
@@ -156,27 +157,27 @@ export function EnhancedNews() {
       <header style={{
         textAlign: 'center',
         marginBottom: '40px',
-        borderBottom: '2px solid #e5e7eb',
+        borderBottom: '2px solid var(--border)',
         paddingBottom: '20px'
       }}>
         <h1 style={{
           fontSize: '36px',
           fontWeight: 'bold',
-          color: '#2563eb',
+          color: 'var(--primary)',
           margin: '0 0 10px 0'
         }}>
           BasedNews
         </h1>
         <p style={{
           fontSize: '18px',
-          color: '#6b7280',
+          color: 'var(--muted-foreground)',
           margin: '0 0 10px 0'
         }}>
           Cryptocurrency News & Market Data
         </p>
         <p style={{
           fontSize: '14px',
-          color: '#9ca3af',
+          color: 'var(--muted-foreground)',
           margin: 0
         }}>
           {status}
@@ -193,8 +194,8 @@ export function EnhancedNews() {
           style={{
             display: 'inline-block',
             padding: '12px 24px',
-            backgroundColor: '#2563eb',
-            color: 'white',
+            backgroundColor: 'var(--primary)',
+            color: 'var(--primary-foreground)',
             textDecoration: 'none',
             borderRadius: '6px',
             marginRight: '10px',
@@ -208,8 +209,8 @@ export function EnhancedNews() {
           style={{
             display: 'inline-block',
             padding: '12px 24px',
-            backgroundColor: '#059669',
-            color: 'white',
+            backgroundColor: 'var(--secondary)',
+            color: 'var(--secondary-foreground)',
             textDecoration: 'none',
             borderRadius: '6px',
             fontWeight: '500'
@@ -221,10 +222,10 @@ export function EnhancedNews() {
 
       {/* Filters and Search */}
       <div style={{
-        backgroundColor: '#f9fafb',
+        backgroundColor: 'var(--muted)',
         padding: '20px',
         borderRadius: '12px',
-        border: '1px solid #e5e7eb',
+        border: '1px solid var(--border)',
         marginBottom: '30px'
       }}>
         <div style={{
@@ -234,37 +235,39 @@ export function EnhancedNews() {
           alignItems: 'end'
         }}>
           {/* Search */}
-          <div>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '6px'
-            }}>
-              🔍 Search Articles
-            </label>
-            <input
-              type="text"
-              placeholder="Search news, sources, topics..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                fontSize: '14px',
-                border: '2px solid #e5e7eb',
-                borderRadius: '8px',
-                outline: 'none',
-                transition: 'border-color 0.2s'
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = '#2563eb';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = '#e5e7eb';
-              }}
-            />
+                     <div>
+             <label style={{
+               display: 'block',
+               fontSize: '14px',
+               fontWeight: '600',
+               color: 'var(--foreground)',
+               marginBottom: '6px'
+             }}>
+               🔍 Search Articles
+             </label>
+                         <input
+               type="text"
+               placeholder="Search news, sources, topics..."
+               value={searchQuery}
+               onChange={(e) => setSearchQuery(e.target.value)}
+               style={{
+                 width: '100%',
+                 padding: '10px 12px',
+                 fontSize: '14px',
+                 border: '2px solid var(--border)',
+                 borderRadius: '8px',
+                 outline: 'none',
+                 transition: 'border-color 0.2s',
+                 backgroundColor: 'var(--background)',
+                 color: 'var(--foreground)'
+               }}
+               onFocus={(e) => {
+                 e.target.style.borderColor = 'var(--primary)';
+               }}
+               onBlur={(e) => {
+                 e.target.style.borderColor = 'var(--border)';
+               }}
+             />
           </div>
 
           {/* Sentiment Filter */}
@@ -369,13 +372,13 @@ export function EnhancedNews() {
           gap: '12px',
           flexWrap: 'wrap'
         }}>
-          <span style={{
-            fontSize: '14px',
-            color: '#6b7280',
-            fontWeight: '500'
-          }}>
-            Showing {filteredNews.length} of {news.length} articles
-          </span>
+                     <span style={{
+             fontSize: '14px',
+             color: 'var(--muted-foreground)',
+             fontWeight: '500'
+           }}>
+             Showing {filteredNews.length} of {news.length} articles
+           </span>
           {(searchQuery || sentimentFilter !== 'all' || timeFilter !== 'all') && (
             <button
               onClick={() => {
@@ -404,7 +407,7 @@ export function EnhancedNews() {
         <h2 style={{
           fontSize: '24px',
           fontWeight: '600',
-          color: '#1f2937',
+          color: 'var(--foreground)',
           marginBottom: '20px'
         }}>
           Latest Crypto News
@@ -418,16 +421,16 @@ export function EnhancedNews() {
           {filteredNews.map((article, index) => (
             <article 
               key={index}
-              style={{
-                border: '1px solid #e5e7eb',
-                borderRadius: '12px',
-                padding: '0',
-                backgroundColor: '#ffffff',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                cursor: 'pointer',
-                overflow: 'hidden'
-              }}
+                             style={{
+                 border: '1px solid var(--border)',
+                 borderRadius: '12px',
+                 padding: '0',
+                 backgroundColor: 'var(--card)',
+                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+                 transition: 'transform 0.2s, box-shadow 0.2s',
+                 cursor: 'pointer',
+                 overflow: 'hidden'
+               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
                 e.currentTarget.style.boxShadow = '0 8px 15px rgba(0, 0, 0, 0.1)';
@@ -486,17 +489,17 @@ export function EnhancedNews() {
                   justifyContent: 'space-between',
                   marginBottom: '12px'
                 }}>
-                  <h3 style={{
-                    fontSize: '18px',
-                    fontWeight: '600',
-                    color: '#1f2937',
-                    lineHeight: '1.4',
-                    flex: 1,
-                    marginRight: '8px',
-                    margin: 0
-                  }}>
-                    {article.title}
-                  </h3>
+                                     <h3 style={{
+                     fontSize: '18px',
+                     fontWeight: '600',
+                     color: 'var(--card-foreground)',
+                     lineHeight: '1.4',
+                     flex: 1,
+                     marginRight: '8px',
+                     margin: 0
+                   }}>
+                     {article.title}
+                   </h3>
                   {!article.urlToImage && (
                     <span style={{
                       fontSize: '12px',
@@ -513,19 +516,19 @@ export function EnhancedNews() {
                 </div>
 
                 {article.description && (
-                  <p 
-                    onClick={() => handleArticleClick(article)}
-                    style={{
-                    fontSize: '14px',
-                    color: '#6b7280',
-                    lineHeight: '1.5',
-                    marginBottom: '15px'
-                  }}>
-                    {article.description.length > 150 
-                      ? article.description.substring(0, 150) + '...'
-                      : article.description
-                    }
-                  </p>
+                                     <p 
+                     onClick={() => handleArticleClick(article)}
+                     style={{
+                     fontSize: '14px',
+                     color: 'var(--muted-foreground)',
+                     lineHeight: '1.5',
+                     marginBottom: '15px'
+                   }}>
+                     {article.description.length > 150 
+                       ? article.description.substring(0, 150) + '...'
+                       : article.description
+                     }
+                   </p>
                 )}
 
                 <div style={{
@@ -539,26 +542,26 @@ export function EnhancedNews() {
                     alignItems: 'center',
                     gap: '8px'
                   }}>
-                    <span style={{
-                      fontSize: '12px',
-                      color: '#9ca3af',
-                      fontWeight: '500'
-                    }}>
-                      {article.source || 'Unknown Source'}
-                    </span>
-                    <span style={{
-                      fontSize: '12px',
-                      color: '#d1d5db'
-                    }}>
-                      •
-                    </span>
-                    <span style={{
-                      fontSize: '12px',
-                      color: '#6b7280',
-                      fontWeight: '500'
-                    }}>
-                      {formatRelativeTime(article.publishedAt)}
-                    </span>
+                                         <span style={{
+                       fontSize: '12px',
+                       color: 'var(--muted-foreground)',
+                       fontWeight: '500'
+                     }}>
+                       {article.source || 'Unknown Source'}
+                     </span>
+                     <span style={{
+                       fontSize: '12px',
+                       color: 'var(--muted-foreground)'
+                     }}>
+                       •
+                     </span>
+                     <span style={{
+                       fontSize: '12px',
+                       color: 'var(--muted-foreground)',
+                       fontWeight: '500'
+                     }}>
+                       {formatRelativeTime(article.publishedAt)}
+                     </span>
                   </div>
                   
                   {article.sentiment && (
@@ -580,51 +583,51 @@ export function EnhancedNews() {
                   display: 'flex',
                   gap: '8px'
                 }}>
-                  <button
-                    onClick={(e) => handleReadFullArticle(article, e)}
-                    style={{
-                      flex: 1,
-                      padding: '10px 16px',
-                      backgroundColor: '#2563eb',
-                      color: '#ffffff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s'
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.backgroundColor = '#1d4ed8';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.backgroundColor = '#2563eb';
-                    }}
-                  >
-                    📖 Read Full Article
-                  </button>
-                  <button
-                    onClick={() => handleArticleClick(article)}
-                    style={{
-                      padding: '10px 16px',
-                      backgroundColor: '#f3f4f6',
-                      color: '#374151',
-                      border: '2px solid #e5e7eb',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s'
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.backgroundColor = '#e5e7eb';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f3f4f6';
-                    }}
-                  >
-                    📝 Summary
-                  </button>
+                                     <button
+                     onClick={(e) => handleReadFullArticle(article, e)}
+                     style={{
+                       flex: 1,
+                       padding: '10px 16px',
+                       backgroundColor: 'var(--primary)',
+                       color: 'var(--primary-foreground)',
+                       border: 'none',
+                       borderRadius: '8px',
+                       fontSize: '14px',
+                       fontWeight: '600',
+                       cursor: 'pointer',
+                       transition: 'background-color 0.2s'
+                     }}
+                     onMouseOver={(e) => {
+                       e.currentTarget.style.opacity = '0.9';
+                     }}
+                     onMouseOut={(e) => {
+                       e.currentTarget.style.opacity = '1';
+                     }}
+                   >
+                     📖 Read Full Article
+                   </button>
+                   <button
+                     onClick={() => handleArticleClick(article)}
+                     style={{
+                       padding: '10px 16px',
+                       backgroundColor: 'var(--secondary)',
+                       color: 'var(--secondary-foreground)',
+                       border: '2px solid var(--border)',
+                       borderRadius: '8px',
+                       fontSize: '14px',
+                       fontWeight: '600',
+                       cursor: 'pointer',
+                       transition: 'background-color 0.2s'
+                     }}
+                     onMouseOver={(e) => {
+                       e.currentTarget.style.opacity = '0.8';
+                     }}
+                     onMouseOut={(e) => {
+                       e.currentTarget.style.opacity = '1';
+                     }}
+                   >
+                     📝 Summary
+                   </button>
                 </div>
               </div>
             </article>
@@ -672,18 +675,18 @@ export function EnhancedNews() {
       </main>
 
       {/* Footer */}
-      <footer style={{
-        marginTop: '60px',
-        paddingTop: '20px',
-        borderTop: '1px solid #e5e7eb',
-        textAlign: 'center',
-        color: '#9ca3af',
-        fontSize: '14px'
-      }}>
-        <p style={{ margin: 0 }}>
-          Real-time cryptocurrency news aggregator • Built with React • Enhanced with filters & sorting
-        </p>
-      </footer>
+             <footer style={{
+         marginTop: '60px',
+         paddingTop: '20px',
+         borderTop: '1px solid var(--border)',
+         textAlign: 'center',
+         color: 'var(--muted-foreground)',
+         fontSize: '14px'
+       }}>
+         <p style={{ margin: 0 }}>
+           Real-time cryptocurrency news aggregator • Built with React • Enhanced with filters & sorting
+         </p>
+       </footer>
 
       {/* News Summary Modal */}
       <NewsSummaryModal 

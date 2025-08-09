@@ -58,21 +58,21 @@
 }
 
 .base {
-  /* Base app inspired dark theme - Base.org blue colors */
+  /* Base app inspired dark theme - Base.org blue colors with high contrast */
   --background: hsl(220, 20%, 8%);
   --foreground: hsl(0, 0%, 98%);
   --muted: hsl(220, 15%, 15%);
-  --muted-foreground: hsl(220, 15%, 75%);
+  --muted-foreground: hsl(220, 15%, 85%); /* Increased contrast */
   --popover: hsl(220, 25%, 10%);
   --popover-foreground: hsl(0, 0%, 98%);
   --card: hsl(220, 18%, 12%);
   --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(220, 15%, 25%);
+  --border: hsl(220, 15%, 30%); /* Lighter border for better visibility */
   --input: hsl(220, 15%, 18%);
   --primary: hsl(221, 83%, 55%); /* Base blue #0052FF */
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(220, 15%, 20%);
-  --secondary-foreground: hsl(0, 0%, 95%);
+  --secondary: hsl(220, 15%, 25%); /* Lighter secondary for better contrast */
+  --secondary-foreground: hsl(0, 0%, 98%); /* Higher contrast text */
   --accent: hsl(221, 83%, 55%);
   --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 62.8%, 55%);
