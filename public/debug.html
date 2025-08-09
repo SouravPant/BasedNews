@@ -1,20 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Debug</title>
+    <title>Based News Debug</title>
+    
+    <!-- Farcaster Frame Meta Tags -->
     <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/icon.png" />
-    <meta property="fc:frame:button:1" content="Test" />
+    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/preview.png" />
+    <meta property="fc:frame:image:aspect_ratio" content="1.5:1" />
+    <meta property="fc:frame:button:1" content="Open Based News" />
+    <meta property="fc:frame:button:1:action" content="link" />
+    <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
+    
+    <!-- Farcaster Mini App Meta Tag -->
+    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://based-news-eight.vercel.app/preview.png","button":{"title":"Open Based News","action":{"type":"launch_miniapp","url":"https://based-news-eight.vercel.app","name":"Based News","splashImageUrl":"https://based-news-eight.vercel.app/splash.png","splashBackgroundColor":"#0052FF"}}}' />
+    
+    <!-- Manifest Reference -->
+    <meta name="fc:frame:miniapp:manifest" content="https://based-news-eight.vercel.app/.well-known/farcaster.json" />
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0052FF 0%, #0040CC 100%);
+            color: white;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+        }
+        .status {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
-    <h1>DEBUG PAGE WORKING</h1>
-    <p>Domain: based-news-eight.vercel.app</p>
-    <p>Time: <script>document.write(new Date())</script></p>
-    <p>URL: <script>document.write(location.href)</script></p>
+    <div class="container">
+        <h1>🔵 Based News Debug</h1>
+        <div class="status">✅ DEBUG PAGE WORKING</div>
+        <div class="status">✅ Proper Farcaster meta tags included</div>
+        <div class="status">✅ fc:miniapp JSON structure added</div>
+        <div class="status">✅ Ready for embed validation</div>
+        
+        <p><strong>Domain:</strong> based-news-eight.vercel.app</p>
+        <p><strong>Time:</strong> <script>document.write(new Date())</script></p>
+        <p><strong>URL:</strong> <script>document.write(location.href)</script></p>
+        <p><strong>In iframe:</strong> <script>document.write(window !== window.parent ? 'Yes' : 'No')</script></p>
+        
+        <div style="margin-top: 20px;">
+            <a href="/" style="color: white; text-decoration: underline;">Go to Main App</a>
+        </div>
+    </div>
+
     <script>
-        if (window.parent !== window) {
-            window.parent.postMessage('ready', '*');
-            console.log('Ready sent from debug page');
+        console.log('🔵 Based News Debug Page Loaded:', {
+            url: location.href,
+            timestamp: new Date().toISOString(),
+            isIframe: window !== window.parent,
+            userAgent: navigator.userAgent
+        });
+        
+        if (window.parent && window.parent !== window) {
+            console.log('🔵 In iframe, sending ready signals...');
+            
+            // Send multiple ready message types
+            const messages = [
+                { type: 'ready' },
+                { type: 'frame-ready' },
+                { type: 'miniapp-ready' },
+                { type: 'sdk-ready' },
+                { action: 'ready' },
+                'ready'
+            ];
+            
+            messages.forEach(msg => {
+                try {
+                    window.parent.postMessage(msg, '*');
+                    console.log('✅ Sent message:', msg);
+                } catch (e) {
+                    console.log('❌ Failed to send message:', msg, e);
+                }
+            });
+            
+            // Set ready flags
+            window.__FARCASTER_READY__ = true;
+            window.__FRAME_READY__ = true;
+            
+            console.log('🔵 Ready signals sent from debug page');
         }
     </script>
 </body>
