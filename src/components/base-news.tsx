@@ -18,16 +18,20 @@ export function BaseNews() {
   const [showFilters, setShowFilters] = React.useState(false);
 
   React.useEffect(() => {
-    console.log('Fetching news...');
+    console.log('🔍 Fetching news...');
     fetch('/api/news')
       .then(res => res.json())
       .then(data => {
-        console.log('News loaded:', data.length);
+        console.log('📰 Raw API Response:', {
+          total: data.length,
+          first: data[0]?.title,
+          last: data[data.length - 1]?.title
+        });
         setNews(data);
         setStatus(`${data.length} articles loaded`);
       })
       .catch(err => {
-        console.error('Error:', err);
+        console.error('❌ Error:', err);
         setStatus('Error loading news');
       });
   }, []);
@@ -82,6 +86,13 @@ export function BaseNews() {
       }
     });
 
+    console.log('🔍 Filter Results:', {
+      original: news.length,
+      afterSearch: searchQuery ? 'applied' : 'skipped',
+      afterSentiment: sentimentFilter !== 'all' ? sentimentFilter : 'all',
+      afterTime: timeFilter !== 'all' ? timeFilter : 'all',
+      final: filtered.length
+    });
     setFilteredNews(filtered);
   }, [news, searchQuery, sentimentFilter, timeFilter, sortBy]);
 
