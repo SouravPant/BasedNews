@@ -1,5 +1,6 @@
 {
-  "frame": {
+  "version": "1",
+  "miniapp": {
     "name": "Based News",
     "version": "1",
     "iconUrl": "https://based-news-eight.vercel.app/icon.png",

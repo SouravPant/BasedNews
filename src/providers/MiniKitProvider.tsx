@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { sdk } from '@farcaster/frame-sdk';
 
 interface User {
   fid?: number;
@@ -39,6 +38,7 @@ declare global {
   interface Window {
     ethereum?: any;
     coinbaseWalletExtension?: any;
+    MiniKit?: any;
   }
 }
 
@@ -55,12 +55,23 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
       console.log('🔵 Based News: Setting frame ready...');
       setIsFrameReadyState(true);
       
-      // Call Farcaster SDK ready when frame is ready
+      // Signal to Farcaster that the mini app is ready
       try {
-        sdk.actions.ready();
-        console.log('✅ Based News: Farcaster SDK ready() called successfully');
+        if (window.parent && window.parent !== window) {
+          console.log('🔵 Based News: Signaling ready to Farcaster parent frame...');
+          window.parent.postMessage({
+            type: 'miniapp-ready',
+            timestamp: Date.now()
+          }, '*');
+          
+          // Also try the MiniKit approach if available
+          if (window.MiniKit) {
+            window.MiniKit.ready();
+          }
+        }
+        console.log('✅ Based News: Ready signal sent successfully');
       } catch (error) {
-        console.log('⚠️ Based News: Not in Farcaster environment or SDK not available:', error);
+        console.log('⚠️ Based News: Error signaling ready:', error);
       }
     }
   };
@@ -179,40 +190,39 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
     }
   };
 
-  // Initialize Farcaster SDK and detect environment
+  // Initialize Farcaster environment detection
   useEffect(() => {
-    const initializeFarcasterSDK = async () => {
+    const initializeFarcasterEnvironment = () => {
       try {
         console.log('🔵 Based News: Initializing Farcaster environment...');
+        console.log('🔵 Based News: URL params:', window.location.search);
+        console.log('🔵 Based News: Referrer:', document.referrer);
+        console.log('🔵 Based News: User Agent:', navigator.userAgent);
         
         // Check if we're in a Farcaster frame
         const isInFrame = window.parent !== window;
         const hasFrameParams = window.location.search.includes('fid=') || 
                              window.location.search.includes('frameData=') ||
                              window.location.href.includes('farcaster') ||
-                             window.location.href.includes('warpcast');
+                             window.location.href.includes('warpcast') ||
+                             document.referrer.includes('farcaster') ||
+                             document.referrer.includes('warpcast');
+        
+        console.log('🔵 Based News: Frame detection:', { isInFrame, hasFrameParams });
         
         if (isInFrame || hasFrameParams) {
           console.log('🔵 Based News: Detected Farcaster environment');
           setIsInBaseApp(true);
           
-          // Try to get context from Farcaster SDK
-          try {
-            const frameContext = await sdk.context;
-            console.log('🔵 Based News: Farcaster context:', frameContext);
-            setContext(frameContext);
-          } catch (error) {
-            console.log('⚠️ Based News: Could not get Farcaster context, using fallback');
-            // Use fallback context for testing
-            setContext({
-              user: {
-                fid: 12345,
-                username: 'baseuser',
-                displayName: 'Base User',
-                pfpUrl: 'https://avatar.tobi.sh/base.svg'
-              }
-            });
-          }
+          // Use fallback context for testing
+          setContext({
+            user: {
+              fid: 12345,
+              username: 'baseuser',
+              displayName: 'Base User',
+              pfpUrl: 'https://avatar.tobi.sh/base.svg'
+            }
+          });
         } else {
           console.log('🔵 Based News: Not in Farcaster environment, running standalone');
         }
@@ -221,22 +231,22 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
         setIsAppLoaded(true);
         
       } catch (error) {
-        console.log('⚠️ Based News: Farcaster SDK not available, running in standalone mode');
+        console.log('⚠️ Based News: Error initializing environment:', error);
         setIsAppLoaded(true);
       }
     };
 
-    initializeFarcasterSDK();
+    initializeFarcasterEnvironment();
   }, []);
 
   // Set frame ready when app is loaded and DOM is ready
   useEffect(() => {
     if (isAppLoaded && !isFrameReady) {
-      // Wait a bit for DOM to be fully rendered
+      // Wait for DOM to be fully rendered and images to load
       const timer = setTimeout(() => {
         console.log('🔵 Based News: App loaded, setting frame ready');
         setFrameReady();
-      }, 1000);
+      }, 2000); // Increased timeout to ensure everything is loaded
 
       return () => clearTimeout(timer);
     }
@@ -253,6 +263,8 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
   // Listen for messages from parent frame
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      console.log('🔵 Based News: Received message:', event.data);
+      
       if (event.data?.type === 'farcaster-frame-context') {
         console.log('🔵 Based News: Received Farcaster frame context:', event.data);
         setIsInBaseApp(true);
@@ -263,6 +275,26 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, []);
+
+  // Send periodic heartbeat to parent frame
+  useEffect(() => {
+    if (isInBaseApp && isFrameReady) {
+      const interval = setInterval(() => {
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+              type: 'miniapp-heartbeat',
+              timestamp: Date.now()
+            }, '*');
+          }
+        } catch (error) {
+          // Ignore errors
+        }
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isInBaseApp, isFrameReady]);
 
   const value: MiniKitContextType = {
     setFrameReady,
