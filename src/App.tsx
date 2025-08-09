@@ -8,6 +8,7 @@ import { NewsAggregator } from "@/pages/news-aggregator";
 import { Coins } from "@/pages/coins";
 import NotFound from "@/pages/not-found";
 import { ErrorBoundary } from "./components/error-boundary";
+import { MiniAppDashboard } from "./components/mini-app-dashboard";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
                 <Switch>
                   <Route path="/" component={NewsAggregator} />
                   <Route path="/coins" component={Coins} />
+                  <Route path="/dashboard" component={MiniAppDashboard} />
                   <Route component={NotFound} />
                 </Switch>
               </ErrorBoundary>
