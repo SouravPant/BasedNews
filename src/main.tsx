@@ -2,9 +2,9 @@ import { createRoot } from "react-dom/client";
 import React from "react";
 import "./index.css";
 import { EnhancedCoins } from "./pages/enhanced-coins";
+import { EnhancedNews } from "./components/enhanced-news";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 import { WalletConnect } from "./components/wallet-connect";
-import { NewsSummaryModal } from "./components/news-summary-modal";
 
 function WorkingNewsApp() {
   const [news, setNews] = React.useState([]);
@@ -455,7 +455,7 @@ function App() {
     <>
       <ThemeToggleSimple />
       <WalletConnect />
-      <WorkingNewsApp />
+      <EnhancedNews />
     </>
   );
 }

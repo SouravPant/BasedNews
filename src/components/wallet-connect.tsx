@@ -9,6 +9,7 @@ export function WalletConnect({ onAccountChange }: WalletConnectProps) {
   const [balance, setBalance] = React.useState<string | null>(null);
   const [isConnecting, setIsConnecting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [showBenefits, setShowBenefits] = React.useState(false);
 
   const connectWallet = async () => {
     setIsConnecting(true);
@@ -173,57 +174,110 @@ export function WalletConnect({ onAccountChange }: WalletConnectProps) {
       right: '20px',
       zIndex: 1000
     }}>
-      <button
-        onClick={connectWallet}
-        disabled={isConnecting}
-        style={{
-          backgroundColor: '#0052ff',
-          border: '2px solid #0066ff',
-          borderRadius: '12px',
-          padding: '12px 20px',
-          color: '#ffffff',
-          cursor: isConnecting ? 'not-allowed' : 'pointer',
-          fontSize: '14px',
-          fontWeight: '600',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          transition: 'all 0.2s ease',
-          opacity: isConnecting ? 0.7 : 1,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}
-        onMouseOver={(e) => {
-          if (!isConnecting) {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
-          }
-        }}
-        onMouseOut={(e) => {
-          if (!isConnecting) {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-          }
-        }}
-      >
-        {isConnecting ? (
-          <>
+      <div style={{ position: 'relative' }}>
+        <button
+          onClick={connectWallet}
+          disabled={isConnecting}
+          onMouseEnter={() => setShowBenefits(true)}
+          onMouseLeave={() => setShowBenefits(false)}
+          style={{
+            backgroundColor: '#0052ff',
+            border: '2px solid #0066ff',
+            borderRadius: '12px',
+            padding: '12px 20px',
+            color: '#ffffff',
+            cursor: isConnecting ? 'not-allowed' : 'pointer',
+            fontSize: '14px',
+            fontWeight: '600',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            transition: 'all 0.2s ease',
+            opacity: isConnecting ? 0.7 : 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+          onMouseOver={(e) => {
+            if (!isConnecting) {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
+            }
+          }}
+          onMouseOut={(e) => {
+            if (!isConnecting) {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            }
+          }}
+        >
+          {isConnecting ? (
+            <>
+              <div style={{
+                width: '16px',
+                height: '16px',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                borderTop: '2px solid #ffffff',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }}></div>
+              Connecting...
+            </>
+          ) : (
+            <>
+              <span>🔗</span>
+              Unlock Premium Features
+            </>
+          )}
+        </button>
+
+        {/* Benefits Tooltip */}
+        {showBenefits && !account && (
+          <div style={{
+            position: 'absolute',
+            top: '60px',
+            right: '0',
+            backgroundColor: '#1f2937',
+            color: '#ffffff',
+            padding: '16px',
+            borderRadius: '12px',
+            fontSize: '14px',
+            width: '280px',
+            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.2)',
+            zIndex: 1002,
+            border: '1px solid #374151'
+          }}>
             <div style={{
-              width: '16px',
-              height: '16px',
-              border: '2px solid rgba(255, 255, 255, 0.3)',
-              borderTop: '2px solid #ffffff',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
-            }}></div>
-            Connecting...
-          </>
-        ) : (
-          <>
-            <span>🔗</span>
-            Connect Wallet
-          </>
+              fontWeight: '600',
+              marginBottom: '8px',
+              color: '#60a5fa'
+            }}>
+              🚀 Premium Features
+            </div>
+            <ul style={{
+              margin: 0,
+              paddingLeft: '16px',
+              fontSize: '13px',
+              lineHeight: '1.5'
+            }}>
+              <li>💰 Track your crypto portfolio</li>
+              <li>🔔 Personalized news alerts</li>
+              <li>📊 Advanced market analytics</li>
+              <li>⭐ Bookmark favorite articles</li>
+              <li>🎯 Sentiment-based filters</li>
+              <li>🔵 Base ecosystem rewards</li>
+            </ul>
+            <div style={{
+              marginTop: '12px',
+              padding: '8px',
+              backgroundColor: '#374151',
+              borderRadius: '6px',
+              fontSize: '12px',
+              color: '#d1d5db'
+            }}>
+              Connect your wallet to unlock these features and more!
+            </div>
+          </div>
         )}
-      </button>
+      </div>
 
       {error && (
         <div style={{
