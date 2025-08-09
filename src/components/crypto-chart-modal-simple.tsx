@@ -142,7 +142,7 @@ function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; pr
             margin: '0 0 4px 0',
             color: 'var(--foreground)'
           }}>
-            Price Chart ({days}D)
+            Price Chart
           </h3>
           <div style={{ 
             display: 'flex', 
@@ -177,7 +177,7 @@ function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; pr
 export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: CryptoChartModalProps) {
   const [chartData, setChartData] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
-  const [timeframe, setTimeframe] = React.useState('7');
+  const [timeframe, setTimeframe] = React.useState('1');
 
 
   React.useEffect(() => {
@@ -185,17 +185,17 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
       setLoading(true);
       console.log(`🔍 Fetching chart data for ${cryptocurrency.id} (${timeframe} days)`);
       
-      // Use fallback data immediately and try to fetch real data
+      // Use fallback data immediately and try to fetch real data - always 24h
       const fallbackData = {
         coinId: cryptocurrency.id, 
-        days: parseInt(timeframe), 
-        data: generateFallbackData(cryptocurrency.id, parseInt(timeframe))
+        days: 1, 
+        data: generateFallbackData(cryptocurrency.id, 1)
       };
       setChartData(fallbackData);
       setLoading(false);
       
-      // Try to fetch real data but don't block UI
-      fetch(`/api/cryptocurrencies/${cryptocurrency.id}/chart?days=${timeframe}`)
+      // Try to fetch real data but don't block UI - always 24h
+      fetch(`/api/cryptocurrencies/${cryptocurrency.id}/chart?days=1`)
         .then(res => {
           console.log('📊 Chart API response status:', res.status);
           if (!res.ok) { 
@@ -216,7 +216,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
           console.log('📊 Chart API unavailable, using fallback data:', err.message);
         });
     }
-  }, [isOpen, cryptocurrency?.id, timeframe]);
+      }, [isOpen, cryptocurrency?.id]);
 
 
 
@@ -323,20 +323,10 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
                       cryptocurrency?.currentPrice || 
                       getBasePriceForCoin(cryptocurrency?.id || '');
   
-  // Calculate price change based on selected timeframe and chart data
-  const calculatePriceChange = () => {
-    if (chartData?.data && chartData.data.length > 1) {
-      const firstPrice = chartData.data[0]?.price || currentPrice;
-      const lastPrice = chartData.data[chartData.data.length - 1]?.price || currentPrice;
-      return firstPrice > 0 ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0;
-    }
-    // Fallback to 24h data if available
-    return cryptocurrency?.price_change_percentage_24h || 
-           cryptocurrency?.priceChangePercentage24h || 
-           (Math.random() - 0.5) * 10; // Random change for demo
-  };
-
-  const priceChangeForTimeframe = calculatePriceChange();
+  // Always use 24h price change from cryptocurrency data
+  const priceChange24h = cryptocurrency?.price_change_percentage_24h || 
+                         cryptocurrency?.priceChangePercentage24h || 
+                         (Math.random() - 0.5) * 10; // Random change for demo
   
   const marketCap = cryptocurrency?.market_cap || 
                    cryptocurrency?.marketCap || 
@@ -472,14 +462,14 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
                 marginBottom: '4px',
                 fontWeight: '500'
               }}>
-                {timeframe === '1' ? '24h Change' : `${timeframe}d Change`}
+                24h Change
               </div>
               <div style={{
                 fontSize: '16px',
                 fontWeight: '600',
-                color: priceChangeForTimeframe >= 0 ? '#22c55e' : '#ef4444'
+                color: priceChange24h >= 0 ? '#22c55e' : '#ef4444'
               }}>
-                {formatPercentage(priceChangeForTimeframe)}
+                {formatPercentage(priceChange24h)}
               </div>
             </div>
             <div>
@@ -501,40 +491,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
             </div>
           </div>
 
-          {/* Timeframe Selection */}
-          <div style={{
-            display: 'flex',
-            gap: '8px',
-            marginBottom: '20px'
-          }}>
-            <span style={{
-              fontSize: '14px',
-              color: 'var(--muted-foreground)',
-              alignSelf: 'center',
-              marginRight: '8px',
-              fontWeight: '500'
-            }}>
-              Price Chart
-            </span>
-            {['1', '7', '30', '90', '365'].map((days) => (
-              <button
-                key={days}
-                onClick={() => setTimeframe(days)}
-                style={{
-                  padding: '6px 12px',
-                  background: timeframe === days ? 'var(--base-blue)' : 'var(--secondary)',
-                  color: timeframe === days ? 'white' : 'var(--secondary-foreground)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  fontWeight: '600'
-                }}
-              >
-                {days === '1' ? '24H' : days === '7' ? '7D' : days === '30' ? '30D' : days === '90' ? '90D' : '1Y'}
-              </button>
-            ))}
-          </div>
+
         </div>
 
         {/* Chart Area */}
@@ -572,7 +529,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
             <WorkingChart 
               data={chartData.data} 
               coinName={cryptocurrency?.name || 'Unknown'}
-              days={parseInt(timeframe)}
+              days={1}
             />
           ) : (
             <div style={{
