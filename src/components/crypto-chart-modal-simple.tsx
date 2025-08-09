@@ -206,49 +206,37 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
   React.useEffect(() => {
     if (isOpen && cryptocurrency?.id) {
       setLoading(true);
-      console.log(`Fetching chart data for ${cryptocurrency.id} (${timeframe} days)`);
+      console.log(`🔍 Fetching chart data for ${cryptocurrency.id} (${timeframe} days)`);
+      
+      // Use fallback data immediately and try to fetch real data
+      const fallbackData = {
+        coinId: cryptocurrency.id, 
+        days: parseInt(timeframe), 
+        data: generateFallbackData(cryptocurrency.id, parseInt(timeframe))
+      };
+      setChartData(fallbackData);
+      setLoading(false);
+      
+      // Try to fetch real data but don't block UI
       fetch(`/api/cryptocurrencies/${cryptocurrency.id}/chart?days=${timeframe}`)
         .then(res => {
-          console.log('Chart API response status:', res.status);
+          console.log('📊 Chart API response status:', res.status);
           if (!res.ok) { 
-            throw new Error(`HTTP error! status: ${res.status}`); 
+            console.warn('Chart API not available, using fallback');
+            return null;
           }
-          return res.text(); // Get as text first to debug
+          return res.json();
         })
-        .then(text => {
-          console.log('Raw API response:', text.substring(0, 200));
-          try {
-            const data = JSON.parse(text);
-            console.log('Parsed chart data:', data);
-            if (data && data.data && Array.isArray(data.data) && data.data.length > 0) {
-              setChartData(data);
-            } else {
-              console.warn('Invalid chart data structure:', data);
-              setChartData({ 
-                coinId: cryptocurrency.id, 
-                days: parseInt(timeframe), 
-                data: generateFallbackData(cryptocurrency.id, parseInt(timeframe)) 
-              });
-            }
-            setLoading(false);
-          } catch (parseError) {
-            console.error('JSON parse error:', parseError);
-            setChartData({ 
-              coinId: cryptocurrency.id, 
-              days: parseInt(timeframe), 
-              data: generateFallbackData(cryptocurrency.id, parseInt(timeframe)) 
-            });
-            setLoading(false);
+        .then(data => {
+          if (data && data.data && Array.isArray(data.data) && data.data.length > 0) {
+            console.log('✅ Real chart data received, updating');
+            setChartData(data);
+          } else {
+            console.log('📊 Using fallback chart data');
           }
         })
         .catch(err => {
-          console.error('Chart data fetch error:', err);
-          setChartData({ 
-            coinId: cryptocurrency.id, 
-            days: parseInt(timeframe), 
-            data: generateFallbackData(cryptocurrency.id, parseInt(timeframe)) 
-          });
-          setLoading(false);
+          console.log('📊 Chart API unavailable, using fallback data:', err.message);
         });
     }
   }, [isOpen, cryptocurrency?.id, timeframe]);

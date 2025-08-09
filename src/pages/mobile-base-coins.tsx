@@ -19,6 +19,9 @@ export function MobileBaseCoins() {
   const [selectedCoin, setSelectedCoin] = React.useState<Coin | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [selectedCoinInfo, setSelectedCoinInfo] = React.useState(null);
+  const [isInfoModalOpen, setIsInfoModalOpen] = React.useState(false);
+  const [coinDescription, setCoinDescription] = React.useState('');
 
   // Base ecosystem coins - comprehensive list of 100 Base tokens and projects
   const baseEcosystemCoins = [
@@ -269,6 +272,31 @@ export function MobileBaseCoins() {
     setSelectedCoin(null);
   };
 
+  const handleInfoClick = (coin: Coin) => {
+    setSelectedCoinInfo(coin);
+    setIsInfoModalOpen(true);
+    
+    // Fetch description from CoinGecko
+    console.log(`🔍 Fetching description for ${coin.id}`);
+    fetch(`https://api.coingecko.com/api/v3/coins/${coin.id}`)
+      .then(res => res.json())
+      .then(data => {
+        const description = data?.description?.en || '';
+        const cleanDescription = description.replace(/<[^>]*>/g, '').substring(0, 300);
+        setCoinDescription(cleanDescription + (cleanDescription.length >= 300 ? '...' : ''));
+      })
+      .catch(error => {
+        console.error('❌ Error fetching coin description:', error);
+        setCoinDescription('Description not available for this cryptocurrency.');
+      });
+  };
+
+  const handleCloseInfoModal = () => {
+    setIsInfoModalOpen(false);
+    setSelectedCoinInfo(null);
+    setCoinDescription('');
+  };
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -411,7 +439,7 @@ export function MobileBaseCoins() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  padding: '16px',
+                  padding: '12px 16px',
                   borderBottom: index < filteredCoins.length - 1 ? '1px solid var(--border)' : 'none',
                   cursor: 'pointer',
                   transition: 'background-color 0.2s ease',
@@ -432,9 +460,9 @@ export function MobileBaseCoins() {
               >
                 {/* Rank */}
                 <div style={{
-                  minWidth: '32px',
-                  fontSize: '14px',
-                  fontWeight: '600',
+                  minWidth: '24px',
+                  fontSize: '12px',
+                  fontWeight: '500',
                   color: 'var(--muted-foreground)',
                   textAlign: 'center'
                 }}>
@@ -453,8 +481,8 @@ export function MobileBaseCoins() {
                     src={coin.image}
                     alt={coin.name}
                     style={{
-                      width: '32px',
-                      height: '32px',
+                      width: '28px',
+                      height: '28px',
                       borderRadius: '50%',
                       flexShrink: 0
                     }}
@@ -464,7 +492,7 @@ export function MobileBaseCoins() {
                   />
                   <div style={{ minWidth: 0 }}>
                     <div style={{
-                      fontSize: '16px',
+                      fontSize: '14px',
                       fontWeight: '600',
                       color: 'var(--foreground)',
                       overflow: 'hidden',
@@ -474,7 +502,7 @@ export function MobileBaseCoins() {
                       {coin.name}
                     </div>
                     <div style={{
-                      fontSize: '12px',
+                      fontSize: '11px',
                       color: 'var(--muted-foreground)',
                       textTransform: 'uppercase'
                     }}>
@@ -486,10 +514,10 @@ export function MobileBaseCoins() {
                 {/* Price and Change */}
                 <div style={{
                   textAlign: 'right',
-                  minWidth: '80px'
+                  minWidth: '70px'
                 }}>
                   <div style={{
-                    fontSize: '16px',
+                    fontSize: '14px',
                     fontWeight: '600',
                     color: 'var(--foreground)',
                     marginBottom: '2px'
@@ -505,13 +533,30 @@ export function MobileBaseCoins() {
                   </div>
                 </div>
 
-                {/* Chart Icon */}
-                <div style={{
-                  marginLeft: '8px',
-                  fontSize: '16px',
-                  color: 'var(--muted-foreground)'
-                }}>
-                  📊
+                {/* Info Icon */}
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleInfoClick(coin);
+                  }}
+                  style={{
+                    marginLeft: '8px',
+                    fontSize: '14px',
+                    color: 'var(--primary)',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--primary-foreground)',
+                    border: '1px solid var(--primary)',
+                    width: '20px',
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  i
                 </div>
               </div>
             ))}
@@ -603,6 +648,86 @@ export function MobileBaseCoins() {
         onClose={handleCloseModal}
         cryptocurrency={selectedCoin}
       />
+
+      {/* Info Modal */}
+      {isInfoModalOpen && selectedCoinInfo && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: 'var(--background)',
+            borderRadius: '16px',
+            maxWidth: '400px',
+            width: '100%',
+            maxHeight: '70vh',
+            border: '1px solid var(--border)',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              padding: '20px',
+              borderBottom: '1px solid var(--border)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <img 
+                  src={selectedCoinInfo.image}
+                  alt={selectedCoinInfo.name}
+                  style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                />
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
+                    {selectedCoinInfo.name}
+                  </h3>
+                  <p style={{ margin: 0, fontSize: '14px', color: 'var(--muted-foreground)' }}>
+                    {selectedCoinInfo.symbol.toUpperCase()}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleCloseInfoModal}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: 'var(--muted)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--muted-foreground)',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div style={{ padding: '20px', overflowY: 'auto', maxHeight: '50vh' }}>
+              <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '600' }}>
+                About
+              </h4>
+              <p style={{
+                margin: 0,
+                fontSize: '14px',
+                lineHeight: '1.5',
+                color: 'var(--muted-foreground)'
+              }}>
+                {coinDescription || 'Loading description...'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Spinner Animation */}
       <style jsx>{`
