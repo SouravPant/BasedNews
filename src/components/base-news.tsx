@@ -175,16 +175,7 @@ export function BaseNews() {
         }
       />
 
-              {/* Theme Toggle - Below Base Mainnet text, above articles */}
-        <div style={{
-          padding: '16px 20px',
-          background: 'var(--card)',
-          borderBottom: '1px solid var(--border)',
-          display: 'flex',
-          justifyContent: 'center'
-        }}>
-          <ThemeToggleSimple inlineMode={true} />
-        </div>
+      
 
         {/* Search and Filters */}
         <div style={{
@@ -593,6 +584,17 @@ export function BaseNews() {
         )}
 
       </main>
+
+      {/* Theme Toggle - After Articles, Before Navigation */}
+      <div style={{
+        padding: '16px 20px',
+        display: 'flex',
+        justifyContent: 'center',
+        background: 'var(--background)',
+        borderTop: '1px solid var(--border)'
+      }}>
+        <ThemeToggleSimple inlineMode={true} />
+      </div>
 
              {/* Base Bottom Navigation */}
        <nav style={{
