@@ -12,6 +12,14 @@
       "destination": "/.well-known/$1"
     },
     {
+      "source": "/test.html",
+      "destination": "/test.html"
+    },
+    {
+      "source": "/fallback.html",
+      "destination": "/fallback.html"
+    },
+    {
       "source": "/coins",
       "destination": "/index.html"
     },

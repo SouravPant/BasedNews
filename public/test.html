@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Based News Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .status { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+            background: rgba(255,255,255,0.2);
+        }
+        .debug-info {
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔵 Based News Test Page</h1>
+        <div class="status">✅ Static page loading successfully</div>
+        <div class="status">✅ Vercel deployment working</div>
+        <div class="status">✅ Basic routing functional</div>
+        
+        <div class="debug-info">
+            <h3>Debug Information:</h3>
+            <p><strong>URL:</strong> <span id="url"></span></p>
+            <p><strong>Referrer:</strong> <span id="referrer"></span></p>
+            <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
+            <p><strong>In iframe:</strong> <span id="iframe"></span></p>
+            <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+            <p><strong>Parent origin:</strong> <span id="parentOrigin"></span></p>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <a href="/" style="color: white; text-decoration: underline;">Go to Main App</a>
+        </div>
+    </div>
+
+    <script>
+        // Populate debug info
+        document.getElementById('url').textContent = window.location.href;
+        document.getElementById('referrer').textContent = document.referrer || 'None';
+        document.getElementById('userAgent').textContent = navigator.userAgent.substring(0, 80) + '...';
+        document.getElementById('iframe').textContent = window !== window.parent ? 'Yes' : 'No';
+        document.getElementById('timestamp').textContent = new Date().toISOString();
+        
+        try {
+            document.getElementById('parentOrigin').textContent = window.parent.location.origin;
+        } catch (e) {
+            document.getElementById('parentOrigin').textContent = 'Cross-origin (blocked)';
+        }
+        
+        // Log to console for debugging
+        console.log('🔵 Based News Test Page Loaded:', {
+            url: window.location.href,
+            referrer: document.referrer,
+            userAgent: navigator.userAgent,
+            isIframe: window !== window.parent,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Send ready message if in iframe
+        if (window.parent && window.parent !== window) {
+            console.log('🔵 Sending ready messages from test page...');
+            window.parent.postMessage({ type: 'ready', source: 'based-news-test' }, '*');
+            window.parent.postMessage({ type: 'frame-ready', source: 'based-news-test' }, '*');
+            window.parent.postMessage('ready', '*');
+        }
+    </script>
+</body>
+</html>

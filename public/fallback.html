@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Based News - Fallback</title>
+    
+    <!-- Farcaster Frame Meta Tags -->
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/icon.png" />
+    <meta property="fc:frame:image:aspect_ratio" content="1.91:1" />
+    <meta property="fc:frame:button:1" content="Open Based News" />
+    <meta property="fc:frame:button:1:action" content="link" />
+    <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0052FF 0%, #0040CC 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            max-width: 500px;
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: rgba(255,255,255,0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">⬜</div>
+        <div class="title">Based News</div>
+        <div class="subtitle">Real-time crypto news & Base ecosystem tracking</div>
+        
+        <div class="status">✅ Fallback page loaded successfully</div>
+        <div class="status">✅ No JavaScript errors</div>
+        <div class="status">✅ Ready for Farcaster integration</div>
+        
+        <div>
+            <a href="/" class="button">Main App</a>
+            <a href="/test.html" class="button">Test Page</a>
+        </div>
+        
+        <script>
+            // Simple ready calls without dependencies
+            console.log('🔵 Fallback page loaded');
+            
+            if (window.parent && window.parent !== window) {
+                console.log('🔵 In iframe, sending ready signals...');
+                
+                // Multiple ready message types
+                const messages = [
+                    { type: 'ready' },
+                    { type: 'frame-ready' },
+                    { type: 'miniapp-ready' },
+                    'ready'
+                ];
+                
+                messages.forEach(msg => {
+                    try {
+                        window.parent.postMessage(msg, '*');
+                    } catch (e) {
+                        console.log('Failed to send message:', msg, e);
+                    }
+                });
+                
+                // Set ready flags
+                window.__FARCASTER_READY__ = true;
+                window.__FRAME_READY__ = true;
+            }
+        </script>
+    </div>
+</body>
+</html>
