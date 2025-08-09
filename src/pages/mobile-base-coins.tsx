@@ -168,17 +168,52 @@ export function MobileBaseCoins() {
       console.log('📡 Fetching Base ecosystem coins from CoinGecko...');
       
       const baseCoins = [
-        'ethereum', 'usd-coin', 'wrapped-bitcoin', 'dai', 'tether',
-        'aerodrome-finance', 'compound', 'uniswap', 'aave', 'curve-dao-token',
-        'balancer', 'sushiswap', 'pancakeswap', 'yearn-finance', 'maker',
-        'degen-base', 'coinbase-wrapped-staked-eth', 'frax', 'liquity', 'origin-protocol',
-        'convex-finance', 'lido-dao', 'rocket-pool', 'staked-ether', 'morpho',
-        'seamless-protocol', 'moonwell', 'extra-finance', 'based-brett'
+        // Core Base Infrastructure
+        'ethereum', 'usd-coin', 'wrapped-bitcoin', 'dai', 'tether', 'coinbase-wrapped-staked-eth',
+        
+        // Base Native DeFi Protocols
+        'aerodrome-finance', 'seamless-protocol', 'moonwell', 'extra-finance', 'based-brett',
+        'base-protocol', 'prime-protocol', 'synthetix-network-token',
+        
+        // Major DeFi on Base
+        'compound', 'uniswap', 'aave', 'curve-dao-token', 'balancer', 'sushiswap',
+        'pancakeswap', 'yearn-finance', 'maker', 'frax', 'liquity', 'origin-protocol',
+        'convex-finance', 'lido-dao', 'rocket-pool', 'morpho',
+        
+        // Base Meme & Community Tokens  
+        'degen-base', 'based-brett', 'pepe', 'shiba-inu', 'higher', 'toshi',
+        'normie', 'keyboard-cat', 'mochi-market', 'optimus-ai',
+        
+        // Base Gaming & NFT
+        'parallel', 'treasure-dao', 'immutable-x', 'gala', 'enjincoin',
+        
+        // Base Social & Creator Economy
+        'friend-tech', 'lens-protocol', 'cyberconnect', 'rally',
+        
+        // Cross-Chain & Infrastructure
+        'chainlink', 'polygon', 'optimism', 'arbitrum', 'the-graph',
+        'livepeer', 'render-token', 'filecoin', 'arweave',
+        
+        // Base Derivatives & Trading
+        'perpetual-protocol', 'dydx', 'gains-network', 'kwenta',
+        
+        // Yield & Staking on Base
+        'lido-staked-ether', 'rocket-pool-eth', 'stakewise', 'swell-network',
+        
+        // Base Oracle & Data
+        'api3', 'band-protocol', 'tellor', 'uma',
+        
+        // Base Privacy & Security
+        'tornado-cash', 'aztec-protocol', 'railgun',
+        
+        // Emerging Base Projects
+        'friend-tech-shares', 'base-god', 'onchain-trade', 'bald',
+        'bitcoin-base', 'wrapped-eth', 'based-ai', 'base-terminal'
       ].join(',');
       
-      const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${baseCoins}&order=market_cap_desc&per_page=30&page=1&sparkline=false&price_change_percentage=24h`
-      );
+              const response = await fetch(
+          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${baseCoins}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`
+        );
       
       if (!response.ok) {
         throw new Error('Failed to fetch cryptocurrency data');
@@ -258,6 +293,56 @@ export function MobileBaseCoins() {
           market_cap: 987654321,
           image: 'https://assets.coingecko.com/coins/images/34515/large/degen.png',
           rank: 5
+        },
+        {
+          id: 'wrapped-bitcoin',
+          name: 'Wrapped Bitcoin',
+          symbol: 'wbtc',
+          current_price: 95000.0,
+          price_change_percentage_24h: 1.23,
+          market_cap: 15000000000,
+          image: 'https://assets.coingecko.com/coins/images/7598/large/wrapped_bitcoin_wbtc.png',
+          rank: 6
+        },
+        {
+          id: 'dai',
+          name: 'Dai',
+          symbol: 'dai',
+          current_price: 1.0,
+          price_change_percentage_24h: 0.05,
+          market_cap: 8000000000,
+          image: 'https://assets.coingecko.com/coins/images/9956/large/4943.png',
+          rank: 7
+        },
+        {
+          id: 'tether',
+          name: 'Tether',
+          symbol: 'usdt',
+          current_price: 1.0,
+          price_change_percentage_24h: 0.01,
+          market_cap: 120000000000,
+          image: 'https://assets.coingecko.com/coins/images/325/large/Tether.png',
+          rank: 8
+        },
+        {
+          id: 'chainlink',
+          name: 'Chainlink',
+          symbol: 'link',
+          current_price: 25.67,
+          price_change_percentage_24h: 3.45,
+          market_cap: 15000000000,
+          image: 'https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png',
+          rank: 9
+        },
+        {
+          id: 'uniswap',
+          name: 'Uniswap',
+          symbol: 'uni',
+          current_price: 12.34,
+          price_change_percentage_24h: -1.56,
+          market_cap: 9000000000,
+          image: 'https://assets.coingecko.com/coins/images/12504/large/uni.jpg',
+          rank: 10
         }
       ]);
     } finally {
