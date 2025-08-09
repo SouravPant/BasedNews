@@ -1,5 +1,6 @@
 import React from "react";
 import { BaseWalletConnect } from "./base-wallet-connect";
+import { SimpleCoinModal } from "./simple-coin-modal";
 
 interface Coin {
   id: string;
@@ -28,6 +29,8 @@ export function MiniAppDashboard() {
   const [isAddingCoin, setIsAddingCoin] = React.useState(false);
   const [searchResults, setSearchResults] = React.useState<Coin[]>([]);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [selectedCoin, setSelectedCoin] = React.useState<Coin | null>(null);
+  const [isChartModalOpen, setIsChartModalOpen] = React.useState(false);
 
   // Load saved data from localStorage
   React.useEffect(() => {
@@ -89,6 +92,27 @@ export function MiniAppDashboard() {
     const newWatchlist = watchlist.filter(item => item.id !== coinId);
     setWatchlist(newWatchlist);
     localStorage.setItem('basednews-watchlist', JSON.stringify(newWatchlist));
+  };
+
+  const handleCoinClick = (coin: Coin) => {
+    console.log('🎯 Coin clicked:', coin.name);
+    // Convert coin format to match SimpleCoinModal expected format
+    const modalCoin = {
+      id: coin.id,
+      name: coin.name,
+      symbol: coin.symbol,
+      current_price: parseFloat(coin.currentPrice.replace(/[$,]/g, '')),
+      price_change_percentage_24h: parseFloat(coin.priceChangePercentage24h.replace(/[%]/g, '')),
+      market_cap: 0, // We don't have this data in the dashboard format
+      image: coin.image || 'https://via.placeholder.com/64'
+    };
+    setSelectedCoin(modalCoin);
+    setIsChartModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsChartModalOpen(false);
+    setSelectedCoin(null);
   };
 
   const addToPortfolio = (coin: Coin, amount: number, purchasePrice: number) => {
@@ -356,15 +380,23 @@ export function MiniAppDashboard() {
             gap: '8px'
           }}>
             {watchlist.map((coin, index) => (
-              <div key={index} style={{
-                backgroundColor: 'var(--card)',
-                border: '1px solid var(--border)',
-                borderRadius: '12px',
-                padding: '16px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
+              <div 
+                key={index} 
+                onClick={() => handleCoinClick(coin)}
+                style={{
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--muted)'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'var(--card)'}
+              >
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
