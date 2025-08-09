@@ -174,10 +174,10 @@ export function BaseNews() {
     }}>
       {/* Base Header */}
       <BaseHeader 
-        title="Base News" 
+        title="Based News" 
         subtitle="Latest onchain updates"
         actions={
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <ThemeToggleSimple inlineMode={true} />
             <BaseNetworkBadge />
           </div>

@@ -116,16 +116,16 @@ export function ThemeToggleSimple({ inlineMode = false }: ThemeToggleProps) {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            padding: '6px 10px',
+            gap: '4px',
+            padding: '4px 8px',
             background: 'var(--card)',
             border: '1px solid var(--border)',
-            borderRadius: '8px',
+            borderRadius: '6px',
             cursor: 'pointer',
-            fontSize: '12px',
+            fontSize: '11px',
             fontWeight: '500',
             color: 'var(--card-foreground)',
-            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
             transition: 'all 0.2s ease',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
@@ -144,8 +144,8 @@ export function ThemeToggleSimple({ inlineMode = false }: ThemeToggleProps) {
         >
           {/* Theme Icon */}
           <div style={{
-            width: '16px',
-            height: '16px',
+            width: '14px',
+            height: '14px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

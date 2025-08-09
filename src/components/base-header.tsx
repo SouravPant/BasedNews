@@ -54,15 +54,13 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
           
           <div style={{ minWidth: 0, flex: 1 }}>
             <h1 className="base-heading" style={{
-              fontSize: 'clamp(18px, 4vw, 24px)',
+              fontSize: 'clamp(16px, 5vw, 24px)',
               fontWeight: '800',
               color: 'var(--foreground)',
               margin: 0,
               letterSpacing: '-0.02em',
               lineHeight: '1.2',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis'
+              whiteSpace: 'nowrap'
             }}>
               {title}
             </h1>

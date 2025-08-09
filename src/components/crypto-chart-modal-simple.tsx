@@ -365,9 +365,20 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
                       cryptocurrency?.currentPrice || 
                       getBasePriceForCoin(cryptocurrency?.id || '');
   
-  const priceChange24h = cryptocurrency?.price_change_percentage_24h || 
-                        cryptocurrency?.priceChangePercentage24h || 
-                        (Math.random() - 0.5) * 10; // Random change for demo
+  // Calculate price change based on selected timeframe and chart data
+  const calculatePriceChange = () => {
+    if (chartData?.data && chartData.data.length > 1) {
+      const firstPrice = chartData.data[0]?.price || currentPrice;
+      const lastPrice = chartData.data[chartData.data.length - 1]?.price || currentPrice;
+      return firstPrice > 0 ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0;
+    }
+    // Fallback to 24h data if available
+    return cryptocurrency?.price_change_percentage_24h || 
+           cryptocurrency?.priceChangePercentage24h || 
+           (Math.random() - 0.5) * 10; // Random change for demo
+  };
+
+  const priceChangeForTimeframe = calculatePriceChange();
   
   const marketCap = cryptocurrency?.market_cap || 
                    cryptocurrency?.marketCap || 
@@ -503,14 +514,14 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
                 marginBottom: '4px',
                 fontWeight: '500'
               }}>
-                24h Change
+                {timeframe === '1' ? '24h Change' : `${timeframe}d Change`}
               </div>
               <div style={{
                 fontSize: '16px',
                 fontWeight: '600',
-                color: priceChange24h >= 0 ? '#22c55e' : '#ef4444'
+                color: priceChangeForTimeframe >= 0 ? '#22c55e' : '#ef4444'
               }}>
-                {formatPercentage(priceChange24h)}
+                {formatPercentage(priceChangeForTimeframe)}
               </div>
             </div>
             <div>
