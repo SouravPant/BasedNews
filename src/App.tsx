@@ -15,8 +15,26 @@ import { initializeFarcasterSDK, forceReadyCall } from "./utils/farcaster-sdk";
 function AppContent() {
   const { isFrameReady, isInBaseApp } = useMiniKitContext();
   const [showContent, setShowContent] = useState(false);
+  const [debugInfo, setDebugInfo] = useState('');
 
   useEffect(() => {
+    // Debug iframe context
+    const isInIframe = window !== window.parent;
+    const userAgent = navigator.userAgent;
+    const referrer = document.referrer;
+    
+    const debug = {
+      isInIframe,
+      isInBaseApp,
+      userAgent: userAgent.substring(0, 100),
+      referrer: referrer.substring(0, 100),
+      url: window.location.href,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('🔵 Based News Debug Info:', debug);
+    setDebugInfo(JSON.stringify(debug, null, 2));
+    
     // Initialize SDK immediately
     initializeFarcasterSDK();
     
@@ -61,7 +79,27 @@ function AppContent() {
 
   // Show loading screen while initializing in Farcaster environment
   if (!showContent) {
-    return <FarcasterLoadingScreen />;
+    return (
+      <div>
+        <FarcasterLoadingScreen />
+        {/* Debug info for troubleshooting */}
+        {process.env.NODE_ENV === 'development' && (
+          <div style={{ 
+            position: 'fixed', 
+            bottom: '10px', 
+            left: '10px', 
+            background: 'rgba(0,0,0,0.8)', 
+            color: 'white', 
+            padding: '10px', 
+            fontSize: '10px',
+            maxWidth: '300px',
+            zIndex: 9999
+          }}>
+            <pre>{debugInfo}</pre>
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -84,6 +122,15 @@ function App() {
   // Initialize SDK on app mount with multiple attempts
   useEffect(() => {
     console.log('🔵 Based News: App mounted, initializing Farcaster SDK...');
+    
+    // Log environment info
+    console.log('🔵 Environment:', {
+      userAgent: navigator.userAgent,
+      referrer: document.referrer,
+      isIframe: window !== window.parent,
+      url: window.location.href
+    });
+    
     initializeFarcasterSDK();
     
     // Additional calls at different intervals
