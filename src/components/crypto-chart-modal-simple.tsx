@@ -189,6 +189,7 @@ function WorkingChart({ data, coinName, days, actualPriceChange }: { data: Array
 }
 
 export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: CryptoChartModalProps) {
+  console.log('🚀 CryptoChartModalSimple rendered with:', { isOpen, cryptocurrency: cryptocurrency?.name });
   const [chartData, setChartData] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [timeframe, setTimeframe] = React.useState('1');
@@ -332,11 +333,8 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
 
   if (!isOpen) return null;
   
-  // Debug logging
-  console.log('🔍 Modal opening with cryptocurrency:', cryptocurrency);
-  
+  // Simple test modal to debug rendering
   if (!cryptocurrency) {
-    console.error('❌ No cryptocurrency data provided to modal');
     return (
       <div style={{
         position: 'fixed',
@@ -348,22 +346,26 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1000
+        zIndex: 9999
       }}>
         <div style={{
-          backgroundColor: 'var(--background)',
+          backgroundColor: 'white',
           padding: '20px',
-          borderRadius: '16px',
-          color: 'var(--foreground)'
+          borderRadius: '8px',
+          color: 'black'
         }}>
-          <p>Error: No coin data available</p>
-          <button onClick={onClose} style={{ marginTop: '10px', padding: '8px 16px' }}>
+          <h3>Debug Modal</h3>
+          <p>Modal is working but no cryptocurrency data!</p>
+          <button onClick={onClose} style={{ padding: '8px 16px', marginTop: '10px' }}>
             Close
           </button>
         </div>
       </div>
     );
   }
+  
+  // Debug logging
+  console.log('🔍 Modal opening with cryptocurrency:', cryptocurrency);
 
   // Extract price data with fallbacks
   const currentPrice = cryptocurrency?.current_price || 

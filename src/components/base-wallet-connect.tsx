@@ -1,4 +1,6 @@
 import React from "react";
+import { Address, Avatar, Name, Identity } from '@coinbase/onchainkit/identity';
+import { Wallet, ConnectWallet } from '@coinbase/onchainkit/wallet';
 
 interface WalletConnectProps {
   showInPortfolio?: boolean;
@@ -7,6 +9,7 @@ interface WalletConnectProps {
 export function BaseWalletConnect({ showInPortfolio = false }: WalletConnectProps) {
   const [account, setAccount] = React.useState<string | null>(null);
   const [balance, setBalance] = React.useState<string | null>(null);
+  const [portfolioValue, setPortfolioValue] = React.useState<string | null>(null);
   const [isConnecting, setIsConnecting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [walletType, setWalletType] = React.useState<'metamask' | 'coinbase' | 'smart-wallet' | 'farcaster' | null>(null);
@@ -24,6 +27,7 @@ export function BaseWalletConnect({ showInPortfolio = false }: WalletConnectProp
         if (accounts.length > 0) {
           setAccount(accounts[0]);
           await fetchBalance(accounts[0]);
+          await fetchPortfolioValue(accounts[0]);
           
           // Detect wallet type
           if (window.ethereum.isMetaMask) {
@@ -51,6 +55,32 @@ export function BaseWalletConnect({ showInPortfolio = false }: WalletConnectProp
       }
     } catch (error) {
       console.error('Error fetching balance:', error);
+    }
+  };
+
+  const fetchPortfolioValue = async (address: string) => {
+    try {
+      console.log('🔍 Fetching portfolio for:', address);
+      
+      if (window.ethereum) {
+        const ethBalance = await window.ethereum.request({
+          method: 'eth_getBalance',
+          params: [address, 'latest']
+        });
+        
+        const ethValue = parseInt(ethBalance, 16) / Math.pow(10, 18);
+        
+        // Mock portfolio calculation for demo
+        // In production, fetch real token balances from Base network
+        const mockTokenValue = Math.random() * 1000;
+        const totalValue = (ethValue * 3400) + mockTokenValue; // ETH price * amount + tokens
+        
+        setPortfolioValue(totalValue.toFixed(2));
+        console.log('💰 Portfolio value:', totalValue.toFixed(2));
+      }
+    } catch (error) {
+      console.error('Error fetching portfolio value:', error);
+      setPortfolioValue('0.00');
     }
   };
 
@@ -106,6 +136,7 @@ export function BaseWalletConnect({ showInPortfolio = false }: WalletConnectProp
         setAccount(accounts[0]);
         setWalletType('metamask');
         await fetchBalance(accounts[0]);
+        await fetchPortfolioValue(accounts[0]);
       }
     } catch (error: any) {
       setError(error.message || 'Failed to connect wallet');
@@ -132,6 +163,7 @@ export function BaseWalletConnect({ showInPortfolio = false }: WalletConnectProp
           setAccount(accounts[0]);
           setWalletType('coinbase');
           await fetchBalance(accounts[0]);
+          await fetchPortfolioValue(accounts[0]);
         }
       } else {
         // Redirect to Coinbase Wallet if not installed
@@ -275,7 +307,11 @@ export function BaseWalletConnect({ showInPortfolio = false }: WalletConnectProp
               alignItems: 'center',
               gap: '6px'
             }}>
-              <span>{balance} ETH</span>
+              {showInPortfolio && portfolioValue ? (
+                <span>Portfolio: ${portfolioValue}</span>
+              ) : (
+                <span>{balance} ETH</span>
+              )}
               <span>•</span>
               <span style={{
                 padding: '2px 6px',
