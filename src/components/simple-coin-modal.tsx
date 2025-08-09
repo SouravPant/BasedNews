@@ -8,19 +8,43 @@ interface SimpleCoinModalProps {
 
 export function SimpleCoinModal({ isOpen, onClose, coin }: SimpleCoinModalProps) {
   const [coinData, setCoinData] = React.useState<any>(null);
+  const [chartData, setChartData] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(false);
+
+  // Helper function to format market cap
+  const formatMarketCap = (marketCap: number) => {
+    if (marketCap >= 1000000000) {
+      return `$${(marketCap / 1000000000).toFixed(1)}B`;
+    } else if (marketCap >= 1000000) {
+      return `$${(marketCap / 1000000).toFixed(1)}M`;
+    } else if (marketCap >= 1000) {
+      return `$${(marketCap / 1000).toFixed(1)}K`;
+    } else {
+      return `$${marketCap.toFixed(2)}`;
+    }
+  };
 
   React.useEffect(() => {
     if (isOpen && coin?.id) {
       setLoading(true);
       console.log('🔍 Fetching coin data for:', coin.id);
       
-      // Fetch detailed coin data from CoinGecko
-      fetch(`https://api.coingecko.com/api/v3/coins/${coin.id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=true`)
-        .then(res => res.json())
-        .then(data => {
-          console.log('✅ Coin data received:', data);
-          setCoinData(data);
+      // Fetch both coin data and chart data
+      Promise.all([
+        // Basic coin data
+        fetch(`https://api.coingecko.com/api/v3/coins/${coin.id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`),
+        // 7-day chart data
+        fetch(`https://api.coingecko.com/api/v3/coins/${coin.id}/market_chart?vs_currency=usd&days=7&interval=hourly`)
+      ])
+        .then(async ([coinRes, chartRes]) => {
+          const coinData = await coinRes.json();
+          const chartData = await chartRes.json();
+          
+          console.log('✅ Coin data received:', coinData);
+          console.log('✅ Chart data received:', chartData);
+          
+          setCoinData(coinData);
+          setChartData(chartData);
           setLoading(false);
         })
         .catch(error => {
@@ -168,45 +192,128 @@ export function SimpleCoinModal({ isOpen, onClose, coin }: SimpleCoinModalProps)
                     Market Cap
                   </div>
                   <div style={{ fontSize: '16px', fontWeight: '600' }}>
-                    ${coinData.market_data?.market_cap?.usd ? 
-                      (coinData.market_data.market_cap.usd / 1000000).toFixed(1) + 'M' : 'N/A'}
+                    {coinData.market_data?.market_cap?.usd ? 
+                      formatMarketCap(coinData.market_data.market_cap.usd) : 'N/A'}
                   </div>
                 </div>
               </div>
 
-              {/* Sparkline Chart */}
-              {coinData.market_data?.sparkline_7d?.price && (
+              {/* Enhanced 7-Day Chart */}
+              {chartData?.prices && chartData.prices.length > 0 && (
                 <div style={{ marginBottom: '20px' }}>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>
-                    7-Day Price Trend
+                    7-Day Price Chart
                   </h3>
                   <div style={{
-                    height: '100px',
+                    height: '150px',
                     backgroundColor: 'var(--muted)',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    display: 'flex',
-                    alignItems: 'end',
-                    gap: '2px'
+                    borderRadius: '12px',
+                    padding: '16px',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}>
-                    {coinData.market_data.sparkline_7d.price.slice(0, 50).map((price: number, index: number) => {
-                      const maxPrice = Math.max(...coinData.market_data.sparkline_7d.price);
-                      const minPrice = Math.min(...coinData.market_data.sparkline_7d.price);
-                      const height = ((price - minPrice) / (maxPrice - minPrice)) * 80 + 10;
+                    {(() => {
+                      const prices = chartData.prices.map((point: [number, number]) => point[1]);
+                      const maxPrice = Math.max(...prices);
+                      const minPrice = Math.min(...prices);
+                      const priceRange = maxPrice - minPrice;
+                      
+                      // Create SVG path for smooth line
+                      const width = 100; // percentage
+                      const height = 100; // percentage
+                      const step = width / (prices.length - 1);
+                      
+                      let pathData = '';
+                      
+                      prices.forEach((price: number, index: number) => {
+                        const x = index * step;
+                        const y = 100 - ((price - minPrice) / priceRange) * 80 - 10; // Invert Y and add padding
+                        
+                        if (index === 0) {
+                          pathData += `M ${x} ${y}`;
+                        } else {
+                          pathData += ` L ${x} ${y}`;
+                        }
+                      });
+                      
+                      // Determine if trend is positive or negative
+                      const firstPrice = prices[0];
+                      const lastPrice = prices[prices.length - 1];
+                      const isPositive = lastPrice >= firstPrice;
                       
                       return (
-                        <div
-                          key={index}
-                          style={{
-                            width: '4px',
-                            height: `${height}px`,
-                            backgroundColor: 'var(--primary)',
-                            borderRadius: '2px',
-                            opacity: 0.8
-                          }}
-                        />
+                        <svg
+                          width="100%"
+                          height="100%"
+                          viewBox="0 0 100 100"
+                          style={{ position: 'absolute', top: 0, left: 0 }}
+                        >
+                          {/* Gradient definition */}
+                          <defs>
+                            <linearGradient id={`gradient-${coin.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                              <stop offset="0%" stopColor={isPositive ? '#22c55e' : '#ef4444'} stopOpacity="0.3" />
+                              <stop offset="100%" stopColor={isPositive ? '#22c55e' : '#ef4444'} stopOpacity="0.05" />
+                            </linearGradient>
+                          </defs>
+                          
+                          {/* Fill area under the curve */}
+                          <path
+                            d={`${pathData} L 100 100 L 0 100 Z`}
+                            fill={`url(#gradient-${coin.id})`}
+                          />
+                          
+                          {/* Main line */}
+                          <path
+                            d={pathData}
+                            fill="none"
+                            stroke={isPositive ? '#22c55e' : '#ef4444'}
+                            strokeWidth="0.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          
+                          {/* Data points */}
+                          {prices.map((price: number, index: number) => {
+                            if (index % Math.ceil(prices.length / 10) === 0) { // Show every nth point
+                              const x = index * step;
+                              const y = 100 - ((price - minPrice) / priceRange) * 80 - 10;
+                              
+                              return (
+                                <circle
+                                  key={index}
+                                  cx={x}
+                                  cy={y}
+                                  r="0.8"
+                                  fill={isPositive ? '#22c55e' : '#ef4444'}
+                                  opacity="0.8"
+                                />
+                              );
+                            }
+                            return null;
+                          })}
+                        </svg>
                       );
-                    })}
+                    })()}
+                    
+                    {/* Price labels */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '12px',
+                      right: '12px',
+                      fontSize: '12px',
+                      color: 'var(--muted-foreground)'
+                    }}>
+                      High: ${Math.max(...chartData.prices.map((p: [number, number]) => p[1])).toFixed(4)}
+                    </div>
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '12px',
+                      right: '12px',
+                      fontSize: '12px',
+                      color: 'var(--muted-foreground)'
+                    }}>
+                      Low: ${Math.min(...chartData.prices.map((p: [number, number]) => p[1])).toFixed(4)}
+                    </div>
                   </div>
                 </div>
               )}
