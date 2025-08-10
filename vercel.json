@@ -17,5 +17,16 @@
       "path": "/api/cron/news",
       "schedule": "0 9 * * *"
     }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://explorer-api.walletconnect.com; connect-src 'self' https://explorer-api.walletconnect.com https://api.coingecko.com https://farcaster.xyz https://warpcast.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:;"
+        }
+      ]
+    }
   ]
 }
