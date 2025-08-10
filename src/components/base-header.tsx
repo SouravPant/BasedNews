@@ -53,21 +53,22 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
           
           <div style={{ minWidth: 0, flex: 1 }}>
             <h1 className="base-heading" style={{
-              fontSize: '24px',
+              fontSize: '22px', // Slightly smaller
               fontWeight: '800',
               color: 'var(--foreground)',
               margin: 0,
               letterSpacing: '-0.02em',
-              lineHeight: '1.2'
+              lineHeight: '1.1' // Tighter line height
             }}>
               {title}
             </h1>
             {subtitle && (
               <p className="base-subtitle" style={{
-                fontSize: '14px',
+                fontSize: '12px', // Smaller subtitle
                 color: 'var(--muted-foreground)',
-                margin: '2px 0 0 0',
-                fontWeight: '500'
+                margin: '1px 0 0 0', // Reduced margin
+                fontWeight: '500',
+                lineHeight: '1.2'
               }}>
                 {subtitle}
               </p>

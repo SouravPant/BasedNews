@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TrendingUp, Search, ArrowUpDown, ChevronLeft, ChevronRight, Home } from 'lucide-react';
+import { TrendingUp, Search, ArrowUpDown, ChevronLeft, ChevronRight, Home, Coins } from 'lucide-react';
 import type { Cryptocurrency } from '@shared/schema';
 import { Link } from 'wouter';
 
@@ -143,7 +143,7 @@ export function Coins() {
                 </Button>
               </Link>
               <div className="bg-blue-600 p-1.5 sm:p-2 rounded-lg">
-                <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
+                <Coins className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
               </div>
               <div className="min-w-0 flex-1">
                 <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white truncate">

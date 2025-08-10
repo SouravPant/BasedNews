@@ -1,6 +1,6 @@
 import React from "react";
 import { CryptoChartModalSimple } from "../components/crypto-chart-modal-simple";
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Newspaper, BarChart3, Coins } from 'lucide-react';
 
 interface Coin {
   id: string;
@@ -546,9 +546,7 @@ export function MobileBaseCoins() {
             fontWeight: '600'
           }}
         >
-          <svg style={{ width: '20px', height: '20px', marginBottom: '2px', fill: 'var(--muted-foreground)' }} viewBox="0 0 24 24">
-            <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
-          </svg>
+          <Newspaper size={20} />
           News
         </a>
         <a
@@ -563,9 +561,7 @@ export function MobileBaseCoins() {
             fontWeight: '600'
           }}
         >
-          <svg style={{ width: '20px', height: '20px', marginBottom: '2px', fill: 'var(--muted-foreground)' }} viewBox="0 0 24 24">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-          </svg>
+          <BarChart3 size={20} />
           Dashboard
         </a>
         <a
@@ -580,21 +576,7 @@ export function MobileBaseCoins() {
             fontWeight: '600'
           }}
         >
-          <div style={{
-            width: '20px',
-            height: '20px',
-            background: 'var(--primary)',
-            borderRadius: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '10px',
-            fontWeight: '900',
-            color: 'var(--background)',
-            marginBottom: '2px'
-          }}>
-            B
-          </div>
+          <Coins size={20} />
           Base Coins
         </a>
       </nav>
