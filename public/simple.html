@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BasedNews - Simple Mini App</title>
+    
+    <!-- Farcaster Mini App Meta Tags -->
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/hero.svg" />
+    <meta property="fc:frame:button:1" content="View Latest News" />
+    <meta property="fc:frame:button:1:action" content="link" />
+    <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app/simple.html" />
+    
+    <!-- Farcaster SDK -->
+    <script src="https://sdk.farcaster.xyz/v0.14.1/farcaster.js" async></script>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #0052ff 0%, #003db3 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        .description {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .feature-desc {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .cta {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .button {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s;
+        }
+        .button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 12px;
+            background: rgba(0, 255, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">BasedNews</div>
+            <div class="subtitle">Base Ecosystem News & Crypto Tracker</div>
+            <div class="description">Real-time cryptocurrency news and market data</div>
+        </div>
+        
+        <div class="status" id="status">
+            🎯 Initializing Farcaster Mini App...
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📰</div>
+                <div class="feature-title">Latest News</div>
+                <div class="feature-desc">Real-time cryptocurrency news aggregated from multiple sources</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💰</div>
+                <div class="feature-title">Base Ecosystem</div>
+                <div class="feature-desc">Track Base chain tokens including DEGEN, BRETT, and more</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Market Data</div>
+                <div class="feature-desc">Live prices, charts, and market analytics</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔵</div>
+                <div class="feature-title">Base Native</div>
+                <div class="feature-desc">Built specifically for the Base ecosystem</div>
+            </div>
+        </div>
+        
+        <div class="cta">
+            <a href="/" class="button">🚀 Launch Full App</a>
+        </div>
+    </div>
+
+    <script>
+        // Simple Farcaster Ready Signal
+        function sendReadySignal() {
+            const status = document.getElementById('status');
+            
+            try {
+                // Check if we're in a Farcaster context
+                if (window.parent && window.parent !== window) {
+                    console.log('🎯 Sending Farcaster ready signal...');
+                    status.innerHTML = '🎯 Sending ready signal to Farcaster...';
+                    
+                    // Official Farcaster SDK ready call
+                    if (window.farcaster && window.farcaster.actions) {
+                        console.log('📞 Calling official Farcaster SDK ready method...');
+                        window.farcaster.actions.ready();
+                        status.innerHTML = '✅ Ready signal sent via SDK!';
+                    } else {
+                        // Fallback postMessage methods
+                        window.parent.postMessage({ type: 'sdk.ready', data: {} }, '*');
+                        window.parent.postMessage({ type: 'frame.ready', data: {} }, '*');
+                        window.parent.postMessage({ type: 'sdk_ready' }, '*');
+                        status.innerHTML = '✅ Ready signal sent via postMessage!';
+                    }
+                    
+                    console.log('✅ Ready signals sent successfully');
+                } else {
+                    console.log('ℹ️ Not in iframe context');
+                    status.innerHTML = '✅ Mini app loaded successfully!';
+                }
+            } catch (error) {
+                console.error('❌ Error sending ready signal:', error);
+                status.innerHTML = '⚠️ Error sending ready signal: ' + error.message;
+            }
+        }
+
+        // Send ready signal multiple times with different timing
+        document.addEventListener('DOMContentLoaded', sendReadySignal);
+        window.addEventListener('load', sendReadySignal);
+        
+        // Wait for SDK to load
+        setTimeout(sendReadySignal, 500);
+        setTimeout(sendReadySignal, 1000);
+        setTimeout(sendReadySignal, 2000);
+        
+        // Check for SDK periodically
+        const checkSDK = setInterval(() => {
+            if (window.farcaster && window.farcaster.actions) {
+                console.log('🎯 Farcaster SDK detected, calling ready...');
+                window.farcaster.actions.ready();
+                clearInterval(checkSDK);
+            }
+        }, 1000);
+        
+        // Clear interval after 10 seconds
+        setTimeout(() => clearInterval(checkSDK), 10000);
+    </script>
+</body>
+</html>
