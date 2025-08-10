@@ -15,18 +15,52 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'GET') {
     try {
-      // Get page and per_page from query params, default to 20 for backward compatibility
+      // Get page and per_page from query params
       const page = parseInt(req.query.page as string) || 1;
       const per_page = parseInt(req.query.per_page as string) || 20;
       const includeStablecoins = req.query.includeStablecoins === 'true';
+      const includeBaseCoins = req.query.includeBaseCoins === 'true';
       
+      // Base ecosystem coins for priority inclusion
+      const baseEcosystemCoins = [
+        'ethereum', 'coinbase-wrapped-staked-eth', 'usd-coin', 'aerodrome-finance', 
+        'based-brett', 'degen-base', 'toshi', 'moca-network', 'zora', 'moonwell',
+        'base-protocol', 'seamless-protocol', 'friend-tech', 'extra-finance'
+      ];
+
+      let allCoins = [];
+
+      // If requesting Base coins specifically, fetch them first
+      if (includeBaseCoins && baseEcosystemCoins.length > 0) {
+        try {
+          const baseCoinsResponse = await axios.get(
+            "https://api.coingecko.com/api/v3/coins/markets",
+            {
+              params: {
+                vs_currency: "usd",
+                ids: baseEcosystemCoins.join(','),
+                order: "market_cap_desc",
+                per_page: 250,
+                page: 1,
+                sparkline: false,
+                price_change_percentage: "24h"
+              }
+            }
+          );
+          allCoins = [...baseCoinsResponse.data];
+        } catch (error) {
+          console.log('Error fetching Base coins, continuing with top coins...');
+        }
+      }
+
+      // Fetch top market cap coins (up to 200 for selection)
       const response = await axios.get(
         "https://api.coingecko.com/api/v3/coins/markets",
         {
           params: {
             vs_currency: "usd",
             order: "market_cap_desc",
-            per_page: Math.min(per_page, 250), // CoinGecko API limit
+            per_page: Math.min(per_page === 20 ? 20 : 200, 250), // Support up to 200 coins for selection
             page: page,
             sparkline: false,
             price_change_percentage: "24h"
@@ -34,21 +68,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       );
 
-      // Filter out stablecoins and wrapped tokens only if not explicitly included
+      // Merge Base coins with top coins, avoiding duplicates
+      const existingIds = new Set(allCoins.map(coin => coin.id));
+      const additionalCoins = response.data.filter((coin: any) => !existingIds.has(coin.id));
+      allCoins = [...allCoins, ...additionalCoins];
+
+      // Filter out stablecoins if not explicitly included
       const excludedTokens = [
         'tether', 'usd-coin', 'wrapped-steth', 'staked-ether', 'binance-usd', 'dai',
         'true-usd', 'wrapped-bitcoin', 'first-digital-usd'
       ];
 
-      let filteredCoins = response.data;
+      let filteredCoins = allCoins;
       
       if (!includeStablecoins) {
         filteredCoins = filteredCoins.filter((coin: any) => !excludedTokens.includes(coin.id));
       }
 
-      // For the original endpoint (per_page=20), limit to 20. For the new endpoint, return all filtered coins.
-      if (per_page === 20 && page === 1) {
-        filteredCoins = filteredCoins.slice(0, 20);
+      // For backward compatibility with dashboard, limit to specified amount
+      if (per_page <= 50) {
+        filteredCoins = filteredCoins.slice(0, per_page);
       }
 
       const cryptocurrencies = filteredCoins.map((coin: any) => ({
@@ -62,7 +101,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         volume24h: coin.total_volume?.toString() || "0",
         marketCapRank: coin.market_cap_rank || 0,
         image: coin.image || "",
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        isBaseEcosystem: baseEcosystemCoins.includes(coin.id)
       }));
 
       res.status(200).json(cryptocurrencies);

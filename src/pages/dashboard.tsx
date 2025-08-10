@@ -39,6 +39,9 @@ export default function Dashboard() {
   const [isTwitterModalOpen, setIsTwitterModalOpen] = useState(false);
   const [newsFilter, setNewsFilter] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const [isAddCoinsModalOpen, setIsAddCoinsModalOpen] = useState(false);
+  const [availableCoins, setAvailableCoins] = useState<Cryptocurrency[]>([]);
+  const [selectedCoinsToAdd, setSelectedCoinsToAdd] = useState<Set<string>>(new Set());
 
   const { data: cryptocurrencies, isLoading: cryptoLoading, refetch: refetchCrypto } = useQuery<Cryptocurrency[]>({
     queryKey: ["/api/cryptocurrencies"],
@@ -184,7 +187,29 @@ export default function Dashboard() {
         <section className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground">Top Cryptocurrencies</h2>
-            <p className="text-sm text-muted-foreground">Drag to reorder</p>
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={async () => {
+                  try {
+                    // Fetch more coins for selection (up to 200)
+                    const response = await fetch('/api/cryptocurrencies?per_page=200&includeBaseCoins=true');
+                    const data = await response.json();
+                    console.log('Available coins for selection:', data.length);
+                    setAvailableCoins(data);
+                    setIsAddCoinsModalOpen(true);
+                  } catch (err) {
+                    console.error('Error fetching coins:', err);
+                  }
+                }}
+                className="flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add Coins
+              </Button>
+              <p className="text-sm text-muted-foreground">Drag to reorder</p>
+            </div>
           </div>
           
           <DraggableCryptoGrid
@@ -595,6 +620,139 @@ export default function Dashboard() {
           </div>
         )}
       </main>
+
+      {/* Add Coins Modal */}
+      {isAddCoinsModalOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setIsAddCoinsModalOpen(false)}
+        >
+          <div 
+            className="bg-based-surface border border-border rounded-lg w-full max-w-4xl max-h-[80vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">Add Cryptocurrencies</h3>
+                <p className="text-sm text-muted-foreground">
+                  Select from Base ecosystem coins and top 200 cryptocurrencies
+                </p>
+              </div>
+              <button
+                onClick={() => setIsAddCoinsModalOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Search and Filter */}
+            <div className="p-6 border-b border-border">
+              <div className="flex gap-4">
+                <input
+                  type="text"
+                  placeholder="Search cryptocurrencies..."
+                  className="flex-1 px-3 py-2 bg-background border border-border rounded-md text-foreground"
+                />
+                <Button variant="outline" size="sm">
+                  Base Coins Only
+                </Button>
+              </div>
+            </div>
+
+            {/* Coin List */}
+            <div className="p-6 overflow-y-auto max-h-96">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {availableCoins.map((coin) => {
+                  const isSelected = selectedCoinsToAdd.has(coin.id);
+                  const isAlreadyAdded = (cryptocurrencies || []).some(c => c.id === coin.id);
+                  
+                  return (
+                    <div
+                      key={coin.id}
+                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                        isAlreadyAdded 
+                          ? 'border-muted bg-muted/50 cursor-not-allowed' 
+                          : isSelected 
+                            ? 'border-primary bg-primary/10' 
+                            : 'border-border hover:border-primary/50'
+                      }`}
+                      onClick={() => {
+                        if (isAlreadyAdded) return;
+                        
+                        const newSelected = new Set(selectedCoinsToAdd);
+                        if (isSelected) {
+                          newSelected.delete(coin.id);
+                        } else {
+                          newSelected.add(coin.id);
+                        }
+                        setSelectedCoinsToAdd(newSelected);
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={coin.image}
+                          alt={coin.name}
+                          className="w-8 h-8 rounded-full"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-foreground truncate">
+                              {coin.name}
+                            </span>
+                            {(coin as any).isBaseEcosystem && (
+                              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                Base
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {coin.symbol} • ${parseFloat(coin.currentPrice || '0').toFixed(2)}
+                          </div>
+                        </div>
+                        {isAlreadyAdded ? (
+                          <span className="text-xs text-muted-foreground">Added</span>
+                        ) : (
+                          <div className={`w-4 h-4 border-2 rounded ${isSelected ? 'bg-primary border-primary' : 'border-border'}`}>
+                            {isSelected && <span className="text-white text-xs">✓</span>}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between p-6 border-t border-border">
+              <span className="text-sm text-muted-foreground">
+                {selectedCoinsToAdd.size} coin(s) selected
+              </span>
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsAddCoinsModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => {
+                    // TODO: Add selected coins to the dashboard
+                    console.log('Adding coins:', Array.from(selectedCoinsToAdd));
+                    setIsAddCoinsModalOpen(false);
+                    setSelectedCoinsToAdd(new Set());
+                  }}
+                  disabled={selectedCoinsToAdd.size === 0}
+                >
+                  Add {selectedCoinsToAdd.size} Coin(s)
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

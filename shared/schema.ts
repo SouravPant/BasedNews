@@ -49,6 +49,7 @@ export const cryptocurrencies = pgTable("cryptocurrencies", {
   website: text("website"), // Official website URL
   whitepaper: text("whitepaper"), // Whitepaper URL
   socialMedia: json("social_media"), // Twitter, Discord, Telegram, etc.
+  isBaseEcosystem: boolean("is_base_ecosystem").default(false), // Flag for Base ecosystem coins
   lastUpdated: timestamp("last_updated").defaultNow(),
 });
 
