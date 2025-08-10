@@ -20,6 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const per_page = parseInt(req.query.per_page as string) || 20;
       const includeStablecoins = req.query.includeStablecoins === 'true';
       const includeBaseCoins = req.query.includeBaseCoins === 'true';
+      const idsParam = req.query.ids as string; // Comma-separated list of coin IDs
       
       // Base ecosystem coins for priority inclusion
       const baseEcosystemCoins = [
@@ -30,7 +31,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       let allCoins = [];
 
-      // If requesting Base coins specifically, fetch them first
+      // If specific IDs are requested, fetch them first
+      if (idsParam) {
+        const requestedIds = idsParam.split(',').map(id => id.trim()).filter(Boolean);
+        if (requestedIds.length > 0) {
+          try {
+            const specificCoinsResponse = await axios.get(
+              "https://api.coingecko.com/api/v3/coins/markets",
+              {
+                params: {
+                  vs_currency: "usd",
+                  ids: requestedIds.join(','),
+                  order: "market_cap_desc",
+                  per_page: 250,
+                  page: 1,
+                  sparkline: false,
+                  price_change_percentage: "24h"
+                }
+              }
+            );
+            allCoins = [...specificCoinsResponse.data];
+          } catch (error) {
+            console.log('Error fetching specific coins, falling back to top coins...');
+          }
+        }
+      }
+
+      // If requesting Base coins specifically, fetch them and merge
       if (includeBaseCoins && baseEcosystemCoins.length > 0) {
         try {
           const baseCoinsResponse = await axios.get(
@@ -47,31 +74,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               }
             }
           );
-          allCoins = [...baseCoinsResponse.data];
+          // Merge without duplicates
+          const existingIds = new Set(allCoins.map(coin => coin.id));
+          const newBaseCoins = baseCoinsResponse.data.filter((coin: any) => !existingIds.has(coin.id));
+          allCoins = [...allCoins, ...newBaseCoins];
         } catch (error) {
-          console.log('Error fetching Base coins, continuing with top coins...');
+          console.log('Error fetching Base coins, continuing...');
         }
       }
 
-      // Fetch top market cap coins (up to 200 for selection)
-      const response = await axios.get(
-        "https://api.coingecko.com/api/v3/coins/markets",
-        {
-          params: {
-            vs_currency: "usd",
-            order: "market_cap_desc",
-            per_page: Math.min(per_page === 20 ? 20 : 200, 250), // Support up to 200 coins for selection
-            page: page,
-            sparkline: false,
-            price_change_percentage: "24h"
+      // If we don't have enough coins yet, fetch top market cap coins
+      if (allCoins.length < per_page && !idsParam) {
+        const response = await axios.get(
+          "https://api.coingecko.com/api/v3/coins/markets",
+          {
+            params: {
+              vs_currency: "usd",
+              order: "market_cap_desc",
+              per_page: Math.min(per_page === 20 ? 20 : 200, 250), // Support up to 200 coins for selection
+              page: page,
+              sparkline: false,
+              price_change_percentage: "24h"
+            }
           }
-        }
-      );
-
-      // Merge Base coins with top coins, avoiding duplicates
-      const existingIds = new Set(allCoins.map(coin => coin.id));
-      const additionalCoins = response.data.filter((coin: any) => !existingIds.has(coin.id));
-      allCoins = [...allCoins, ...additionalCoins];
+        );
+        // Merge without duplicates
+        const existingIds = new Set(allCoins.map(coin => coin.id));
+        const additionalCoins = response.data.filter((coin: any) => !existingIds.has(coin.id));
+        allCoins = [...allCoins, ...additionalCoins];
+      }
 
       // Filter out stablecoins if not explicitly included
       const excludedTokens = [

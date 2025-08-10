@@ -42,9 +42,43 @@ export default function Dashboard() {
   const [isAddCoinsModalOpen, setIsAddCoinsModalOpen] = useState(false);
   const [availableCoins, setAvailableCoins] = useState<Cryptocurrency[]>([]);
   const [selectedCoinsToAdd, setSelectedCoinsToAdd] = useState<Set<string>>(new Set());
+  const [userWatchlist, setUserWatchlist] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showBaseOnly, setShowBaseOnly] = useState(false);
+
+  // Load user watchlist from localStorage on mount
+  useEffect(() => {
+    const savedWatchlist = localStorage.getItem('crypto-watchlist');
+    if (savedWatchlist) {
+      try {
+        const watchlist = JSON.parse(savedWatchlist);
+        setUserWatchlist(watchlist);
+      } catch (error) {
+        console.error('Error loading watchlist:', error);
+        // Set default watchlist if none exists
+        const defaultCoins = ['bitcoin', 'ethereum', 'solana', 'cardano', 'polygon'];
+        setUserWatchlist(defaultCoins);
+        localStorage.setItem('crypto-watchlist', JSON.stringify(defaultCoins));
+      }
+    } else {
+      // Set default watchlist including some Base ecosystem coins
+      const defaultCoins = ['bitcoin', 'ethereum', 'based-brett', 'degen-base', 'aerodrome-finance'];
+      setUserWatchlist(defaultCoins);
+      localStorage.setItem('crypto-watchlist', JSON.stringify(defaultCoins));
+    }
+  }, []);
 
   const { data: cryptocurrencies, isLoading: cryptoLoading, refetch: refetchCrypto } = useQuery<Cryptocurrency[]>({
-    queryKey: ["/api/cryptocurrencies"],
+    queryKey: ["/api/cryptocurrencies", userWatchlist.length],
+    queryFn: async () => {
+      if (userWatchlist.length === 0) return [];
+      
+      // Fetch specific coins from user's watchlist + some popular ones for fallback
+      const coinsToFetch = userWatchlist.length > 0 ? userWatchlist : ['bitcoin', 'ethereum', 'solana'];
+      const response = await fetch(`/api/cryptocurrencies?per_page=50&includeBaseCoins=true&ids=${coinsToFetch.join(',')}`);
+      return response.json();
+    },
+    enabled: userWatchlist.length > 0,
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 
@@ -186,8 +220,13 @@ export default function Dashboard() {
         {/* Price Grid Section */}
         <section className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Top Cryptocurrencies</h2>
-            <div className="flex items-center gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">Your Watchlist</h2>
+              <p className="text-sm text-muted-foreground">
+                {userWatchlist.length} cryptocurrencies • Drag to reorder
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
               <Button 
                 variant="outline" 
                 size="sm"
@@ -208,7 +247,6 @@ export default function Dashboard() {
                 <Plus className="w-4 h-4" />
                 Add Coins
               </Button>
-              <p className="text-sm text-muted-foreground">Drag to reorder</p>
             </div>
           </div>
           
@@ -653,9 +691,15 @@ export default function Dashboard() {
                 <input
                   type="text"
                   placeholder="Search cryptocurrencies..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 px-3 py-2 bg-background border border-border rounded-md text-foreground"
                 />
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant={showBaseOnly ? "default" : "outline"} 
+                  size="sm"
+                  onClick={() => setShowBaseOnly(!showBaseOnly)}
+                >
                   Base Coins Only
                 </Button>
               </div>
@@ -664,7 +708,19 @@ export default function Dashboard() {
             {/* Coin List */}
             <div className="p-6 overflow-y-auto max-h-96">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {availableCoins.map((coin) => {
+                {availableCoins
+                  .filter(coin => {
+                    // Search filter
+                    const matchesSearch = searchQuery === "" || 
+                      coin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      coin.symbol.toLowerCase().includes(searchQuery.toLowerCase());
+                    
+                    // Base ecosystem filter
+                    const matchesBaseFilter = !showBaseOnly || (coin as any).isBaseEcosystem;
+                    
+                    return matchesSearch && matchesBaseFilter;
+                  })
+                  .map((coin) => {
                   const isSelected = selectedCoinsToAdd.has(coin.id);
                   const isAlreadyAdded = (cryptocurrencies || []).some(c => c.id === coin.id);
                   
@@ -739,10 +795,22 @@ export default function Dashboard() {
                 </Button>
                 <Button 
                   onClick={() => {
-                    // TODO: Add selected coins to the dashboard
-                    console.log('Adding coins:', Array.from(selectedCoinsToAdd));
+                    // Add selected coins to watchlist
+                    const coinsToAdd = Array.from(selectedCoinsToAdd);
+                    const newWatchlist = [...userWatchlist, ...coinsToAdd];
+                    const uniqueWatchlist = [...new Set(newWatchlist)]; // Remove duplicates
+                    
+                    setUserWatchlist(uniqueWatchlist);
+                    localStorage.setItem('crypto-watchlist', JSON.stringify(uniqueWatchlist));
+                    
+                    console.log('Added coins to watchlist:', coinsToAdd);
+                    console.log('New watchlist:', uniqueWatchlist);
+                    
                     setIsAddCoinsModalOpen(false);
                     setSelectedCoinsToAdd(new Set());
+                    
+                    // Refetch cryptocurrency data to show new coins
+                    refetchCrypto();
                   }}
                   disabled={selectedCoinsToAdd.size === 0}
                 >
