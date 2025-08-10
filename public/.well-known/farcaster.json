@@ -9,15 +9,14 @@
     "name": "BasedNews",
     "subtitle": "Base News and Crypto Tracker",
     "description": "Real-time crypto news and market data for Base ecosystem. Track prices, view charts, and stay updated with latest crypto news.",
-    "iconUrl": "https://based-news-eight.vercel.app/icon.png",
+    "iconUrl": "https://based-news-eight.vercel.app/icon.svg",
     "homeUrl": "https://based-news-eight.vercel.app",
-    "splashImageUrl": "https://based-news-eight.vercel.app/splash.png",
+    "splashImageUrl": "https://based-news-eight.vercel.app/splash.svg",
     "splashBackgroundColor": "#0052ff",
-    "heroImageUrl": "https://based-news-eight.vercel.app/hero.png",
+    "heroImageUrl": "https://based-news-eight.vercel.app/hero.svg",
     "tagline": "Your Base crypto companion",
     "screenshotUrls": [
-      "https://based-news-eight.vercel.app/screenshot1.png",
-      "https://based-news-eight.vercel.app/screenshot2.png"
+      "https://based-news-eight.vercel.app/screenshot1.png"
     ],
     "primaryCategory": "news-media",
     "tags": [
