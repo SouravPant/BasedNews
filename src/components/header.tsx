@@ -42,27 +42,27 @@ export function Header({ lastUpdated }: HeaderProps) {
   return (
     <>
       <BaseMiniAppHeader />
-      <header className="bg-based-surface border-b border-border sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="bg-based-surface border-b border-border sticky top-0 z-50 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-3"> {/* Reduced padding */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Zap className="w-6 h-6 text-white" />
+              <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center"> {/* Slightly smaller */}
+                <Zap className="w-5 h-5 text-white" /> {/* Reduced icon size */}
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">Based Dashboard</h1>
-                <p className="text-xs text-muted-foreground">Market Data & Analytics</p>
+                <h1 className="text-lg font-bold text-foreground">Based Dashboard</h1> {/* Smaller title */}
+                <p className="text-xs text-muted-foreground">Market Analytics</p> {/* Shorter subtitle */}
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3"> {/* Reduced spacing */}
               <BaseSocialFeatures />
               
-              <div className="flex items-center space-x-2 text-sm">
+              <div className="hidden sm:flex items-center space-x-2 text-sm"> {/* Hide on mobile */}
                 <span className="text-foreground">{formatLastUpdated(lastUpdated)}</span>
               </div>
               
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <div className="hidden sm:flex items-center space-x-2 text-sm text-muted-foreground"> {/* Hide on mobile */}
                 <Clock className="w-4 h-4" />
                 <span>{currentTime}</span>
               </div>

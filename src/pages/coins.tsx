@@ -158,15 +158,7 @@ export function Coins() {
             
             <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
               <ThemeToggle />
-              <div className="hidden sm:block" style={{
-                padding: '8px 16px',
-                backgroundColor: 'var(--muted)',
-                borderRadius: '6px',
-                fontSize: '14px',
-                color: 'var(--muted-foreground)'
-              }}>
-                🔗 Wallet (Coming Soon)
-              </div>
+              {/* Removed wallet text for cleaner professional look */}
             </div>
           </div>
         </div>

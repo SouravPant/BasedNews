@@ -303,16 +303,21 @@ export function MobileBaseCoins() {
             alignItems: 'center',
             gap: '8px'
           }}>
-            🔵 Base Ecosystem
+            <div style={{
+              background: 'var(--primary)',
+              color: 'white',
+              width: '28px',
+              height: '28px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Coins size={16} />
+            </div>
+            Base Ecosystem
           </h1>
-          <div style={{
-            fontSize: '12px',
-            color: 'var(--muted-foreground)',
-            textAlign: 'right'
-          }}>
-            <div>{filteredCoins.length} coins</div>
-            <div>Live prices</div>
-          </div>
+          {/* Removed coins count for cleaner look */}
         </div>
 
         {/* Search Bar */}

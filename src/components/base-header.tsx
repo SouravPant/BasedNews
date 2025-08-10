@@ -19,7 +19,7 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
       WebkitBackdropFilter: 'blur(20px)'
     }}>
       <div style={{
-        padding: '16px 20px',
+        padding: '12px 16px', // Reduced padding for mobile
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -29,7 +29,7 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
+          gap: '10px', // Reduced gap for mobile
           minWidth: 0,
           flex: 1
         }}>
@@ -37,14 +37,14 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
             <div className="base-logo" style={{
               background: 'var(--base-blue)',
               color: 'white',
-              width: '36px',
-              height: '36px',
-              borderRadius: '8px',
+              width: '32px', // Smaller on mobile
+              height: '32px',
+              borderRadius: '6px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
-              fontSize: '20px',
+              fontSize: '16px',
               fontFamily: '"Inter", system-ui, sans-serif'
             }}>
               B
@@ -53,22 +53,24 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
           
           <div style={{ minWidth: 0, flex: 1 }}>
             <h1 className="base-heading" style={{
-              fontSize: '22px', // Slightly smaller
+              fontSize: '20px', // Smaller for mobile
               fontWeight: '800',
               color: 'var(--foreground)',
               margin: 0,
               letterSpacing: '-0.02em',
-              lineHeight: '1.1' // Tighter line height
+              lineHeight: '1.1',
+              whiteSpace: 'nowrap' // Prevent title wrapping
             }}>
               {title}
             </h1>
             {subtitle && (
               <p className="base-subtitle" style={{
-                fontSize: '12px', // Smaller subtitle
+                fontSize: '11px', // Even smaller subtitle
                 color: 'var(--muted-foreground)',
-                margin: '1px 0 0 0', // Reduced margin
+                margin: '1px 0 0 0',
                 fontWeight: '500',
-                lineHeight: '1.2'
+                lineHeight: '1.2',
+                whiteSpace: 'nowrap' // Prevent subtitle wrapping
               }}>
                 {subtitle}
               </p>
