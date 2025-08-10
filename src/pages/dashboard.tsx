@@ -232,14 +232,27 @@ export default function Dashboard() {
                 size="sm"
                 onClick={async () => {
                   try {
-                    // Fetch more coins for selection (up to 200)
-                    const response = await fetch('/api/cryptocurrencies?per_page=200&includeBaseCoins=true');
+                    console.log('Fetching coins for modal...');
+                    // Start with a smaller, more manageable request
+                    const response = await fetch('/api/cryptocurrencies?per_page=100&includeBaseCoins=true');
+                    
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
                     const data = await response.json();
                     console.log('Available coins for selection:', data.length);
-                    setAvailableCoins(data);
-                    setIsAddCoinsModalOpen(true);
+                    
+                    if (Array.isArray(data) && data.length > 0) {
+                      setAvailableCoins(data);
+                      setIsAddCoinsModalOpen(true);
+                    } else {
+                      console.error('Invalid data format:', data);
+                      alert('Error loading coins. Please try again.');
+                    }
                   } catch (err) {
                     console.error('Error fetching coins:', err);
+                    alert('Error loading coins. Please try again.');
                   }
                 }}
                 className="flex items-center gap-2"

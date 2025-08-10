@@ -15,12 +15,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'GET') {
     try {
-      // Get page and per_page from query params
-      const page = parseInt(req.query.page as string) || 1;
-      const per_page = parseInt(req.query.per_page as string) || 20;
+      // Get parameters with validation
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const per_page = Math.min(Math.max(1, parseInt(req.query.per_page as string) || 20), 250);
       const includeStablecoins = req.query.includeStablecoins === 'true';
       const includeBaseCoins = req.query.includeBaseCoins === 'true';
-      const idsParam = req.query.ids as string; // Comma-separated list of coin IDs
+      const idsParam = req.query.ids as string;
+      
+      console.log('API called with params:', { page, per_page, includeStablecoins, includeBaseCoins, idsParam });
       
       // Base ecosystem coins for priority inclusion
       const baseEcosystemCoins = [
@@ -32,8 +34,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       let allCoins = [];
 
       // If specific IDs are requested, fetch them first
-      if (idsParam) {
+      if (idsParam && idsParam.trim()) {
         const requestedIds = idsParam.split(',').map(id => id.trim()).filter(Boolean);
+        console.log('Fetching specific coins:', requestedIds);
+        
         if (requestedIds.length > 0) {
           try {
             const specificCoinsResponse = await axios.get(
@@ -41,67 +45,62 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               {
                 params: {
                   vs_currency: "usd",
-                  ids: requestedIds.join(','),
+                  ids: requestedIds.slice(0, 50).join(','), // Limit to 50 IDs per request
                   order: "market_cap_desc",
                   per_page: 250,
                   page: 1,
                   sparkline: false,
                   price_change_percentage: "24h"
-                }
+                },
+                timeout: 10000 // 10 second timeout
               }
             );
             allCoins = [...specificCoinsResponse.data];
+            console.log('Fetched specific coins:', allCoins.length);
           } catch (error) {
-            console.log('Error fetching specific coins, falling back to top coins...');
+            console.error('Error fetching specific coins:', error);
+            // Continue with fallback logic
           }
         }
       }
 
-      // If requesting Base coins specifically, fetch them and merge
-      if (includeBaseCoins && baseEcosystemCoins.length > 0) {
+      // If we need more coins or Base coins specifically
+      if (allCoins.length < per_page || includeBaseCoins) {
         try {
-          const baseCoinsResponse = await axios.get(
+          // For large requests, use pagination to avoid rate limits
+          const coinsToFetch = Math.min(per_page, 100); // Limit to 100 per request
+          
+          const response = await axios.get(
             "https://api.coingecko.com/api/v3/coins/markets",
             {
               params: {
                 vs_currency: "usd",
-                ids: baseEcosystemCoins.join(','),
                 order: "market_cap_desc",
-                per_page: 250,
-                page: 1,
+                per_page: coinsToFetch,
+                page: page,
                 sparkline: false,
                 price_change_percentage: "24h"
-              }
+              },
+              timeout: 10000 // 10 second timeout
             }
           );
+
           // Merge without duplicates
           const existingIds = new Set(allCoins.map(coin => coin.id));
-          const newBaseCoins = baseCoinsResponse.data.filter((coin: any) => !existingIds.has(coin.id));
-          allCoins = [...allCoins, ...newBaseCoins];
+          const additionalCoins = response.data.filter((coin: any) => !existingIds.has(coin.id));
+          allCoins = [...allCoins, ...additionalCoins];
+          console.log('Total coins after merge:', allCoins.length);
         } catch (error) {
-          console.log('Error fetching Base coins, continuing...');
-        }
-      }
-
-      // If we don't have enough coins yet, fetch top market cap coins
-      if (allCoins.length < per_page && !idsParam) {
-        const response = await axios.get(
-          "https://api.coingecko.com/api/v3/coins/markets",
-          {
-            params: {
-              vs_currency: "usd",
-              order: "market_cap_desc",
-              per_page: Math.min(per_page === 20 ? 20 : 200, 250), // Support up to 200 coins for selection
-              page: page,
-              sparkline: false,
-              price_change_percentage: "24h"
-            }
+          console.error('Error fetching top coins:', error);
+          
+          // If we have no coins at all, return a basic error response
+          if (allCoins.length === 0) {
+            return res.status(500).json({ 
+              message: "Failed to fetch cryptocurrency data",
+              error: error.message 
+            });
           }
-        );
-        // Merge without duplicates
-        const existingIds = new Set(allCoins.map(coin => coin.id));
-        const additionalCoins = response.data.filter((coin: any) => !existingIds.has(coin.id));
-        allCoins = [...allCoins, ...additionalCoins];
+        }
       }
 
       // Filter out stablecoins if not explicitly included
@@ -116,8 +115,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         filteredCoins = filteredCoins.filter((coin: any) => !excludedTokens.includes(coin.id));
       }
 
-      // For backward compatibility with dashboard, limit to specified amount
-      if (per_page <= 50) {
+      // Limit results
+      if (per_page < 100) {
         filteredCoins = filteredCoins.slice(0, per_page);
       }
 
@@ -136,10 +135,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         isBaseEcosystem: baseEcosystemCoins.includes(coin.id)
       }));
 
+      console.log('Returning cryptocurrencies:', cryptocurrencies.length);
       res.status(200).json(cryptocurrencies);
     } catch (error) {
-      console.error("Error fetching cryptocurrency data:", error);
-      res.status(500).json({ message: "Failed to fetch cryptocurrency data" });
+      console.error("Error in cryptocurrency API:", error);
+      res.status(500).json({ 
+        message: "Failed to fetch cryptocurrency data",
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      });
     }
   } else {
     res.status(405).json({ message: 'Method not allowed' });
