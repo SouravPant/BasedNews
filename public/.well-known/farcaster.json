@@ -15,6 +15,10 @@
     "splashBackgroundColor": "#0052ff",
     "heroImageUrl": "https://based-news-eight.vercel.app/hero.svg",
     "tagline": "Your Base crypto companion",
+    "buttonTitle": "View Latest News",
+    "ogTitle": "BasedNews - Base News",
+    "ogDescription": "Real-time crypto news and market data for Base ecosystem",
+    "ogImageUrl": "https://based-news-eight.vercel.app/hero.svg",
     "screenshotUrls": [
       "https://based-news-eight.vercel.app/screenshot1.png"
     ],
