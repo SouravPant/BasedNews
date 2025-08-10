@@ -396,22 +396,28 @@ function WorkingNewsApp() {
 }
 
 function App() {
-  const [currentPage, setCurrentPage] = React.useState('news');
+  // Initialize currentPage based on current URL path
+  const getInitialPage = () => {
+    const path = window.location.pathname;
+    console.log('Initial path:', path);
+    if (path === '/coins') {
+      return 'coins';
+    } else if (path === '/dashboard') {
+      return 'dashboard';
+    } else {
+      return 'news';
+    }
+  };
+
+  const [currentPage, setCurrentPage] = React.useState(getInitialPage);
 
   React.useEffect(() => {
-    // Simple routing based on URL path
-    const path = window.location.pathname;
-    if (path === '/coins') {
-      setCurrentPage('coins');
-    } else if (path === '/dashboard') {
-      setCurrentPage('dashboard');
-    } else {
-      setCurrentPage('news');
-    }
-
+    console.log('Current page state:', currentPage);
+    
     // Handle navigation
     const handlePopState = () => {
       const path = window.location.pathname;
+      console.log('Navigation to:', path);
       if (path === '/coins') {
         setCurrentPage('coins');
       } else if (path === '/dashboard') {
@@ -432,6 +438,7 @@ function App() {
       if (link && (link.href.endsWith('/') || link.href.endsWith('/coins') || link.href.endsWith('/dashboard'))) {
         e.preventDefault();
         const path = new URL(link.href).pathname;
+        console.log('Navigating to:', path);
         window.history.pushState({}, '', path);
         
         if (path === '/coins') {
@@ -447,6 +454,8 @@ function App() {
     document.addEventListener('click', handleNavClick);
     return () => document.removeEventListener('click', handleNavClick);
   }, []);
+
+  console.log('Rendering page:', currentPage);
 
   if (currentPage === 'coins') {
     return (
