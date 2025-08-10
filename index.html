@@ -19,23 +19,39 @@
     <meta property="og:image" content="https://based-news-eight.vercel.app/hero.svg" />
     <meta property="og:url" content="https://based-news-eight.vercel.app" />
     <meta property="og:type" content="website" />
-    
-    <!-- Farcaster SDK -->
-    <script src="https://sdk.farcaster.xyz/v0.14.1/farcaster.js" async></script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Farcaster SDK initialization -->
+    <!-- Farcaster Ready Signal via PostMessage -->
     <script>
-      // Initialize Farcaster SDK when it loads
-      window.addEventListener('load', function() {
-        if (window.farcaster && window.farcaster.actions) {
-          console.log('🎯 Farcaster SDK loaded, calling ready...');
-          window.farcaster.actions.ready();
+      // Send ready signal immediately and on load
+      function sendFarcasterReady() {
+        if (window.parent && window.parent !== window) {
+          console.log('🎯 Sending Farcaster ready signal...');
+          try {
+            window.parent.postMessage({ type: 'sdk.ready', data: {} }, '*');
+            window.parent.postMessage({ type: 'frame.ready', data: {} }, '*');
+            window.parent.postMessage({ type: 'sdk_ready' }, '*');
+            window.parent.postMessage({ type: 'miniapp-ready' }, '*');
+            console.log('✅ Ready signals sent successfully');
+          } catch (e) {
+            console.warn('Ready signal error:', e);
+          }
         }
-      });
+      }
+      
+      // Send immediately
+      sendFarcasterReady();
+      
+      // Send on load
+      window.addEventListener('load', sendFarcasterReady);
+      
+      // Send with delays
+      setTimeout(sendFarcasterReady, 100);
+      setTimeout(sendFarcasterReady, 500);
+      setTimeout(sendFarcasterReady, 1000);
     </script>
   </body>
 </html>

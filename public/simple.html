@@ -12,9 +12,6 @@
     <meta property="fc:frame:button:1:action" content="link" />
     <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app/simple.html" />
     
-    <!-- Farcaster SDK -->
-    <script src="https://sdk.farcaster.xyz/v0.14.1/farcaster.js" async></script>
-    
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -103,6 +100,18 @@
             border-radius: 8px;
             border: 1px solid rgba(0, 255, 0, 0.3);
         }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            .logo {
+                font-size: 36px;
+            }
+            .features {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -146,7 +155,7 @@
     </div>
 
     <script>
-        // Simple Farcaster Ready Signal
+        // Simple Farcaster Ready Signal - No External Dependencies
         function sendReadySignal() {
             const status = document.getElementById('status');
             
@@ -156,23 +165,29 @@
                     console.log('🎯 Sending Farcaster ready signal...');
                     status.innerHTML = '🎯 Sending ready signal to Farcaster...';
                     
-                    // Official Farcaster SDK ready call
-                    if (window.farcaster && window.farcaster.actions) {
-                        console.log('📞 Calling official Farcaster SDK ready method...');
-                        window.farcaster.actions.ready();
-                        status.innerHTML = '✅ Ready signal sent via SDK!';
-                    } else {
-                        // Fallback postMessage methods
-                        window.parent.postMessage({ type: 'sdk.ready', data: {} }, '*');
-                        window.parent.postMessage({ type: 'frame.ready', data: {} }, '*');
-                        window.parent.postMessage({ type: 'sdk_ready' }, '*');
-                        status.innerHTML = '✅ Ready signal sent via postMessage!';
-                    }
+                    // Send multiple message formats
+                    const messages = [
+                        { type: 'sdk.ready', data: {} },
+                        { type: 'frame.ready', data: {} },
+                        { type: 'sdk_ready' },
+                        { type: 'miniapp-ready' },
+                        { type: 'frame-ready' },
+                        { type: 'ready' }
+                    ];
                     
+                    messages.forEach(msg => {
+                        try {
+                            window.parent.postMessage(msg, '*');
+                        } catch (e) {
+                            console.warn('Message send failed:', e);
+                        }
+                    });
+                    
+                    status.innerHTML = '✅ Ready signal sent via postMessage!';
                     console.log('✅ Ready signals sent successfully');
                 } else {
                     console.log('ℹ️ Not in iframe context');
-                    status.innerHTML = '✅ Mini app loaded successfully!';
+                    status.innerHTML = '✅ Mini app loaded successfully! (Direct access)';
                 }
             } catch (error) {
                 console.error('❌ Error sending ready signal:', error);
@@ -184,22 +199,18 @@
         document.addEventListener('DOMContentLoaded', sendReadySignal);
         window.addEventListener('load', sendReadySignal);
         
-        // Wait for SDK to load
+        // Send immediately if DOM is already ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', sendReadySignal);
+        } else {
+            sendReadySignal();
+        }
+        
+        // Additional attempts with delays
+        setTimeout(sendReadySignal, 100);
         setTimeout(sendReadySignal, 500);
         setTimeout(sendReadySignal, 1000);
         setTimeout(sendReadySignal, 2000);
-        
-        // Check for SDK periodically
-        const checkSDK = setInterval(() => {
-            if (window.farcaster && window.farcaster.actions) {
-                console.log('🎯 Farcaster SDK detected, calling ready...');
-                window.farcaster.actions.ready();
-                clearInterval(checkSDK);
-            }
-        }, 1000);
-        
-        // Clear interval after 10 seconds
-        setTimeout(() => clearInterval(checkSDK), 10000);
     </script>
 </body>
 </html>
