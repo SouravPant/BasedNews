@@ -21,8 +21,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const includeStablecoins = req.query.includeStablecoins === 'true';
       const includeBaseCoins = req.query.includeBaseCoins === 'true';
       const idsParam = req.query.ids as string;
+      const searchQuery = req.query.search as string; // Add search parameter support
       
-      console.log('API called with params:', { page, per_page, includeStablecoins, includeBaseCoins, idsParam });
+      console.log('API called with params:', { page, per_page, includeStablecoins, includeBaseCoins, idsParam, searchQuery });
       
       // Base ecosystem coins for priority inclusion
       const baseEcosystemCoins = [
@@ -65,10 +66,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       // If we need more coins or Base coins specifically
-      if (allCoins.length < per_page || includeBaseCoins) {
+      if (allCoins.length < per_page || includeBaseCoins || searchQuery) {
         try {
-          // For large requests, use pagination to avoid rate limits
-          const coinsToFetch = Math.min(per_page, 100); // Limit to 100 per request
+          // For search queries, fetch more coins to search through
+          const coinsToFetch = searchQuery ? Math.min(per_page * 10, 250) : Math.min(per_page, 100);
           
           const response = await axios.get(
             "https://api.coingecko.com/api/v3/coins/markets",
@@ -110,6 +111,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ];
 
       let filteredCoins = allCoins;
+      
+      // Apply search filter if provided
+      if (searchQuery && searchQuery.trim()) {
+        const searchTerm = searchQuery.toLowerCase().trim();
+        filteredCoins = filteredCoins.filter((coin: any) => 
+          coin.name.toLowerCase().includes(searchTerm) ||
+          coin.symbol.toLowerCase().includes(searchTerm) ||
+          coin.id.toLowerCase().includes(searchTerm)
+        );
+        console.log(`Search "${searchTerm}" found ${filteredCoins.length} coins`);
+      }
       
       if (!includeStablecoins) {
         filteredCoins = filteredCoins.filter((coin: any) => !excludedTokens.includes(coin.id));
