@@ -7,6 +7,44 @@ import { MiniAppDashboard } from "./components/mini-app-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 import { BaseWalletConnect } from "./components/base-wallet-connect";
 
+// Farcaster SDK Integration
+const useFarcasterSDK = () => {
+  React.useEffect(() => {
+    const initializeSDK = async () => {
+      try {
+        // Try to import and use the Farcaster SDK
+        const sdk = await import('@farcaster/frame-sdk');
+        if (sdk && sdk.actions && sdk.actions.ready) {
+          console.log('🎯 Calling Farcaster SDK ready...');
+          await sdk.actions.ready();
+          console.log('✅ Farcaster SDK ready called successfully');
+        }
+      } catch (error) {
+        console.log('⚠️ Farcaster SDK not available, using fallback...');
+        // Fallback: Use postMessage to signal ready
+        try {
+          if (window.parent && window.parent !== window) {
+            console.log('🔄 Sending ready signal via postMessage...');
+            window.parent.postMessage({ type: 'miniapp-ready' }, '*');
+            window.parent.postMessage({ type: 'frame-ready' }, '*');
+            console.log('✅ Ready signals sent via postMessage');
+          }
+        } catch (postMessageError) {
+          console.log('❌ PostMessage fallback failed:', postMessageError);
+        }
+      }
+    };
+
+    // Call immediately when component mounts
+    initializeSDK();
+
+    // Also call after a small delay to ensure DOM is ready
+    const timeoutId = setTimeout(initializeSDK, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, []);
+};
+
 function WorkingNewsApp() {
   const [news, setNews] = React.useState([]);
   const [status, setStatus] = React.useState('Loading news...');
@@ -396,6 +434,9 @@ function WorkingNewsApp() {
 }
 
 function App() {
+  // Initialize Farcaster SDK
+  useFarcasterSDK();
+
   // Initialize currentPage based on current URL path
   const getInitialPage = () => {
     const path = window.location.pathname;
