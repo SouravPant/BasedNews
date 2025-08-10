@@ -47,21 +47,21 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl w-full h-[600px] bg-card border-border text-card-foreground">
-        <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <div className="flex items-center space-x-3">
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[85vh] sm:h-[600px] bg-card border-border text-card-foreground p-3 sm:p-6">
+        <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-4">
+          <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
             {cryptocurrency?.image && (
               <img 
                 src={cryptocurrency.image} 
                 alt={cryptocurrency.name}
-                className="w-8 h-8 rounded-full"
+                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex-shrink-0"
               />
             )}
-            <div>
-              <DialogTitle className="text-xl font-bold text-card-foreground">
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="text-lg sm:text-xl font-bold text-card-foreground truncate">
                 {cryptocurrency.name} Chart
               </DialogTitle>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">
                 Current Price: ${parseFloat(cryptocurrency.currentPrice || '0').toLocaleString('en-US', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: parseFloat(cryptocurrency.currentPrice || '0') < 1 ? 6 : 2,
@@ -72,14 +72,14 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
         </DialogHeader>
 
         {/* Time Range Selector */}
-        <div className="flex space-x-2 mb-4">
+        <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
           {timeRangeOptions.map((option) => (
             <Button
               key={option.days}
               variant={selectedDays === option.days ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedDays(option.days)}
-              className="text-xs"
+              className="text-xs px-2 py-1 sm:px-3 sm:py-2 h-7 sm:h-8"
             >
               {option.label}
             </Button>

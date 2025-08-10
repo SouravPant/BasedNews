@@ -132,31 +132,33 @@ export function Coins() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <Link to="/">
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                  <Home className="h-4 w-4" />
-                  Back to News
+                <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
+                  <Home className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Back to News</span>
+                  <span className="sm:hidden">Back</span>
                 </Button>
               </Link>
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-white" />
+              <div className="bg-blue-600 p-1.5 sm:p-2 rounded-lg">
+                <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Top Cryptocurrencies
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white truncate">
+                  <span className="sm:hidden">Crypto</span>
+                  <span className="hidden sm:inline">Top Cryptocurrencies</span>
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
                   Real-time prices for top 100 cryptocurrencies
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
               <ThemeToggle />
-              <div style={{
+              <div className="hidden sm:block" style={{
                 padding: '8px 16px',
                 backgroundColor: 'var(--muted)',
                 borderRadius: '6px',
@@ -171,22 +173,22 @@ export function Coins() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         {/* Search and Sort Controls */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-2 sm:gap-4">
           <div className="relative flex-1">
             <Input
               type="text"
               placeholder="Search cryptocurrencies..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-8 sm:pl-10 text-sm h-8 sm:h-10"
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
           </div>
           
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="w-full sm:w-48 h-8 sm:h-10 text-sm">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -247,7 +249,7 @@ export function Coins() {
               return (
                 <Card 
                   key={crypto.id}
-                  className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                  className="p-2 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
                   onClick={() => handleCryptoClick(crypto)}
                 >
                   {/* Desktop Layout */}
@@ -295,20 +297,20 @@ export function Coins() {
 
                   {/* Mobile Layout */}
                   <div className="lg:hidden">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono flex-shrink-0">
                           #{crypto.marketCapRank}
                         </span>
                         {crypto.image ? (
                           <img 
                             src={crypto.image} 
                             alt={crypto.name}
-                            className="w-6 h-6 rounded-full"
+                            className="w-5 h-5 rounded-full flex-shrink-0"
                           />
                         ) : null}
-                        <div>
-                          <div className="font-semibold text-gray-900 dark:text-white text-sm">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-gray-900 dark:text-white text-sm truncate">
                             {crypto.name}
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
@@ -316,7 +318,7 @@ export function Coins() {
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex-shrink-0">
                         <div className="font-mono font-semibold text-gray-900 dark:text-white text-sm">
                           {formatPrice(crypto.currentPrice)}
                         </div>

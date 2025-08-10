@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Chart from 'react-apexcharts';
@@ -18,7 +18,17 @@ interface CryptoChartProps {
 
 export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChange }: CryptoChartProps) {
   const [chartType, setChartType] = useState<'line' | 'area'>('line');
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
 
   // Calculate price change
@@ -39,11 +49,11 @@ export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChang
   const chartOptions = {
     chart: {
       type: chartType as any,
-      height: 400,
+      height: isMobile ? 280 : 400,
       toolbar: {
         show: true,
         tools: {
-          download: true,
+          download: !isMobile,
           selection: true,
           zoom: true,
           zoomin: true,
@@ -126,18 +136,19 @@ export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChang
 
   return (
     <div className="w-full h-full">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 sm:mb-4 gap-2">
         <div className="flex items-center gap-2">
-          <Badge variant={isPositive ? 'default' : 'destructive'}>
+          <Badge variant={isPositive ? 'default' : 'destructive'} className="text-xs px-2 py-1">
             {isPositive ? '+' : ''}{priceChangePercentage.toFixed(2)}%
           </Badge>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-1 sm:gap-2">
           <Button
             variant={chartType === 'line' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setChartType('line')}
+            className="text-xs px-2 py-1 h-7 sm:h-8"
           >
             Line
           </Button>
@@ -145,18 +156,19 @@ export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChang
             variant={chartType === 'area' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setChartType('area')}
+            className="text-xs px-2 py-1 h-7 sm:h-8"
           >
             Area
           </Button>
         </div>
       </div>
       
-      <div className="w-full h-96">
+      <div className="w-full h-72 sm:h-96">
         <Chart
           options={chartOptions}
           series={series}
           type={chartType}
-          height={400}
+          height={isMobile ? 280 : 400}
           width="100%"
         />
       </div>

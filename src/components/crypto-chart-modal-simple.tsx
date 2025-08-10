@@ -10,6 +10,17 @@ interface CryptoChartModalProps {
 // ApexCharts component - same as the working version
 function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; price: number }>, coinName: string, days: number }) {
   const [chartType, setChartType] = React.useState<'line' | 'area'>('area');
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   if (!data || data.length === 0) return null;
 
@@ -31,11 +42,11 @@ function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; pr
   const chartOptions = {
     chart: {
       type: chartType as any,
-      height: 350,
+      height: isMobile ? 280 : 350,
       toolbar: {
         show: true,
         tools: {
-          download: true,
+          download: !isMobile,
           selection: true,
           zoom: true,
           zoomin: true,
@@ -121,16 +132,18 @@ function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; pr
   }];
 
   return (
-    <div style={{ marginTop: '20px' }}>
+    <div style={{ marginTop: isMobile ? '12px' : '20px' }}>
       <div style={{ 
         display: 'flex', 
+        flexDirection: isMobile ? 'column' : 'row',
         justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: '20px'
+        alignItems: isMobile ? 'flex-start' : 'center',
+        marginBottom: isMobile ? '12px' : '20px',
+        gap: isMobile ? '8px' : '0'
       }}>
         <div>
           <h3 style={{ 
-            fontSize: '18px', 
+            fontSize: isMobile ? '16px' : '18px', 
             fontWeight: '600', 
             margin: '0 0 4px 0',
             color: 'var(--foreground)'
@@ -141,7 +154,7 @@ function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; pr
             display: 'flex', 
             alignItems: 'center', 
             gap: '8px',
-            fontSize: '14px'
+            fontSize: isMobile ? '12px' : '14px'
           }}>
             <span style={{ 
               color: isPositive ? '#22c55e' : '#ef4444',
@@ -155,16 +168,16 @@ function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; pr
           </div>
         </div>
         
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: isMobile ? '6px' : '8px' }}>
           <button
             onClick={() => setChartType('area')}
             style={{
-              padding: '6px 12px',
+              padding: isMobile ? '4px 8px' : '6px 12px',
               background: chartType === 'area' ? 'var(--base-blue)' : 'var(--secondary)',
               color: chartType === 'area' ? 'white' : 'var(--secondary-foreground)',
               border: 'none',
               borderRadius: '6px',
-              fontSize: '12px',
+              fontSize: isMobile ? '11px' : '12px',
               cursor: 'pointer'
             }}
           >
@@ -173,12 +186,12 @@ function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; pr
           <button
             onClick={() => setChartType('line')}
             style={{
-              padding: '6px 12px',
+              padding: isMobile ? '4px 8px' : '6px 12px',
               background: chartType === 'line' ? 'var(--base-blue)' : 'var(--secondary)',
               color: chartType === 'line' ? 'white' : 'var(--secondary-foreground)',
               border: 'none',
               borderRadius: '6px',
-              fontSize: '12px',
+              fontSize: isMobile ? '11px' : '12px',
               cursor: 'pointer'
             }}
           >
@@ -191,7 +204,7 @@ function WorkingChart({ data, coinName, days }: { data: Array<{ time: string; pr
         options={chartOptions} 
         series={series} 
         type={chartType}
-        height={350} 
+        height={isMobile ? 280 : 350} 
       />
     </div>
   );
@@ -202,6 +215,17 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
   const [loading, setLoading] = React.useState(false);
   const [timeframe, setTimeframe] = React.useState('7');
   const [coinDescription, setCoinDescription] = React.useState('');
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   React.useEffect(() => {
     if (isOpen && cryptocurrency?.id) {
@@ -385,15 +409,15 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: '20px',
+      padding: isMobile ? '10px' : '20px',
       backdropFilter: 'blur(4px)'
     }}>
       <div style={{
         backgroundColor: 'var(--background)',
-        borderRadius: '16px',
-        maxWidth: '800px',
+        borderRadius: isMobile ? '12px' : '16px',
+        maxWidth: isMobile ? '100%' : '800px',
         width: '100%',
-        maxHeight: '90vh',
+        maxHeight: isMobile ? '95vh' : '90vh',
         border: '1px solid var(--border)',
         boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
         display: 'flex',
@@ -402,34 +426,38 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
       }}>
         {/* Header */}
         <div style={{
-          padding: '24px 24px 0 24px',
+          padding: isMobile ? '16px 16px 0 16px' : '24px 24px 0 24px',
           borderBottom: '1px solid var(--border)'
         }}>
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            marginBottom: '16px'
+            marginBottom: isMobile ? '12px' : '16px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '12px', flex: 1, minWidth: 0 }}>
               {cryptocurrency?.image && (
                 <img 
                   src={cryptocurrency.image}
                   alt={cryptocurrency.name}
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%'
+                    width: isMobile ? '32px' : '40px',
+                    height: isMobile ? '32px' : '40px',
+                    borderRadius: '50%',
+                    flexShrink: 0
                   }}
                 />
               )}
-              <div>
+              <div style={{ minWidth: 0, flex: 1 }}>
                 <h2 style={{
-                  fontSize: '24px',
+                  fontSize: isMobile ? '18px' : '24px',
                   fontWeight: '700',
                   color: 'var(--foreground)',
                   margin: '0 0 4px 0',
-                  fontFamily: '"Inter", system-ui, sans-serif'
+                  fontFamily: '"Inter", system-ui, sans-serif',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
                 }}>
                   {cryptocurrency?.name || 'Unknown'}
                 </h2>
@@ -437,7 +465,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  fontSize: '14px',
+                  fontSize: isMobile ? '12px' : '14px',
                   color: 'var(--muted-foreground)'
                 }}>
                   <span style={{ 
@@ -454,18 +482,19 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
             <button
               onClick={onClose}
               style={{
-                width: '32px',
-                height: '32px',
+                width: isMobile ? '28px' : '32px',
+                height: isMobile ? '28px' : '32px',
                 borderRadius: '50%',
                 backgroundColor: 'var(--muted)',
                 border: '1px solid var(--border)',
                 color: 'var(--muted-foreground)',
-                fontSize: '18px',
+                fontSize: isMobile ? '16px' : '18px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                flexShrink: 0
               }}
             >
               ×
@@ -475,13 +504,13 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
           {/* Price Information */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-            gap: '16px',
-            marginBottom: '20px'
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: isMobile ? '12px' : '16px',
+            marginBottom: isMobile ? '12px' : '20px'
           }}>
             <div>
               <div style={{
-                fontSize: '12px',
+                fontSize: isMobile ? '10px' : '12px',
                 color: 'var(--muted-foreground)',
                 marginBottom: '4px',
                 fontWeight: '500'
@@ -489,7 +518,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
                 Current Price
               </div>
               <div style={{
-                fontSize: '20px',
+                fontSize: isMobile ? '16px' : '20px',
                 fontWeight: '700',
                 color: 'var(--foreground)'
               }}>
@@ -498,7 +527,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
             </div>
             <div>
               <div style={{
-                fontSize: '12px',
+                fontSize: isMobile ? '10px' : '12px',
                 color: 'var(--muted-foreground)',
                 marginBottom: '4px',
                 fontWeight: '500'
@@ -506,16 +535,16 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
                 24h Change
               </div>
               <div style={{
-                fontSize: '16px',
+                fontSize: isMobile ? '14px' : '16px',
                 fontWeight: '600',
                 color: priceChange24h >= 0 ? '#22c55e' : '#ef4444'
               }}>
                 {formatPercentage(priceChange24h)}
               </div>
             </div>
-            <div>
+            <div style={{ gridColumn: isMobile ? 'span 2' : 'auto' }}>
               <div style={{
-                fontSize: '12px',
+                fontSize: isMobile ? '10px' : '12px',
                 color: 'var(--muted-foreground)',
                 marginBottom: '4px',
                 fontWeight: '500'
@@ -523,7 +552,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
                 Market Cap
               </div>
               <div style={{
-                fontSize: '16px',
+                fontSize: isMobile ? '14px' : '16px',
                 fontWeight: '600',
                 color: 'var(--foreground)'
               }}>
@@ -535,14 +564,15 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
           {/* Timeframe Selection */}
           <div style={{
             display: 'flex',
-            gap: '8px',
-            marginBottom: '20px'
+            flexWrap: 'wrap',
+            gap: isMobile ? '6px' : '8px',
+            marginBottom: isMobile ? '12px' : '20px'
           }}>
             <span style={{
-              fontSize: '14px',
+              fontSize: isMobile ? '12px' : '14px',
               color: 'var(--muted-foreground)',
               alignSelf: 'center',
-              marginRight: '8px',
+              marginRight: isMobile ? '4px' : '8px',
               fontWeight: '500'
             }}>
               Price Chart
@@ -552,12 +582,12 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
                 key={days}
                 onClick={() => setTimeframe(days)}
                 style={{
-                  padding: '6px 12px',
+                  padding: isMobile ? '4px 8px' : '6px 12px',
                   background: timeframe === days ? 'var(--base-blue)' : 'var(--secondary)',
                   color: timeframe === days ? 'white' : 'var(--secondary-foreground)',
                   border: '1px solid var(--border)',
                   borderRadius: '6px',
-                  fontSize: '12px',
+                  fontSize: isMobile ? '10px' : '12px',
                   cursor: 'pointer',
                   fontWeight: '600'
                 }}
@@ -572,20 +602,20 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
         <div style={{
           flex: 1,
           overflow: 'auto',
-          padding: '0 24px 24px 24px'
+          padding: isMobile ? '0 16px 16px 16px' : '0 24px 24px 24px'
         }}>
           {loading ? (
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              height: '300px',
+              height: isMobile ? '250px' : '300px',
               flexDirection: 'column',
-              gap: '16px'
+              gap: isMobile ? '12px' : '16px'
             }}>
               <div style={{
-                width: '40px',
-                height: '40px',
+                width: isMobile ? '32px' : '40px',
+                height: isMobile ? '32px' : '40px',
                 border: '3px solid var(--border)',
                 borderTop: '3px solid var(--base-blue)',
                 borderRadius: '50%',
@@ -594,7 +624,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
               <p style={{
                 color: 'var(--muted-foreground)',
                 margin: 0,
-                fontSize: '14px'
+                fontSize: isMobile ? '12px' : '14px'
               }}>
                 Loading chart data...
               </p>
@@ -610,15 +640,15 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              height: '300px',
+              height: isMobile ? '250px' : '300px',
               flexDirection: 'column',
-              gap: '16px'
+              gap: isMobile ? '12px' : '16px'
             }}>
-              <div style={{ fontSize: '48px' }}>📊</div>
+              <div style={{ fontSize: isMobile ? '32px' : '48px' }}>📊</div>
               <p style={{
                 color: 'var(--muted-foreground)',
                 margin: 0,
-                fontSize: '16px',
+                fontSize: isMobile ? '14px' : '16px',
                 textAlign: 'center'
               }}>
                 Chart data temporarily unavailable
@@ -626,7 +656,7 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
               <p style={{
                 color: 'var(--muted-foreground)',
                 margin: 0,
-                fontSize: '14px',
+                fontSize: isMobile ? '12px' : '14px',
                 textAlign: 'center'
               }}>
                 Showing fallback price: {formatPrice(currentPrice)}
@@ -635,29 +665,55 @@ export function CryptoChartModalSimple({ isOpen, onClose, cryptocurrency }: Cryp
           )}
         </div>
 
-        {/* Analysis Section */}
-        <div style={{
-          padding: '20px 24px',
-          borderTop: '1px solid var(--border)',
-          backgroundColor: 'var(--muted)'
-        }}>
-          <h3 style={{
-            fontSize: '16px',
-            fontWeight: '600',
-            color: 'var(--foreground)',
-            margin: '0 0 12px 0'
+        {/* Analysis Section - More Compact on Mobile */}
+        {!isMobile && (
+          <div style={{
+            padding: '20px 24px',
+            borderTop: '1px solid var(--border)',
+            backgroundColor: 'var(--muted)'
           }}>
-            💡 About {cryptocurrency?.name || 'This Token'}
-          </h3>
-          <p style={{
-            fontSize: '14px',
-            color: 'var(--muted-foreground)',
-            margin: 0,
-            lineHeight: '1.5'
+            <h3 style={{
+              fontSize: '16px',
+              fontWeight: '600',
+              color: 'var(--foreground)',
+              margin: '0 0 12px 0'
+            }}>
+              💡 About {cryptocurrency?.name || 'This Token'}
+            </h3>
+            <p style={{
+              fontSize: '14px',
+              color: 'var(--muted-foreground)',
+              margin: 0,
+              lineHeight: '1.5'
+            }}>
+              {coinDescription || 'Loading description...'}
+            </p>
+          </div>
+        )}
+        
+        {/* Mobile: Compact Description at Bottom */}
+        {isMobile && coinDescription && (
+          <div style={{
+            padding: '12px 16px',
+            borderTop: '1px solid var(--border)',
+            backgroundColor: 'var(--muted)',
+            maxHeight: '80px',
+            overflow: 'hidden'
           }}>
-            {coinDescription || 'Loading description...'}
-          </p>
-        </div>
+            <p style={{
+              fontSize: '12px',
+              color: 'var(--muted-foreground)',
+              margin: 0,
+              lineHeight: '1.4',
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden'
+            }}>
+              {coinDescription}
+            </p>
+          </div>
+        )}
       </div>
 
       <style jsx>{`
