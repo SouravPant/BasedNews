@@ -79,7 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (coinGeckoResponse.data.data && coinGeckoResponse.data.data.length > 0) {
           console.log('✅ CoinGecko News API success: Fetched', coinGeckoResponse.data.data.length, 'articles');
           
-          const newsArticles = coinGeckoResponse.data.data.slice(0, 10).map((article: any) => ({
+          const newsArticles = coinGeckoResponse.data.data.slice(0, 20).map((article: any) => ({
             title: article.title || 'Untitled',
             url: article.url,
             source: article.author || 'CoinGecko',

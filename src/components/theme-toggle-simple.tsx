@@ -174,13 +174,14 @@ export function ThemeToggleSimple({ inlineMode = false }: ThemeToggleProps) {
             style={{
               position: 'absolute',
               top: '100%',
-              left: 0,
+              right: 0, // Changed from left: 0 to right: 0 for better mobile positioning
               marginTop: '8px',
               background: 'var(--popover)',
               border: '1px solid var(--border)',
               borderRadius: '16px',
               padding: '8px',
-              minWidth: '220px',
+              minWidth: '200px', // Reduced from 220px to 200px for better mobile fit
+              maxWidth: '200px', // Added max-width to prevent expansion
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
