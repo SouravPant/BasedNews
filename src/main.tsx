@@ -7,41 +7,54 @@ import { MiniAppDashboard } from "./components/mini-app-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 import { BaseWalletConnect } from "./components/base-wallet-connect";
 
-// Farcaster SDK Integration
-const useFarcasterSDK = () => {
+// Simple Farcaster Ready Signal
+const useFarcasterReady = () => {
   React.useEffect(() => {
-    const initializeSDK = async () => {
+    const sendReadySignal = () => {
       try {
-        // Try to import and use the Farcaster SDK
-        const sdk = await import('@farcaster/frame-sdk');
-        if (sdk && sdk.actions && sdk.actions.ready) {
-          console.log('🎯 Calling Farcaster SDK ready...');
-          await sdk.actions.ready();
-          console.log('✅ Farcaster SDK ready called successfully');
+        if (window.parent && window.parent !== window) {
+          console.log('🎯 Sending Farcaster ready signal...');
+          
+          // Primary method - what Farcaster docs specify
+          window.parent.postMessage({ type: 'sdk_ready' }, '*');
+          
+          // Backup methods
+          window.parent.postMessage({ type: 'miniapp-ready' }, '*');
+          window.parent.postMessage({ type: 'frame-ready' }, '*');
+          
+          console.log('✅ Ready signals sent successfully');
+        } else {
+          console.log('ℹ️ Not in iframe context, skipping ready signal');
         }
       } catch (error) {
-        console.log('⚠️ Farcaster SDK not available, using fallback...');
-        // Fallback: Use postMessage to signal ready
-        try {
-          if (window.parent && window.parent !== window) {
-            console.log('🔄 Sending ready signal via postMessage...');
-            window.parent.postMessage({ type: 'miniapp-ready' }, '*');
-            window.parent.postMessage({ type: 'frame-ready' }, '*');
-            console.log('✅ Ready signals sent via postMessage');
-          }
-        } catch (postMessageError) {
-          console.log('❌ PostMessage fallback failed:', postMessageError);
-        }
+        console.error('❌ Error sending ready signal:', error);
       }
     };
 
-    // Call immediately when component mounts
-    initializeSDK();
+    // Send immediately when hook runs
+    sendReadySignal();
 
-    // Also call after a small delay to ensure DOM is ready
-    const timeoutId = setTimeout(initializeSDK, 1000);
+    // Send after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', sendReadySignal);
+    } else {
+      // DOM already ready, send after a small delay
+      setTimeout(sendReadySignal, 100);
+    }
 
-    return () => clearTimeout(timeoutId);
+    // Send after images and content are loaded
+    window.addEventListener('load', sendReadySignal);
+
+    // Send multiple times with delays to ensure it works
+    const timeouts = [500, 1000, 2000].map(delay => 
+      setTimeout(sendReadySignal, delay)
+    );
+
+    return () => {
+      document.removeEventListener('DOMContentLoaded', sendReadySignal);
+      window.removeEventListener('load', sendReadySignal);
+      timeouts.forEach(clearTimeout);
+    };
   }, []);
 };
 
@@ -434,8 +447,8 @@ function WorkingNewsApp() {
 }
 
 function App() {
-  // Initialize Farcaster SDK
-  useFarcasterSDK();
+  // Initialize Farcaster Ready Signal
+  useFarcasterReady();
 
   // Initialize currentPage based on current URL path
   const getInitialPage = () => {
