@@ -6,20 +6,48 @@ import { BaseNews } from "./components/base-news";
 import { MiniAppDashboard } from "./components/mini-app-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 
-// Simple Farcaster Ready Signal
+// Farcaster SDK Ready Signal
 const useFarcasterReady = () => {
   React.useEffect(() => {
     const sendReadySignal = () => {
       try {
+        // Check if we're in a Farcaster context
         if (window.parent && window.parent !== window) {
           console.log('🎯 Sending Farcaster ready signal...');
           
-          // Primary method - what Farcaster docs specify
-          window.parent.postMessage({ type: 'sdk_ready' }, '*');
+          // Official Farcaster SDK ready call
+          if (typeof window !== 'undefined' && window.parent) {
+            // Method 1: Official Farcaster SDK ready signal
+            window.parent.postMessage({
+              type: 'sdk.ready',
+              data: {}
+            }, '*');
+            
+            // Method 2: Alternative format
+            window.parent.postMessage({
+              type: 'frame.ready',
+              data: {}
+            }, '*');
+            
+            // Method 3: Backup legacy methods
+            window.parent.postMessage({ type: 'sdk_ready' }, '*');
+            window.parent.postMessage({ type: 'miniapp-ready' }, '*');
+            window.parent.postMessage({ type: 'frame-ready' }, '*');
+          }
           
-          // Backup methods
-          window.parent.postMessage({ type: 'miniapp-ready' }, '*');
-          window.parent.postMessage({ type: 'frame-ready' }, '*');
+          // Try to call the official SDK if available
+          if (typeof window !== 'undefined') {
+            // Check for official Farcaster SDK
+            if ((window as any).farcaster?.actions?.ready) {
+              console.log('📞 Calling official Farcaster SDK ready method...');
+              (window as any).farcaster.actions.ready();
+            }
+            // Fallback to legacy SDK format
+            else if ((window as any).sdk?.actions?.ready) {
+              console.log('📞 Calling legacy SDK ready method...');
+              (window as any).sdk.actions.ready();
+            }
+          }
           
           console.log('✅ Ready signals sent successfully');
         } else {
@@ -45,7 +73,7 @@ const useFarcasterReady = () => {
     window.addEventListener('load', sendReadySignal);
 
     // Send multiple times with delays to ensure it works
-    const timeouts = [500, 1000, 2000].map(delay => 
+    const timeouts = [500, 1000, 2000, 3000].map(delay => 
       setTimeout(sendReadySignal, delay)
     );
 
