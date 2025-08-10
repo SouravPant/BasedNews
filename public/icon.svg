@@ -1,0 +1,15 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#0052ff" rx="64"/>
+  
+  <!-- Inner container -->
+  <rect x="64" y="64" width="384" height="384" fill="#ffffff" rx="32"/>
+  
+  <!-- "B" for Based -->
+  <text x="256" y="320" font-family="Arial Black, sans-serif" font-size="200" font-weight="900" text-anchor="middle" fill="#0052ff">B</text>
+  
+  <!-- News indicator dots -->
+  <circle cx="180" cy="400" r="8" fill="#0052ff"/>
+  <circle cx="256" cy="400" r="8" fill="#0052ff"/>
+  <circle cx="332" cy="400" r="8" fill="#0052ff"/>
+</svg>

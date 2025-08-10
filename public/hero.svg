@@ -1,0 +1,25 @@
+<svg width="1200" height="400" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0052ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0066ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#heroGradient)"/>
+  
+  <!-- Main content -->
+  <text x="100" y="150" font-family="Arial Black, sans-serif" font-size="48" font-weight="900" fill="#ffffff">BasedNews</text>
+  <text x="100" y="200" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" opacity="0.9">Your Base crypto companion</text>
+  <text x="100" y="240" font-family="Arial, sans-serif" font-size="18" fill="#ffffff" opacity="0.8">Track prices • View charts • Stay updated</text>
+  
+  <!-- Chart icon representation -->
+  <g transform="translate(800, 80)">
+    <rect width="300" height="200" fill="#ffffff" opacity="0.1" rx="12"/>
+    <polyline points="20,160 60,120 100,140 140,100 180,80 220,60 260,40" stroke="#ffffff" stroke-width="4" fill="none"/>
+    <circle cx="60" r="6" cy="120" fill="#ffffff"/>
+    <circle cx="100" r="6" cy="140" fill="#ffffff"/>
+    <circle cx="140" r="6" cy="100" fill="#ffffff"/>
+    <circle cx="180" r="6" cy="80" fill="#ffffff"/>
+  </g>
+</svg>
