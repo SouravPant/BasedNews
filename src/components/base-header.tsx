@@ -19,17 +19,18 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
       WebkitBackdropFilter: 'blur(20px)'
     }}>
       <div style={{
-        padding: '12px 16px', // Reduced padding for mobile
+        padding: '10px 12px',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start', // Changed to flex-start for better mobile layout
         justifyContent: 'space-between',
-        maxWidth: '100%'
+        maxWidth: '100%',
+        gap: '8px'
       }}>
         {/* Left side - Logo and Title */}
         <div style={{
           display: 'flex',
-          alignItems: 'center',
-          gap: '10px', // Reduced gap for mobile
+          alignItems: 'flex-start', // Changed to flex-start
+          gap: '8px',
           minWidth: 0,
           flex: 1
         }}>
@@ -37,15 +38,16 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
             <div className="base-logo" style={{
               background: 'var(--base-blue)',
               color: 'white',
-              width: '32px', // Smaller on mobile
-              height: '32px',
+              width: '28px',
+              height: '28px',
               borderRadius: '6px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
-              fontSize: '16px',
-              fontFamily: '"Inter", system-ui, sans-serif'
+              fontSize: '14px',
+              fontFamily: '"Inter", system-ui, sans-serif',
+              flexShrink: 0 // Prevent logo from shrinking
             }}>
               B
             </div>
@@ -53,24 +55,22 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
           
           <div style={{ minWidth: 0, flex: 1 }}>
             <h1 className="base-heading" style={{
-              fontSize: '20px', // Smaller for mobile
-              fontWeight: '800',
+              fontSize: '18px', // Slightly larger but still compact
+              fontWeight: '700',
               color: 'var(--foreground)',
               margin: 0,
-              letterSpacing: '-0.02em',
-              lineHeight: '1.1',
-              whiteSpace: 'nowrap' // Prevent title wrapping
+              letterSpacing: '-0.01em',
+              lineHeight: '1.1'
             }}>
               {title}
             </h1>
             {subtitle && (
               <p className="base-subtitle" style={{
-                fontSize: '11px', // Even smaller subtitle
+                fontSize: '11px',
                 color: 'var(--muted-foreground)',
-                margin: '1px 0 0 0',
-                fontWeight: '500',
-                lineHeight: '1.2',
-                whiteSpace: 'nowrap' // Prevent subtitle wrapping
+                margin: '2px 0 0 0',
+                fontWeight: '400',
+                lineHeight: '1.2'
               }}>
                 {subtitle}
               </p>
@@ -83,8 +83,9 @@ export function BaseHeader({ title, subtitle, showLogo = true, actions }: BaseHe
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            marginLeft: '16px'
+            gap: '6px',
+            flexShrink: 0,
+            marginTop: '2px' // Small offset to align better with title
           }}>
             {actions}
           </div>
@@ -149,22 +150,22 @@ export function BaseNetworkBadge() {
     <div style={{
       display: 'flex',
       alignItems: 'center',
-      gap: '8px',
-      padding: '6px 12px',
+      gap: '4px', // Reduced gap
+      padding: '4px 8px', // Reduced padding
       background: 'var(--base-blue)',
       color: 'white',
-      borderRadius: '8px',
-      fontSize: '12px',
+      borderRadius: '6px', // Smaller radius
+      fontSize: '10px', // Smaller font
       fontWeight: '600'
     }}>
       <div style={{
-        width: '8px',
-        height: '8px',
+        width: '6px', // Smaller dot
+        height: '6px',
         borderRadius: '50%',
         background: '#00ff00',
         animation: 'basePulse 1s ease-in-out infinite'
       }} />
-      Base Mainnet
+      Base
     </div>
   );
 }
