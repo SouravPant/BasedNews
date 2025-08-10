@@ -28,8 +28,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Base ecosystem coins for priority inclusion
       const baseEcosystemCoins = [
         'ethereum', 'coinbase-wrapped-staked-eth', 'usd-coin', 'aerodrome-finance', 
-        'based-brett', 'degen-base', 'toshi', 'moca-network', 'zora', 'moonwell',
-        'base-protocol', 'seamless-protocol', 'friend-tech', 'extra-finance'
+        'based-brett', 'degen-base', 'degen', 'toshi', 'moca-network', 'zora', 'moonwell',
+        'base-protocol', 'seamless-protocol', 'friend-tech', 'extra-finance',
+        // Additional Base ecosystem tokens
+        'higher', 'bald', 'baseswap', 'compound-ether', 'compound-usd-coin'
       ];
 
       let allCoins = [];
@@ -120,7 +122,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           coin.symbol.toLowerCase().includes(searchTerm) ||
           coin.id.toLowerCase().includes(searchTerm)
         );
+        
+        // Sort search results to prioritize Base ecosystem coins and exact matches
+        filteredCoins.sort((a: any, b: any) => {
+          const aIsBase = baseEcosystemCoins.includes(a.id);
+          const bIsBase = baseEcosystemCoins.includes(b.id);
+          const aExactMatch = a.name.toLowerCase() === searchTerm || a.symbol.toLowerCase() === searchTerm;
+          const bExactMatch = b.name.toLowerCase() === searchTerm || b.symbol.toLowerCase() === searchTerm;
+          
+          // Prioritize exact matches first
+          if (aExactMatch && !bExactMatch) return -1;
+          if (!aExactMatch && bExactMatch) return 1;
+          
+          // Then prioritize Base ecosystem coins
+          if (aIsBase && !bIsBase) return -1;
+          if (!aIsBase && bIsBase) return 1;
+          
+          // Finally sort by market cap rank
+          return (a.market_cap_rank || 999999) - (b.market_cap_rank || 999999);
+        });
+        
         console.log(`Search "${searchTerm}" found ${filteredCoins.length} coins`);
+        
+        // Debug logging for DEGEN searches
+        if (searchTerm.includes('degen')) {
+          console.log('DEGEN search results:', filteredCoins.map((coin: any) => ({
+            id: coin.id,
+            name: coin.name,
+            symbol: coin.symbol,
+            isBase: baseEcosystemCoins.includes(coin.id)
+          })));
+        }
       }
       
       if (!includeStablecoins) {
