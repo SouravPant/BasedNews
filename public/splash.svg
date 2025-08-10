@@ -10,7 +10,7 @@
   
   <!-- Main logo/text -->
   <text x="600" y="350" font-family="Arial Black, sans-serif" font-size="72" font-weight="900" text-anchor="middle" fill="#ffffff">BasedNews</text>
-  <text x="600" y="420" font-family="Arial, sans-serif" font-size="32" text-anchor="middle" fill="#ffffff" opacity="0.9">Base Ecosystem News & Crypto Tracker</text>
+  <text x="600" y="420" font-family="Arial, sans-serif" font-size="32" text-anchor="middle" fill="#ffffff" opacity="0.9">Base Ecosystem News and Crypto Tracker</text>
   
   <!-- Decorative elements -->
   <circle cx="200" cy="200" r="4" fill="#ffffff" opacity="0.6"/>
