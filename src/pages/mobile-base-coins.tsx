@@ -317,7 +317,34 @@ export function MobileBaseCoins() {
             </div>
             Base Ecosystem
           </h1>
-          {/* Removed coins count for cleaner look */}
+          
+          {/* Live Prices Indicator */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '4px 8px',
+            background: 'rgba(0, 123, 255, 0.1)', // Base blue with transparency
+            borderRadius: '6px',
+            border: '1px solid rgba(0, 123, 255, 0.2)'
+          }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#007bff', // Base blue color
+              animation: 'livePulse 1.5s ease-in-out infinite',
+              boxShadow: '0 0 4px rgba(0, 123, 255, 0.6)'
+            }} />
+            <span style={{
+              fontSize: '12px',
+              fontWeight: '600',
+              color: '#007bff', // Base blue color
+              letterSpacing: '0.02em'
+            }}>
+              Live Prices
+            </span>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -593,11 +620,29 @@ export function MobileBaseCoins() {
         cryptocurrency={selectedCoin}
       />
 
-      {/* Spinner Animation */}
+      {/* Animations */}
       <style jsx>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes livePulse {
+          0% { 
+            opacity: 1; 
+            transform: scale(1);
+            box-shadow: 0 0 4px rgba(0, 123, 255, 0.6);
+          }
+          50% { 
+            opacity: 0.6; 
+            transform: scale(1.1);
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.8);
+          }
+          100% { 
+            opacity: 1; 
+            transform: scale(1);
+            box-shadow: 0 0 4px rgba(0, 123, 255, 0.6);
+          }
         }
       `}</style>
     </div>
