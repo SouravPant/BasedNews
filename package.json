@@ -14,8 +14,7 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
-    "@coinbase/onchainkit": "^0.38.19",
-    "@coinbase/wallet-sdk": "^4.3.7",
+
     "@farcaster/core": "^0.18.5",
     "@farcaster/frame-sdk": "^0.1.8",
     "@hookform/resolvers": "^3.10.0",
@@ -90,8 +89,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tw-animate-css": "^1.2.5",
     "vaul": "^1.1.2",
-    "viem": "^2.33.3",
-    "wagmi": "^2.16.1",
+
     "wouter": "^3.3.5",
     "ws": "^8.18.0",
     "zod": "^3.24.2",

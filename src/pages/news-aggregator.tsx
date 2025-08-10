@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { NewsArticle } from '@/components/news-article';
 import { NewsArticleModal } from '@/components/news-article-modal';
-import { WalletAssetsDisplay } from '@/components/wallet-assets-display';
-import { CoinbaseWallet } from '@/components/coinbase-wallet';
+
+
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Loader2, TrendingUp, Globe, Search, Coins } from 'lucide-react';
 import type { NewsArticle as NewsArticleType } from '@shared/schema';
 import { Link } from 'wouter';
-import { useWallet } from '@/hooks/useMiniKit';
+
 
 interface FilterState {
   dateRange: string;
@@ -19,7 +19,7 @@ interface FilterState {
 }
 
 export function NewsAggregator() {
-  const [connectedAccount, setConnectedAccount] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArticle, setSelectedArticle] = useState<NewsArticleType | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,7 +31,7 @@ export function NewsAggregator() {
     sortBy: 'relevance'
   });
 
-  const { wallet, isConnected } = useWallet();
+
   const articlesPerPage = 12;
 
   // Fetch news articles with pagination
@@ -76,9 +76,7 @@ export function NewsAggregator() {
     await refetch();
   };
 
-  const handleAccountChange = (account: string | null) => {
-    setConnectedAccount(account);
-  };
+
 
   const handleFilterChange = (newFilters: FilterState) => {
     setFilters(newFilters);
@@ -112,7 +110,15 @@ export function NewsAggregator() {
             
             <div className="flex items-center gap-4">
               <ThemeToggle />
-              <CoinbaseWallet onAccountChange={handleAccountChange} />
+              <div style={{
+                padding: '8px 16px',
+                backgroundColor: 'var(--muted)',
+                borderRadius: '6px',
+                fontSize: '14px',
+                color: 'var(--muted-foreground)'
+              }}>
+                🔗 Wallet (Coming Soon)
+              </div>
             </div>
           </div>
         </div>
@@ -136,32 +142,7 @@ export function NewsAggregator() {
 
         </div>
 
-        {/* Welcome Message for Connected Users */}
-        {connectedAccount && (
-          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <div className="flex items-center gap-3">
-              <Globe className="h-5 w-5 text-blue-600" />
-              <div>
-                <h3 className="font-medium text-blue-900 dark:text-blue-100">
-                  Welcome to BasedNews!
-                </h3>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  Stay updated with the latest cryptocurrency news and market insights.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
-        {/* Wallet Assets Display */}
-        {(connectedAccount || isConnected) && (
-          <div className="mb-8">
-            <WalletAssetsDisplay 
-              connectedAddress={connectedAccount || wallet?.address || null}
-              provider={wallet || undefined}
-            />
-          </div>
-        )}
 
         {/* News Grid */}
         <div className="space-y-6">

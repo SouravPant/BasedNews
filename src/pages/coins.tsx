@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CryptoChartModal } from '@/components/crypto-chart-modal';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { CoinbaseWallet } from '@/components/coinbase-wallet';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,7 +18,7 @@ export function Coins() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('market_cap_rank');
   const [currentPage, setCurrentPage] = useState(1);
-  const [connectedAccount, setConnectedAccount] = useState<string | null>(null);
+
   const itemsPerPage = 100;
 
   // Fetch top 100 cryptocurrencies
@@ -74,9 +74,7 @@ export function Coins() {
     setIsChartModalOpen(true);
   };
 
-  const handleAccountChange = (account: string | null) => {
-    setConnectedAccount(account);
-  };
+
 
   const formatPrice = (price: string | null | undefined) => {
     if (!price) return '$0.00';
@@ -158,7 +156,15 @@ export function Coins() {
             
             <div className="flex items-center gap-4">
               <ThemeToggle />
-              <CoinbaseWallet onAccountChange={handleAccountChange} />
+              <div style={{
+                padding: '8px 16px',
+                backgroundColor: 'var(--muted)',
+                borderRadius: '6px',
+                fontSize: '14px',
+                color: 'var(--muted-foreground)'
+              }}>
+                🔗 Wallet (Coming Soon)
+              </div>
             </div>
           </div>
         </div>

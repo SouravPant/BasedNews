@@ -1,5 +1,4 @@
 import React from "react";
-import { BaseWalletConnect } from "./base-wallet-connect";
 
 interface Coin {
   id: string;
@@ -190,7 +189,17 @@ export function MiniAppDashboard() {
             }}>
               💼 Portfolio Overview
             </h2>
-            <BaseWalletConnect showInPortfolio={true} />
+            <div style={{
+              padding: '20px',
+              backgroundColor: 'var(--muted)',
+              borderRadius: '8px',
+              border: '1px solid var(--border)',
+              textAlign: 'center'
+            }}>
+              <p style={{ color: 'var(--muted-foreground)', margin: 0 }}>
+                🔗 Connect your wallet to view portfolio
+              </p>
+            </div>
           </div>
         
         <div style={{

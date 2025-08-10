@@ -5,7 +5,6 @@ import { MobileBaseCoins } from "./pages/mobile-base-coins";
 import { BaseNews } from "./components/base-news";
 import { MiniAppDashboard } from "./components/mini-app-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
-import { BaseWalletConnect } from "./components/base-wallet-connect";
 
 // Simple Farcaster Ready Signal
 const useFarcasterReady = () => {
