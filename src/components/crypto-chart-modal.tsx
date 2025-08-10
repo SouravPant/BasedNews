@@ -23,7 +23,7 @@ interface ChartData {
 }
 
 export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChartModalProps) {
-  const [selectedDays, setSelectedDays] = useState<number>(7);
+  const [selectedDays, setSelectedDays] = useState<number>(1); // Default to 24 hours
 
   const { data: chartData, isLoading, error } = useQuery<ChartData>({
     queryKey: ['/api/cryptocurrencies', cryptocurrency?.id, 'chart', selectedDays],
@@ -35,10 +35,6 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
 
   const timeRangeOptions = [
     { label: '24H', days: 1 },
-    { label: '7D', days: 7 },
-    { label: '30D', days: 30 },
-    { label: '90D', days: 90 },
-    { label: '1Y', days: 365 },
   ];
 
   if (!cryptocurrency) {

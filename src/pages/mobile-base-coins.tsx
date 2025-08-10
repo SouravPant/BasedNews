@@ -1,5 +1,6 @@
 import React from "react";
 import { CryptoChartModalSimple } from "../components/crypto-chart-modal-simple";
+import { TrendingUp } from 'lucide-react';
 
 interface Coin {
   id: string;
@@ -508,10 +509,11 @@ export function MobileBaseCoins() {
                 {/* Chart Icon */}
                 <div style={{
                   marginLeft: '8px',
-                  fontSize: '16px',
-                  color: 'var(--muted-foreground)'
+                  color: 'var(--muted-foreground)',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}>
-                  📊
+                  <TrendingUp size={16} />
                 </div>
               </div>
             ))}
