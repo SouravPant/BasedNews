@@ -7,11 +7,9 @@
     <meta name="description" content="Real-time crypto news, market data, and Base ecosystem tracking" />
     
     <!-- Farcaster Mini App Meta Tags -->
-    <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/screenshot1.png" />
-    <meta property="fc:frame:button:1" content="View Latest News" />
-    <meta property="fc:frame:button:1:action" content="link" />
-    <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
+    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://based-news-eight.vercel.app/screenshot1.png","button":{"title":"Open BasedNews","action":{"type":"launch_miniapp","url":"https://based-news-eight.vercel.app","name":"BasedNews","splashImageUrl":"https://based-news-eight.vercel.app/splash.svg","splashBackgroundColor":"#0052ff"}}}' />
+    <!-- For backward compatibility -->
+    <meta name="fc:frame" content='{"version":"1","imageUrl":"https://based-news-eight.vercel.app/screenshot1.png","button":{"title":"Open BasedNews","action":{"type":"launch_frame","url":"https://based-news-eight.vercel.app","name":"BasedNews","splashImageUrl":"https://based-news-eight.vercel.app/splash.svg","splashBackgroundColor":"#0052ff"}}}' />
     
     <!-- Enhanced Open Graph Meta Tags for Farcaster URL Embeds -->
     <meta property="og:title" content="BasedNews - Base Ecosystem News" />
