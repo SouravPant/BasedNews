@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BasedNews - Minimal Test</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0052ff 0%, #003db3 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .success { background: rgba(0,255,0,0.2); border-color: rgba(0,255,0,0.3); }
+        .error { background: rgba(255,0,0,0.2); border-color: rgba(255,0,0,0.3); }
+        .button {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .logs {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 BasedNews - Minimal Test</h1>
+        <p>Testing basic functionality without React/external dependencies</p>
+        
+        <div class="status" id="main-status">
+            ⏳ Initializing...
+        </div>
+        
+        <div class="status" id="iframe-status">
+            🔍 Checking iframe context...
+        </div>
+        
+        <div class="status" id="ready-status">
+            📡 Ready signal status...
+        </div>
+        
+        <div class="logs" id="logs">
+            <div>📝 Console logs will appear here...</div>
+        </div>
+        
+        <div>
+            <a href="/" class="button">🏠 Main App</a>
+            <a href="/simple.html" class="button">📱 Simple App</a>
+            <button onclick="testNews()" class="button">📰 Test News API</button>
+            <button onclick="sendReadySignal()" class="button">📡 Send Ready Signal</button>
+        </div>
+    </div>
+
+    <script>
+        // Logging system
+        const logs = document.getElementById('logs');
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.style.color = type === 'error' ? '#ff6b6b' : type === 'warn' ? '#ffd93d' : '#6bcf7f';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logs.appendChild(logEntry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+        
+        // Override console methods
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            addLog('ERROR: ' + args.join(' '), 'error');
+        };
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            addLog('WARN: ' + args.join(' '), 'warn');
+        };
+        
+        // Status updates
+        function updateStatus(elementId, message, success = null) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            if (success === true) {
+                element.className = 'status success';
+            } else if (success === false) {
+                element.className = 'status error';
+            } else {
+                element.className = 'status';
+            }
+        }
+        
+        // Check iframe context
+        function checkIframeContext() {
+            const isInIframe = window.parent && window.parent !== window;
+            const hasParentOrigin = window.parent && window.parent.location.origin !== window.location.origin;
+            
+            if (isInIframe) {
+                updateStatus('iframe-status', '✅ Running in iframe (Farcaster context)', true);
+                console.log('✅ Iframe context detected');
+                console.log('Parent origin:', window.parent.location.origin);
+                return true;
+            } else {
+                updateStatus('iframe-status', 'ℹ️ Running standalone (not in iframe)', null);
+                console.log('ℹ️ Standalone context (not in iframe)');
+                return false;
+            }
+        }
+        
+        // Send Farcaster ready signal
+        function sendReadySignal() {
+            const isInIframe = checkIframeContext();
+            
+            if (!isInIframe) {
+                updateStatus('ready-status', 'ℹ️ Not in iframe - ready signal not needed', null);
+                console.log('ℹ️ Not in iframe context, skipping ready signal');
+                return;
+            }
+            
+            try {
+                console.log('🎯 Sending Farcaster ready signals...');
+                
+                const messages = [
+                    { type: 'sdk.ready', data: {} },
+                    { type: 'frame.ready', data: {} },
+                    { type: 'sdk_ready' },
+                    { type: 'miniapp-ready' },
+                    { type: 'frame-ready' },
+                    { type: 'ready' }
+                ];
+                
+                let successCount = 0;
+                messages.forEach((msg, index) => {
+                    try {
+                        window.parent.postMessage(msg, '*');
+                        successCount++;
+                        console.log(`✅ Sent message ${index + 1}: ${msg.type}`);
+                    } catch (e) {
+                        console.error(`❌ Failed to send message ${index + 1}:`, e.message);
+                    }
+                });
+                
+                updateStatus('ready-status', `✅ Sent ${successCount}/${messages.length} ready signals`, true);
+                console.log(`✅ Successfully sent ${successCount} ready signals`);
+                
+            } catch (error) {
+                updateStatus('ready-status', '❌ Failed to send ready signals', false);
+                console.error('❌ Ready signal error:', error);
+            }
+        }
+        
+        // Test news API
+        async function testNews() {
+            console.log('🔄 Testing news API...');
+            updateStatus('main-status', '🔄 Testing news API...');
+            
+            try {
+                const response = await fetch('/api/news');
+                const data = await response.json();
+                
+                if (response.ok && Array.isArray(data)) {
+                    updateStatus('main-status', `✅ News API working - ${data.length} articles`, true);
+                    console.log(`✅ News API returned ${data.length} articles`);
+                } else {
+                    updateStatus('main-status', `⚠️ News API returned: ${response.status}`, false);
+                    console.warn('⚠️ News API response:', response.status, data);
+                }
+            } catch (error) {
+                updateStatus('main-status', '❌ News API failed', false);
+                console.error('❌ News API error:', error);
+            }
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Minimal test app initialized');
+            updateStatus('main-status', '✅ App loaded successfully', true);
+            
+            // Check context
+            const isInIframe = checkIframeContext();
+            
+            // Auto-send ready signal if in iframe
+            if (isInIframe) {
+                setTimeout(sendReadySignal, 500);
+            }
+            
+            // Test news API
+            setTimeout(testNews, 1000);
+        });
+        
+        // Handle errors
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error?.message || e.message);
+            updateStatus('main-status', '❌ App error occurred', false);
+        });
+        
+        // Handle unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+        });
+    </script>
+</body>
+</html>
