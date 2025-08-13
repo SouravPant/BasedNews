@@ -551,3 +551,4 @@ console.log('Starting App...');
 const root = createRoot(document.getElementById("root")!);
 root.render(<App />);
 console.log('App rendered!');
+// Farcaster SDK integration complete
