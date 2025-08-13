@@ -6,6 +6,7 @@ import { BaseNews } from "./components/base-news";
 import { MiniAppDashboard } from "./components/mini-app-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 import { sdk } from '@farcaster/miniapp-sdk';
+import { useBatchRelativeTime } from './lib/timeUtils';
 
 // Immediate Farcaster SDK Ready Signal - Call ASAP
 const sendImmediateReadySignal = async () => {
@@ -154,6 +155,10 @@ function WorkingNewsApp() {
   const [selectedArticle, setSelectedArticle] = React.useState(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
+  // Use the new batch relative time hook for auto-updating times
+  const articleTimestamps = news.map(article => article.publishedAt);
+  const relativeTimes = useBatchRelativeTime(articleTimestamps);
+
   React.useEffect(() => {
     console.log('Fetching news...');
     fetch('/api/news')
@@ -179,40 +184,7 @@ function WorkingNewsApp() {
     setSelectedArticle(null);
   };
 
-  const formatRelativeTime = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffInMs = now.getTime() - date.getTime();
-      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-      const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-
-      // Handle invalid or future dates
-      if (diffInMs < 0 || date.getFullYear() < 2000) {
-        // For invalid dates, show relative time based on index or random recent time
-        const randomHours = Math.floor(Math.random() * 12) + 1;
-        return `${randomHours}h ago`;
-      }
-
-      if (diffInMinutes < 60) {
-        return diffInMinutes <= 1 ? 'Just now' : `${diffInMinutes}m ago`;
-      } else if (diffInHours < 24) {
-        return diffInHours === 1 ? '1h ago' : `${diffInHours}h ago`;
-      } else if (diffInDays < 7) {
-        return diffInDays === 1 ? '1d ago' : `${diffInDays}d ago`;
-      } else {
-        return date.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric'
-        });
-      }
-    } catch {
-      // Fallback for any parsing errors
-      const randomHours = Math.floor(Math.random() * 8) + 1;
-      return `${randomHours}h ago`;
-    }
-  };
+  // Remove the old formatRelativeTime function - now using centralized utility
 
   return (
     <div style={{
@@ -443,7 +415,7 @@ function WorkingNewsApp() {
                     color: '#6b7280',
                     fontWeight: '500'
                   }}>
-                    {formatRelativeTime(article.publishedAt)}
+                    {relativeTimes[index]}
                   </span>
                 </div>
                 

@@ -1,191 +1,134 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { X, Brain, ExternalLink, MessageSquare, ArrowUp } from "lucide-react";
-
-interface RedditPost {
-  id: string;
-  title: string;
-  author: string;
-  subreddit: string;
-  url: string;
-  upvotes: number;
-  comments: number;
-  createdAt: Date;
-}
+import React from 'react';
+import { X, ExternalLink, ArrowUp, MessageSquare } from 'lucide-react';
+import { useRelativeTime } from '@/lib/timeUtils';
 
 interface RedditSummaryModalProps {
-  post: RedditPost | null;
+  post: any;
   isOpen: boolean;
   onClose: () => void;
 }
 
-interface SummaryResponse {
-  summary: string;
-  word_count: number;
-  url: string;
-}
-
 export function RedditSummaryModal({ post, isOpen, onClose }: RedditSummaryModalProps) {
-  const [summary, setSummary] = useState<string | null>(null);
-
-  const summarizeMutation = useMutation({
-    mutationFn: async (text: string): Promise<SummaryResponse> => {
-      const response = await fetch("/api/summarize", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          text: `Reddit post from r/${post?.subreddit}: ${text}`,
-          url: post?.url
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error("Failed to generate summary");
-      }
-      
-      return response.json();
-    },
-    onSuccess: (data) => {
-      setSummary(data.summary);
-    },
-    onError: (error) => {
-      console.error("Failed to generate summary:", error);
-      setSummary("Failed to generate summary. Please try again.");
-    }
-  });
-
-  const handleSummarize = () => {
-    if (post && !summary && !summarizeMutation.isPending) {
-      summarizeMutation.mutate(post.title);
-    }
-  };
-
-  const formatTimeAgo = (timestamp: Date) => {
-    const now = new Date();
-    const diff = Math.floor((now.getTime() - new Date(timestamp).getTime()) / 1000);
-    
-    if (diff < 60) return "Just now";
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    return `${Math.floor(diff / 86400)}d ago`;
-  };
+  // Use the centralized auto-updating time hook
+  const relativeTime = useRelativeTime(post?.createdAt);
 
   if (!post) return null;
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl w-full bg-card border-border text-card-foreground">
-        <DialogHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-          <div className="flex-1 pr-4">
-            <DialogTitle className="text-xl font-bold text-card-foreground leading-tight">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Reddit Post</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          {/* Post Info */}
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-sm">r/</span>
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 dark:text-white">
+                r/{post.subreddit || 'cryptocurrency'}
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400">
+                u/{post.author || 'unknown'} • {relativeTime}
+              </p>
+            </div>
+          </div>
+
+          {/* Post Title */}
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white leading-tight">
               {post.title}
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              AI-powered Reddit post summary for {post.title}
-            </DialogDescription>
-            <div className="flex items-center gap-3 mt-3">
-              <span className="text-sm font-medium text-orange-500">r/{post.subreddit}</span>
-              <span className="text-xs text-muted-foreground">by u/{post.author}</span>
-              <span className="text-xs text-muted-foreground">
-                {formatTimeAgo(post.createdAt)}
+            </h3>
+          </div>
+
+          {/* Post Content */}
+          {post.content && (
+            <div className="mb-6">
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <p className="text-gray-900 dark:text-white leading-relaxed whitespace-pre-wrap">
+                  {post.content.length > 500 
+                    ? `${post.content.slice(0, 500)}...`
+                    : post.content
+                  }
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Post Image */}
+          {post.imageUrl && (
+            <div className="mb-6">
+              <img
+                src={post.imageUrl}
+                alt={post.title}
+                className="w-full h-auto max-h-96 object-cover rounded-lg"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
+
+          {/* Engagement Stats */}
+          <div className="flex items-center space-x-6 mb-6 text-gray-500 dark:text-gray-400">
+            {post.upvotes && (
+              <div className="flex items-center space-x-2">
+                <ArrowUp className="w-5 h-5" />
+                <span>{post.upvotes.toLocaleString()} upvotes</span>
+              </div>
+            )}
+            {post.comments && (
+              <div className="flex items-center space-x-2">
+                <MessageSquare className="w-5 h-5" />
+                <span>{post.comments.toLocaleString()} comments</span>
+              </div>
+            )}
+          </div>
+
+          {/* Sentiment */}
+          {post.sentiment && (
+            <div className="mb-6">
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                post.sentiment === 'bullish' 
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                  : post.sentiment === 'bearish'
+                  ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                  : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+              }`}>
+                {post.sentiment.charAt(0).toUpperCase() + post.sentiment.slice(1)} Sentiment
               </span>
             </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-muted-foreground hover:text-card-foreground hover:bg-muted shrink-0"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </DialogHeader>
+          )}
 
-        <div className="space-y-4">
-          {/* Post Stats */}
-          <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
-            <div className="flex items-center gap-1">
-              <ArrowUp className="w-4 h-4 text-orange-500" />
-              <span className="text-sm font-medium">{post.upvotes}</span>
+          {/* External Link */}
+          {post.url && (
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <a
+                href={post.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>View on Reddit</span>
+              </a>
             </div>
-            <div className="flex items-center gap-1">
-              <MessageSquare className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm">{post.comments} comments</span>
-            </div>
-          </div>
-
-          {/* AI Summary Section */}
-          <div className="border-t border-border pt-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Brain className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-card-foreground">AI Summary (50-100 words)</h3>
-              </div>
-              {!summary && !summarizeMutation.isPending && (
-                <Button
-                  onClick={handleSummarize}
-                  size="sm"
-                  className="text-xs"
-                >
-                  Generate Summary
-                </Button>
-              )}
-            </div>
-
-            {summarizeMutation.isPending && (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
-            )}
-
-            {summary && (
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="text-sm text-card-foreground leading-relaxed">
-                  {summary}
-                </p>
-              </div>
-            )}
-
-            {!summary && !summarizeMutation.isPending && (
-              <p className="text-xs text-muted-foreground italic">
-                Click "Generate Summary" to get an AI-powered analysis of this Reddit discussion.
-              </p>
-            )}
-
-            {summarizeMutation.isError && !summary && (
-              <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-lg">
-                <p className="text-xs text-red-400">
-                  Failed to generate summary. The AI service may be temporarily unavailable.
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-between items-center pt-4 border-t border-border">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.open(post.url, '_blank')}
-              className="flex items-center gap-2"
-            >
-              <ExternalLink className="w-4 h-4" />
-              View on Reddit
-            </Button>
-            
-            <Button onClick={onClose} variant="default" size="sm">
-              Close
-            </Button>
-          </div>
+          )}
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }
