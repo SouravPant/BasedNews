@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farcaster Ready Signal Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Farcaster Ready Signal Test</h1>
+    
+    <div class="test-container">
+        <h2>Environment Status</h2>
+        <div id="env-status" class="status info">Checking...</div>
+    </div>
+
+    <div class="test-container">
+        <h2>Ready Signals Sent</h2>
+        <div id="signals-status" class="status info">Preparing...</div>
+        <button onclick="sendTestSignals()">Send Test Signals</button>
+    </div>
+
+    <div class="test-container">
+        <h2>Console Log</h2>
+        <div id="console-log" class="log">Ready signal test started...\n</div>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script type="module">
+        import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk';
+
+        let logContainer = document.getElementById('console-log');
+        let signalsSent = 0;
+
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logContainer.textContent += `[${timestamp}] ${message}\n`;
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStatus(elementId, message, className) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${className}`;
+        }
+
+        // Check environment
+        function checkEnvironment() {
+            const isIframe = window.parent !== window;
+            const userAgent = navigator.userAgent;
+            const url = window.location.href;
+            
+            addLog(`Environment Check:`);
+            addLog(`- Is iframe: ${isIframe}`);
+            addLog(`- URL: ${url}`);
+            addLog(`- User Agent: ${userAgent}`);
+            
+            if (isIframe) {
+                updateStatus('env-status', '✅ Running in iframe (good for testing)', 'success');
+            } else {
+                updateStatus('env-status', '⚠️ Not in iframe (normal for direct access)', 'info');
+            }
+        }
+
+        // Send ready signals
+        async function sendReadySignals() {
+            try {
+                addLog('🚀 Starting ready signal test...');
+                
+                // Test 1: SDK Ready
+                try {
+                    const isInMiniApp = await sdk.isInMiniApp();
+                    addLog(`📱 SDK isInMiniApp: ${isInMiniApp}`);
+                    
+                    if (isInMiniApp) {
+                        addLog('🎯 Calling sdk.actions.ready()...');
+                        await sdk.actions.ready();
+                        addLog('✅ SDK ready() called successfully');
+                        signalsSent++;
+                    }
+                } catch (sdkError) {
+                    addLog(`⚠️ SDK error: ${sdkError.message}`);
+                }
+                
+                // Test 2: PostMessage signals
+                if (window.parent && window.parent !== window) {
+                    addLog('📡 Sending postMessage ready signals...');
+                    const signals = [
+                        { type: 'sdk.ready', data: {} },
+                        { type: 'frame.ready', data: {} },
+                        { type: 'sdk_ready' },
+                        { type: 'miniapp-ready' },
+                        { type: 'ready' },
+                        { type: 'farcaster-ready' },
+                        { type: 'app-ready' }
+                    ];
+                    
+                    signals.forEach((signal, index) => {
+                        try {
+                            window.parent.postMessage(signal, '*');
+                            addLog(`✅ Sent: ${signal.type}`);
+                            signalsSent++;
+                        } catch (e) {
+                            addLog(`❌ Failed: ${signal.type} - ${e.message}`);
+                        }
+                    });
+                } else {
+                    addLog('ℹ️ No parent window - postMessage signals not applicable');
+                }
+                
+                updateStatus('signals-status', `✅ Sent ${signalsSent} ready signals`, 'success');
+                addLog(`🎉 Test complete! Sent ${signalsSent} signals total`);
+                
+            } catch (error) {
+                addLog(`❌ Test failed: ${error.message}`);
+                updateStatus('signals-status', '❌ Test failed', 'error');
+            }
+        }
+
+        // Test function for button
+        window.sendTestSignals = sendReadySignals;
+        
+        window.clearLog = function() {
+            logContainer.textContent = 'Log cleared...\n';
+        };
+
+        // Auto-run tests
+        document.addEventListener('DOMContentLoaded', () => {
+            checkEnvironment();
+            setTimeout(sendReadySignals, 500);
+        });
+    </script>
+</body>
+</html>
