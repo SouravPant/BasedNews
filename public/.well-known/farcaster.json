@@ -31,5 +31,31 @@
       "trading"
     ],
     "noindex": true
+  },
+  "miniApp": {
+    "version": "1",
+    "name": "BasedNews",
+    "subtitle": "Base News and Crypto Tracker",
+    "description": "Real-time crypto news and market data for Base ecosystem. Track prices, view charts, and stay updated with latest crypto news.",
+    "iconUrl": "https://based-news-eight.vercel.app/icon.svg",
+    "homeUrl": "https://based-news-eight.vercel.app",
+    "splashImageUrl": "https://based-news-eight.vercel.app/splash.svg",
+    "splashBackgroundColor": "#0052ff",
+    "heroImageUrl": "https://based-news-eight.vercel.app/hero.svg",
+    "tagline": "Your Base crypto companion",
+    "ogTitle": "BasedNews - Base News",
+    "ogDescription": "Real-time crypto news and market data for Base ecosystem",
+    "ogImageUrl": "https://based-news-eight.vercel.app/hero.svg",
+    "screenshotUrls": [
+      "https://based-news-eight.vercel.app/screenshot1.png"
+    ],
+    "primaryCategory": "news-media",
+    "tags": [
+      "crypto",
+      "news", 
+      "base",
+      "defi",
+      "trading"
+    ]
   }
 }

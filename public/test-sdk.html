@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farcaster SDK Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Farcaster SDK Integration Test</h1>
+    
+    <div class="test-container">
+        <h2>Environment Check</h2>
+        <div id="env-status">Checking environment...</div>
+        <pre id="env-details"></pre>
+    </div>
+
+    <div class="test-container">
+        <h2>SDK Status</h2>
+        <div id="sdk-status">Initializing SDK...</div>
+        <pre id="sdk-details"></pre>
+    </div>
+
+    <div class="test-container">
+        <h2>Ready Function Test</h2>
+        <div id="ready-status">Preparing to test ready function...</div>
+        <button onclick="testReady()">Test Ready Function</button>
+        <pre id="ready-details"></pre>
+    </div>
+
+    <div class="test-container">
+        <h2>Context Information</h2>
+        <div id="context-status">Loading context...</div>
+        <pre id="context-details"></pre>
+    </div>
+
+    <script type="module">
+        import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk';
+
+        function updateStatus(elementId, message, isSuccess = null) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = 'status ' + (isSuccess === true ? 'success' : isSuccess === false ? 'error' : 'info');
+        }
+
+        function updateDetails(elementId, data) {
+            document.getElementById(elementId).textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Environment Check
+        async function checkEnvironment() {
+            try {
+                const envInfo = {
+                    userAgent: navigator.userAgent,
+                    url: window.location.href,
+                    isIframe: window.parent !== window,
+                    referrer: document.referrer,
+                    timestamp: new Date().toISOString()
+                };
+
+                updateStatus('env-status', '✅ Environment check completed', true);
+                updateDetails('env-details', envInfo);
+            } catch (error) {
+                updateStatus('env-status', '❌ Environment check failed: ' + error.message, false);
+                updateDetails('env-details', { error: error.message });
+            }
+        }
+
+        // SDK Status Check
+        async function checkSDK() {
+            try {
+                console.log('🔍 Checking SDK status...');
+                
+                const isInMiniApp = await sdk.isInMiniApp();
+                console.log('📱 Is in Mini App:', isInMiniApp);
+                
+                const sdkInfo = {
+                    isInMiniApp: isInMiniApp,
+                    sdkAvailable: typeof sdk !== 'undefined',
+                    actionsAvailable: typeof sdk.actions !== 'undefined',
+                    readyAvailable: typeof sdk.actions?.ready !== 'undefined',
+                    contextAvailable: typeof sdk.context !== 'undefined'
+                };
+
+                updateStatus('sdk-status', 
+                    isInMiniApp ? '✅ Running in Mini App context' : '⚠️ Not in Mini App context', 
+                    isInMiniApp);
+                updateDetails('sdk-details', sdkInfo);
+                
+                return isInMiniApp;
+            } catch (error) {
+                console.error('❌ SDK check failed:', error);
+                updateStatus('sdk-status', '❌ SDK check failed: ' + error.message, false);
+                updateDetails('sdk-details', { error: error.message });
+                return false;
+            }
+        }
+
+        // Test Ready Function
+        window.testReady = async function() {
+            try {
+                console.log('🚀 Testing ready function...');
+                updateStatus('ready-status', '🔄 Testing ready function...', null);
+                
+                const isInMiniApp = await sdk.isInMiniApp();
+                
+                if (isInMiniApp) {
+                    console.log('📞 Calling sdk.actions.ready()...');
+                    await sdk.actions.ready();
+                    
+                    updateStatus('ready-status', '✅ Ready function called successfully!', true);
+                    updateDetails('ready-details', {
+                        success: true,
+                        method: 'sdk.actions.ready()',
+                        timestamp: new Date().toISOString(),
+                        context: 'Mini App'
+                    });
+                } else {
+                    console.log('⚠️ Not in Mini App context, sending fallback signals...');
+                    
+                    // Fallback ready signals
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({ type: 'sdk.ready', data: {} }, '*');
+                        window.parent.postMessage({ type: 'frame.ready', data: {} }, '*');
+                        window.parent.postMessage({ type: 'miniapp-ready' }, '*');
+                        
+                        updateStatus('ready-status', '⚠️ Fallback ready signals sent (not in Mini App)', null);
+                        updateDetails('ready-details', {
+                            success: true,
+                            method: 'postMessage fallback',
+                            timestamp: new Date().toISOString(),
+                            context: 'Development/Testing'
+                        });
+                    } else {
+                        updateStatus('ready-status', 'ℹ️ No Mini App or iframe context detected', null);
+                        updateDetails('ready-details', {
+                            success: false,
+                            reason: 'Not in iframe or Mini App context',
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Ready function test failed:', error);
+                updateStatus('ready-status', '❌ Ready function test failed: ' + error.message, false);
+                updateDetails('ready-details', { 
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        };
+
+        // Get Context Information
+        async function getContextInfo() {
+            try {
+                console.log('🎯 Getting context information...');
+                
+                const isInMiniApp = await sdk.isInMiniApp();
+                let contextInfo = {
+                    isInMiniApp: isInMiniApp
+                };
+
+                if (isInMiniApp) {
+                    try {
+                        const context = await sdk.context;
+                        contextInfo.context = context;
+                        updateStatus('context-status', '✅ Context loaded successfully', true);
+                    } catch (contextError) {
+                        contextInfo.contextError = contextError.message;
+                        updateStatus('context-status', '⚠️ Context available but error loading details', null);
+                    }
+                } else {
+                    updateStatus('context-status', 'ℹ️ No context (not in Mini App)', null);
+                }
+
+                updateDetails('context-details', contextInfo);
+            } catch (error) {
+                console.error('❌ Context check failed:', error);
+                updateStatus('context-status', '❌ Context check failed: ' + error.message, false);
+                updateDetails('context-details', { error: error.message });
+            }
+        }
+
+        // Run all checks on page load
+        async function runAllChecks() {
+            await checkEnvironment();
+            const isInMiniApp = await checkSDK();
+            await getContextInfo();
+            
+            // Auto-test ready function if in Mini App
+            if (isInMiniApp) {
+                setTimeout(() => {
+                    console.log('🔄 Auto-testing ready function...');
+                    testReady();
+                }, 1000);
+            }
+        }
+
+        // Start checks when page loads
+        document.addEventListener('DOMContentLoaded', runAllChecks);
+    </script>
+</body>
+</html>

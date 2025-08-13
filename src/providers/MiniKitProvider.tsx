@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { sdk } from '@farcaster/miniapp-sdk';
 
 interface User {
   fid?: number;
@@ -127,7 +128,30 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
 
   const signInWithBase = async (): Promise<{ success: boolean; user?: User; error?: string }> => {
     try {
-      // If already authenticated in Base App
+      // Check if we're in a Mini App and can get user info from SDK
+      const isInMiniApp = await sdk.isInMiniApp();
+      
+      if (isInMiniApp) {
+        try {
+          // Try to get user context from Farcaster SDK
+          const farcasterContext = await sdk.context;
+          if (farcasterContext?.user) {
+            const farcasterUser: User = {
+              fid: farcasterContext.user.fid,
+              username: farcasterContext.user.username,
+              displayName: farcasterContext.user.displayName,
+              pfpUrl: farcasterContext.user.pfpUrl,
+              address: wallet?.address
+            };
+            setUser(farcasterUser);
+            return { success: true, user: farcasterUser };
+          }
+        } catch (sdkError) {
+          console.log('Could not get Farcaster context, using fallback:', sdkError);
+        }
+      }
+
+      // If already authenticated in Base App (fallback)
       if (context?.user) {
         const baseUser: User = {
           fid: context.user.fid,
@@ -167,27 +191,77 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
   };
 
   useEffect(() => {
-    // Check if we're running in a Base App or Farcaster environment
-    const checkEnvironment = () => {
-      // Check for Farcaster SDK or Base App context
-      const isFarcaster = typeof window !== 'undefined' && 
-        (window.location.href.includes('farcaster') || 
-         window.location.href.includes('warpcast') ||
-         window.location.search.includes('baseapp=true') ||
-         window.parent !== window);
-      
-      setIsInBaseApp(isFarcaster);
-      
-      if (isFarcaster) {
-        // Mock context for testing - in real implementation this would come from SDK
-        setContext({
-          user: {
-            fid: 12345,
-            username: 'baseuser',
-            displayName: 'Base User',
-            pfpUrl: 'https://avatar.tobi.sh/base.svg'
+    // Check if we're running in a Farcaster Mini App environment
+    const checkEnvironment = async () => {
+      try {
+        // Use the official SDK to check if we're in a Mini App
+        const isMiniApp = await sdk.isInMiniApp();
+        console.log('🔍 SDK isInMiniApp check:', isMiniApp);
+        
+        setIsInBaseApp(isMiniApp);
+        
+        if (isMiniApp) {
+          try {
+            // Try to get context from Farcaster SDK
+            const farcasterContext = await sdk.context;
+            console.log('🎯 Farcaster context:', farcasterContext);
+            setContext(farcasterContext);
+          } catch (contextError) {
+            console.log('Could not get Farcaster context:', contextError);
+            
+            // Fallback context for testing
+            setContext({
+              user: {
+                fid: 12345,
+                username: 'baseuser',
+                displayName: 'Base User',
+                pfpUrl: 'https://avatar.tobi.sh/base.svg'
+              }
+            });
           }
-        });
+        } else {
+          // Fallback detection for development
+          const isFarcaster = typeof window !== 'undefined' && 
+            (window.location.href.includes('farcaster') || 
+             window.location.href.includes('warpcast') ||
+             window.location.search.includes('baseapp=true') ||
+             window.parent !== window);
+          
+          if (isFarcaster) {
+            console.log('🔧 Development fallback: detected Farcaster environment');
+            setIsInBaseApp(true);
+            setContext({
+              user: {
+                fid: 12345,
+                username: 'baseuser',
+                displayName: 'Base User',
+                pfpUrl: 'https://avatar.tobi.sh/base.svg'
+              }
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error checking Farcaster environment:', error);
+        
+        // Fallback to manual detection
+        const isFarcaster = typeof window !== 'undefined' && 
+          (window.location.href.includes('farcaster') || 
+           window.location.href.includes('warpcast') ||
+           window.location.search.includes('baseapp=true') ||
+           window.parent !== window);
+        
+        setIsInBaseApp(isFarcaster);
+        
+        if (isFarcaster) {
+          setContext({
+            user: {
+              fid: 12345,
+              username: 'baseuser',
+              displayName: 'Base User',
+              pfpUrl: 'https://avatar.tobi.sh/base.svg'
+            }
+          });
+        }
       }
     };
 
