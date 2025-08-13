@@ -6,18 +6,15 @@
     <title>BasedNews - Base Ecosystem News</title>
     <meta name="description" content="Real-time crypto news, market data, and Base ecosystem tracking" />
     
-    <!-- Farcaster Mini App Meta Tags -->
-    <meta property="fc:frame" content="vNext" />
-    <meta property="fc:miniapp" content="v1" />
-    <meta property="fc:frame:image" content="https://based-news-eight.vercel.app/screenshot1.png" />
-    <meta property="fc:frame:button:1" content="Open BasedNews" />
-    <meta property="fc:frame:button:1:action" content="link" />
-    <meta property="fc:frame:button:1:target" content="https://based-news-eight.vercel.app" />
+    <!-- Farcaster Mini App Meta Tags (New JSON Format) -->
+    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://based-news-eight.vercel.app/hero.png","button":{"title":"Open BasedNews","action":{"type":"launch_miniapp","url":"https://based-news-eight.vercel.app","name":"BasedNews","splashImageUrl":"https://based-news-eight.vercel.app/splash.png","splashBackgroundColor":"#0052ff"}}}' />
+    <!-- For backward compatibility -->
+    <meta name="fc:frame" content='{"version":"1","imageUrl":"https://based-news-eight.vercel.app/hero.png","button":{"title":"Open BasedNews","action":{"type":"launch_frame","url":"https://based-news-eight.vercel.app","name":"BasedNews","splashImageUrl":"https://based-news-eight.vercel.app/splash.png","splashBackgroundColor":"#0052ff"}}}' />
     
     <!-- Enhanced Open Graph Meta Tags for Farcaster URL Embeds -->
     <meta property="og:title" content="BasedNews - Base Ecosystem News" />
     <meta property="og:description" content="Real-time crypto news, market data, and Base ecosystem tracking. Stay updated with the latest developments in the Base ecosystem." />
-    <meta property="og:image" content="https://based-news-eight.vercel.app/screenshot1.png" />
+    <meta property="og:image" content="https://based-news-eight.vercel.app/hero.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="BasedNews - Base Ecosystem News Platform" />
@@ -28,73 +25,128 @@
     
     <!-- Twitter Card Meta Tags (Farcaster follows these standards) -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@BasedNews" />
+    <meta name="twitter:creator" content="@BasedNews" />
     <meta name="twitter:title" content="BasedNews - Base Ecosystem News" />
-    <meta name="twitter:description" content="Real-time crypto news, market data, and Base ecosystem tracking. Stay updated with the latest developments in the Base ecosystem." />
-    <meta name="twitter:image" content="https://based-news-eight.vercel.app/screenshot1.png" />
+    <meta name="twitter:description" content="Real-time crypto news, market data, and Base ecosystem tracking" />
+    <meta name="twitter:image" content="https://based-news-eight.vercel.app/hero.png" />
     <meta name="twitter:image:alt" content="BasedNews - Base Ecosystem News Platform" />
     
-    <!-- Additional Meta Tags for Better Embed Support -->
-    <meta name="theme-color" content="#000000" />
-    <meta name="msapplication-TileColor" content="#000000" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <!-- Additional SEO Meta Tags -->
+    <meta name="keywords" content="crypto, news, base, blockchain, defi, ethereum, l2, layer 2, cryptocurrency, trading, market data" />
+    <meta name="author" content="BasedNews Team" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0052ff" />
     
-    <!-- Farcaster Ready Signal via PostMessage -->
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="BasedNews" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/icon.png" />
+    <link rel="apple-touch-icon" href="/icon.png" />
+    
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        background-color: #f8fafc;
+        color: #1f2937;
+        line-height: 1.6;
+      }
+      
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+
+    <!-- Farcaster Ready Signal Script -->
     <script>
-      // Enhanced ready signal function
+      // Enhanced ready signal for Farcaster Mini App
+      console.log('🚀 Starting Farcaster ready signals...');
+      
       function sendFarcasterReady() {
         if (window.parent && window.parent !== window) {
-          console.log('🎯 HTML: Sending Farcaster ready signal...');
-          try {
-            // Send multiple signal types to ensure compatibility
-            const signals = [
-              { type: 'sdk.ready', data: {} },
-              { type: 'frame.ready', data: {} },
-              { type: 'sdk_ready' },
-              { type: 'miniapp-ready' },
-              { type: 'ready' },
-              { type: 'farcaster-ready' },
-              { type: 'app-ready' }
-            ];
-            
-            signals.forEach(signal => {
+          console.log('📡 Sending Farcaster ready signals...');
+          
+          // Multiple signal types for maximum compatibility
+          const signals = [
+            { type: 'sdk.ready', data: {} },
+            { type: 'frame.ready', data: {} },
+            { type: 'sdk_ready' },
+            { type: 'miniapp-ready' },
+            { type: 'ready' },
+            { type: 'farcaster-ready' }
+          ];
+          
+          signals.forEach(signal => {
+            try {
               window.parent.postMessage(signal, '*');
-            });
-            
-            console.log('✅ HTML: Ready signals sent successfully');
-          } catch (e) {
-            console.warn('HTML: Ready signal error:', e);
-          }
+              console.log('✅ Sent signal:', signal.type);
+            } catch (e) {
+              console.log('❌ Failed to send signal:', signal.type, e);
+            }
+          });
+        } else {
+          console.log('ℹ️ Not in iframe - no parent window to signal');
         }
       }
       
-      // Send immediately when script runs
-      sendFarcasterReady();
+      // Send ready signals at multiple timing points
+      sendFarcasterReady(); // Immediate
+      setTimeout(sendFarcasterReady, 50);   // Very quick
+      setTimeout(sendFarcasterReady, 100);  // Quick
+      setTimeout(sendFarcasterReady, 500);  // Medium
+      setTimeout(sendFarcasterReady, 1000); // Slower fallback
+      setTimeout(sendFarcasterReady, 2000); // Even slower fallback
       
-      // Send multiple times with different timing strategies
-      setTimeout(sendFarcasterReady, 10);   // Very immediate
-      setTimeout(sendFarcasterReady, 50);   // Quick
-      setTimeout(sendFarcasterReady, 100);  // Standard
-      setTimeout(sendFarcasterReady, 300);  // Medium
-      setTimeout(sendFarcasterReady, 500);  // Slower
-      setTimeout(sendFarcasterReady, 1000); // Final fallback
-      
-      // Send on various load events
+      // Send on DOM ready
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', sendFarcasterReady);
+      } else {
+        sendFarcasterReady();
       }
+      
+      // Send on window load
       window.addEventListener('load', sendFarcasterReady);
       
-      // Send when page becomes visible (in case it was backgrounded)
+      // Send on visibility change (when tab becomes visible)
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
           sendFarcasterReady();
         }
       });
+      
+      console.log('✅ Farcaster ready signal setup complete');
     </script>
+  </head>
+  <body>
+    <div id="root">
+      <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div style="text-align: center; color: white; padding: 2rem;">
+          <div style="width: 60px; height: 60px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+          <h1 style="font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">BasedNews</h1>
+          <p style="opacity: 0.9; font-size: 1.1rem;">Loading your crypto news...</p>
+        </div>
+      </div>
+    </div>
+    
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
