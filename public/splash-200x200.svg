@@ -1,0 +1,12 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#0052ff" rx="20"/>
+  
+  <!-- "B" for Based -->
+  <text x="100" y="130" font-family="Arial Black, sans-serif" font-size="80" font-weight="900" text-anchor="middle" fill="#ffffff">B</text>
+  
+  <!-- Bottom dots -->
+  <circle cx="70" cy="160" r="3" fill="#ffffff"/>
+  <circle cx="100" cy="160" r="3" fill="#ffffff"/>
+  <circle cx="130" cy="160" r="3" fill="#ffffff"/>
+</svg>
