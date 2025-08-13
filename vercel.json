@@ -2,6 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "vite build --config vite.config.simple.ts",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/.well-known/farcaster.json",
+      "destination": "https://api.farcaster.xyz/miniapps/hosted-manifest/0198a1ad-1598-d9af-0c7c-5086106d7ce0",
+      "statusCode": 307
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -25,19 +32,6 @@
         {
           "key": "X-Robots-Tag",
           "value": "index, follow"
-        }
-      ]
-    },
-    {
-      "source": "/.well-known/farcaster.json",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600"
         }
       ]
     }
