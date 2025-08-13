@@ -7,62 +7,141 @@ import { MiniAppDashboard } from "./components/mini-app-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 import { sdk } from '@farcaster/miniapp-sdk';
 
-// Farcaster SDK Ready Signal
+// Immediate Farcaster SDK Ready Signal - Call ASAP
+const sendImmediateReadySignal = async () => {
+  try {
+    console.log('🚀 IMMEDIATE: Sending Farcaster ready signal...');
+    
+    // Try SDK ready first
+    try {
+      const isInMiniApp = await sdk.isInMiniApp();
+      console.log('📱 IMMEDIATE: Is in Mini App context:', isInMiniApp);
+      
+      if (isInMiniApp) {
+        console.log('🎯 IMMEDIATE: Calling sdk.actions.ready()...');
+        await sdk.actions.ready();
+        console.log('✅ IMMEDIATE: SDK ready signal sent successfully');
+        return true;
+      }
+    } catch (sdkError) {
+      console.log('⚠️ IMMEDIATE: SDK failed, trying fallbacks...', sdkError);
+    }
+    
+    // Fallback ready signals for all cases
+    if (window.parent && window.parent !== window) {
+      console.log('🔄 IMMEDIATE: Sending fallback ready signals...');
+      const signals = [
+        { type: 'sdk.ready', data: {} },
+        { type: 'frame.ready', data: {} },
+        { type: 'sdk_ready' },
+        { type: 'miniapp-ready' },
+        { type: 'ready' },
+        { type: 'farcaster-ready' }
+      ];
+      
+      signals.forEach(signal => {
+        try {
+          window.parent.postMessage(signal, '*');
+        } catch (e) {
+          console.log('Failed to send signal:', signal.type);
+        }
+      });
+      console.log('✅ IMMEDIATE: Fallback ready signals sent');
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('❌ IMMEDIATE: Error sending ready signal:', error);
+    return false;
+  }
+};
+
+// Call immediately when script loads
+sendImmediateReadySignal();
+
+// Farcaster SDK Ready Signal Hook
 const useFarcasterReady = () => {
   React.useEffect(() => {
+    let readySent = false;
+    
     const sendReadySignal = async () => {
+      if (readySent) return;
+      
       try {
-        console.log('🎯 Initializing Farcaster SDK...');
+        console.log('🎯 HOOK: Sending Farcaster ready signal...');
         
         // Check if we're in a Mini App context
         const isInMiniApp = await sdk.isInMiniApp();
-        console.log('📱 Is in Mini App context:', isInMiniApp);
+        console.log('📱 HOOK: Is in Mini App context:', isInMiniApp);
         
         if (isInMiniApp) {
-          console.log('🚀 Calling sdk.actions.ready()...');
+          console.log('🚀 HOOK: Calling sdk.actions.ready()...');
           await sdk.actions.ready();
-          console.log('✅ SDK ready signal sent successfully');
+          console.log('✅ HOOK: SDK ready signal sent successfully');
+          readySent = true;
         } else {
-          console.log('ℹ️ Not in Mini App context, skipping ready signal');
+          console.log('ℹ️ HOOK: Not in Mini App context, trying fallbacks');
           
           // For development/testing outside of Farcaster
           if (window.parent && window.parent !== window) {
-            console.log('🔧 Development mode: sending fallback ready signals...');
-            window.parent.postMessage({ type: 'sdk.ready', data: {} }, '*');
-            window.parent.postMessage({ type: 'frame.ready', data: {} }, '*');
+            console.log('🔧 HOOK: Sending fallback ready signals...');
+            const signals = [
+              { type: 'sdk.ready', data: {} },
+              { type: 'frame.ready', data: {} },
+              { type: 'sdk_ready' },
+              { type: 'miniapp-ready' },
+              { type: 'ready' }
+            ];
+            
+            signals.forEach(signal => {
+              window.parent.postMessage(signal, '*');
+            });
+            readySent = true;
           }
         }
       } catch (error) {
-        console.error('❌ Error with Farcaster SDK ready signal:', error);
+        console.error('❌ HOOK: Error with Farcaster SDK ready signal:', error);
         
         // Fallback for cases where SDK fails
-        if (window.parent && window.parent !== window) {
-          console.log('🔄 Falling back to manual ready signals...');
+        if (window.parent && window.parent !== window && !readySent) {
+          console.log('🔄 HOOK: Falling back to manual ready signals...');
           try {
-            window.parent.postMessage({ type: 'sdk.ready', data: {} }, '*');
-            window.parent.postMessage({ type: 'frame.ready', data: {} }, '*');
-            window.parent.postMessage({ type: 'sdk_ready' }, '*');
-            window.parent.postMessage({ type: 'miniapp-ready' }, '*');
-            console.log('✅ Fallback ready signals sent');
+            const fallbackSignals = [
+              { type: 'sdk.ready', data: {} },
+              { type: 'frame.ready', data: {} },
+              { type: 'sdk_ready' },
+              { type: 'miniapp-ready' },
+              { type: 'ready' },
+              { type: 'farcaster-ready' }
+            ];
+            
+            fallbackSignals.forEach(signal => {
+              window.parent.postMessage(signal, '*');
+            });
+            console.log('✅ HOOK: Fallback ready signals sent');
+            readySent = true;
           } catch (fallbackError) {
-            console.error('❌ Fallback ready signals also failed:', fallbackError);
+            console.error('❌ HOOK: Fallback ready signals also failed:', fallbackError);
           }
         }
       }
     };
 
-    // Send ready signal after component mounts
-    const timer = setTimeout(sendReadySignal, 100);
+    // Multiple timing strategies
+    sendReadySignal(); // Immediate
+    setTimeout(sendReadySignal, 50);   // Very quick
+    setTimeout(sendReadySignal, 100);  // Quick
+    setTimeout(sendReadySignal, 500);  // Medium
+    setTimeout(sendReadySignal, 1000); // Slower fallback
 
-    // Also send after page load
+    // Also send after page load events
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', sendReadySignal);
-    } else {
-      window.addEventListener('load', sendReadySignal);
     }
+    window.addEventListener('load', sendReadySignal);
 
     return () => {
-      clearTimeout(timer);
       document.removeEventListener('DOMContentLoaded', sendReadySignal);
       window.removeEventListener('load', sendReadySignal);
     };

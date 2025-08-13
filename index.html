@@ -45,32 +45,56 @@
     
     <!-- Farcaster Ready Signal via PostMessage -->
     <script>
-      // Send ready signal immediately and on load
+      // Enhanced ready signal function
       function sendFarcasterReady() {
         if (window.parent && window.parent !== window) {
-          console.log('🎯 Sending Farcaster ready signal...');
+          console.log('🎯 HTML: Sending Farcaster ready signal...');
           try {
-            window.parent.postMessage({ type: 'sdk.ready', data: {} }, '*');
-            window.parent.postMessage({ type: 'frame.ready', data: {} }, '*');
-            window.parent.postMessage({ type: 'sdk_ready' }, '*');
-            window.parent.postMessage({ type: 'miniapp-ready' }, '*');
-            console.log('✅ Ready signals sent successfully');
+            // Send multiple signal types to ensure compatibility
+            const signals = [
+              { type: 'sdk.ready', data: {} },
+              { type: 'frame.ready', data: {} },
+              { type: 'sdk_ready' },
+              { type: 'miniapp-ready' },
+              { type: 'ready' },
+              { type: 'farcaster-ready' },
+              { type: 'app-ready' }
+            ];
+            
+            signals.forEach(signal => {
+              window.parent.postMessage(signal, '*');
+            });
+            
+            console.log('✅ HTML: Ready signals sent successfully');
           } catch (e) {
-            console.warn('Ready signal error:', e);
+            console.warn('HTML: Ready signal error:', e);
           }
         }
       }
       
-      // Send immediately
+      // Send immediately when script runs
       sendFarcasterReady();
       
-      // Send on load
+      // Send multiple times with different timing strategies
+      setTimeout(sendFarcasterReady, 10);   // Very immediate
+      setTimeout(sendFarcasterReady, 50);   // Quick
+      setTimeout(sendFarcasterReady, 100);  // Standard
+      setTimeout(sendFarcasterReady, 300);  // Medium
+      setTimeout(sendFarcasterReady, 500);  // Slower
+      setTimeout(sendFarcasterReady, 1000); // Final fallback
+      
+      // Send on various load events
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', sendFarcasterReady);
+      }
       window.addEventListener('load', sendFarcasterReady);
       
-      // Send with delays
-      setTimeout(sendFarcasterReady, 100);
-      setTimeout(sendFarcasterReady, 500);
-      setTimeout(sendFarcasterReady, 1000);
+      // Send when page becomes visible (in case it was backgrounded)
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          sendFarcasterReady();
+        }
+      });
     </script>
   </body>
 </html>
