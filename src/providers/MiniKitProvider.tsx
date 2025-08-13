@@ -311,4 +311,4 @@ export function useMiniKitContext() {
     throw new Error('useMiniKitContext must be used within a MiniKitProvider');
   }
   return context;
-}
+}// Updated for Farcaster SDK integration
