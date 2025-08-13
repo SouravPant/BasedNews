@@ -1,7 +1,12 @@
 {
-  "miniApp": {
-    "name": "BasedNews",
+  "accountAssociation": {
+    "header": "eyJmaWQiOjIzNDU1OSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweGI4NDEyQTEyYzE2NDE3QmJCMmREMGI1YzlFMDhkQzdiZjNBMjQ4RjYifQ",
+    "payload": "eyJkb21haW4iOiJiYXNlZC1uZXdzLWVpZ2h0LnZlcmNlbC5hcHAifQ",
+    "signature": "P0DJ885+3YB//OyF65xXcMFEP+No78tw1Rc9lfsLMcAiN9d6yfLDZ5/ZmyL52u50hHnbcv3wBEUxbF74qk620hw="
+  },
+  "miniapp": {
     "version": "1",
+    "name": "BasedNews",
     "iconUrl": "https://based-news-eight.vercel.app/icon.png",
     "homeUrl": "https://based-news-eight.vercel.app",
     "imageUrl": "https://based-news-eight.vercel.app/image.png",
@@ -22,14 +27,10 @@
       "defi",
       "trading"
     ],
+    "heroImageUrl": "https://based-news-eight.vercel.app/hero.png",
     "tagline": "Your Base crypto companion",
     "ogTitle": "Base News",
     "ogDescription": "Real-time crypto news and market data for Base ecosystem",
     "ogImageUrl": "https://based-news-eight.vercel.app/og-image.png"
-  },
-  "accountAssociation": {
-    "header": "eyJmaWQiOjIzNDU1OSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweGI4NDEyQTEyYzE2NDE3QmJCMmREMGI1YzlFMDhkQzdiZjNBMjQ4RjYifQ",
-    "payload": "eyJkb21haW4iOiJiYXNlZC1uZXdzLWVpZ2h0LnZlcmNlbC5hcHAifQ",
-    "signature": "P0DJ885+3YB//OyF65xXcMFEP+No78tw1Rc9lfsLMcAiN9d6yfLDZ5/ZmyL52u50hHnbcv3wBEUxbF74qk620hw="
   }
 }
