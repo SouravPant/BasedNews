@@ -64,4 +64,4 @@ The deployment creates:
 - **Backend**: Express.js, Node.js
 - **Build**: Vite, ESBuild
 - **Deployment**: Vercel (serverless)
-- **APIs**: CoinGecko, CryptoPanic (optional)
+- **APIs**: CoinGecko, CryptoPanic (optional)# Trigger deployment Mon Aug 18 02:30:22 PM UTC 2025
