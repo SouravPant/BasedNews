@@ -63,6 +63,6 @@
     "ogImageUrl": "https://based-news-eight.vercel.app/og-image.png"
   },
   "baseBuilder": {
-    "allowedAddresses": ["0x73D1aA788C87CB2EF0843a8d638D7399b1608A65"]
+    "allowedAddresses": ["0x01C8093b459AA8AE2Efd0BCBad14f7930b4617aC"]
   }
 }
