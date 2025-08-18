@@ -33,6 +33,35 @@
     "ogDescription": "Real-time crypto news and market data for Base ecosystem",
     "ogImageUrl": "https://based-news-eight.vercel.app/og-image.png"
   },
+  "frame": {
+    "version": "1",
+    "name": "BasedNews",
+    "iconUrl": "https://based-news-eight.vercel.app/icon.png",
+    "homeUrl": "https://based-news-eight.vercel.app",
+    "imageUrl": "https://based-news-eight.vercel.app/image.png",
+    "buttonTitle": "View Latest News",
+    "splashImageUrl": "https://based-news-eight.vercel.app/splash.png",
+    "splashBackgroundColor": "#0052ff",
+    "webhookUrl": "https://based-news-eight.vercel.app/api/webhook",
+    "subtitle": "Base News and Crypto Tracker",
+    "description": "Real-time crypto news and market data for Base ecosystem. Track prices, view charts, and stay updated with latest crypto news.",
+    "screenshotUrls": [
+      "https://based-news-eight.vercel.app/screenshot1.png"
+    ],
+    "primaryCategory": "news-media",
+    "tags": [
+      "crypto",
+      "news",
+      "base",
+      "defi",
+      "trading"
+    ],
+    "heroImageUrl": "https://based-news-eight.vercel.app/hero.png",
+    "tagline": "Your Base crypto companion",
+    "ogTitle": "Base News",
+    "ogDescription": "Real-time crypto news and market data for Base ecosystem",
+    "ogImageUrl": "https://based-news-eight.vercel.app/og-image.png"
+  },
   "baseBuilder": {
     "allowedAddresses": ["0x73D1aA788C87CB2EF0843a8d638D7399b1608A65"]
   }
