@@ -32,5 +32,8 @@
     "ogTitle": "Base News",
     "ogDescription": "Real-time crypto news and market data for Base ecosystem",
     "ogImageUrl": "https://based-news-eight.vercel.app/og-image.png"
+  },
+  "baseBuilder": {
+    "allowedAddresses": ["0x73D1aA788C87CB2EF0843a8d638D7399b1608A65"]
   }
 }
