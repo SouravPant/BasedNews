@@ -1,5 +1,4 @@
 import React from "react";
-import { useComposeCast } from '@coinbase/onchainkit/minikit';
 import { useMiniKit, useBaseAuth, useBaseSocial } from '../hooks/useMiniKit';
 
 // OnchainKit and wallet state
@@ -41,7 +40,6 @@ interface PortfolioItem extends Coin {
 
 export function MiniAppDashboard() {
   // MiniKit Farcaster integration
-  const { composeCast } = useComposeCast();
   const { isInBaseApp, user: farcasterUser } = useMiniKit();
   const { signInWithBase, isAuthenticated } = useBaseAuth();
   const { shareToFarcaster } = useBaseSocial();
@@ -652,22 +650,7 @@ export function MiniAppDashboard() {
                       
                       const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
                       
-                      // 1. First try MiniKit composeCast (works in Base app and Farcaster clients)
-                      if (isInBaseApp) {
-                        try {
-                          console.log('🎯 Using MiniKit composeCast for Base app');
-                          composeCast({
-                            text: shareText,
-                            embeds: [window.location.href]
-                          });
-                          console.log('✅ MiniKit composeCast called successfully');
-                          return;
-                        } catch (error) {
-                          console.error('❌ MiniKit composeCast failed:', error);
-                        }
-                      }
-                      
-                      // 2. Try custom shareToFarcaster hook (handles environment detection)
+                      // 1. Try custom shareToFarcaster hook (handles environment detection)
                       try {
                         console.log('🎯 Using shareToFarcaster hook');
                         shareToFarcaster(shareText, [window.location.href]);
@@ -677,7 +660,7 @@ export function MiniAppDashboard() {
                         console.error('❌ shareToFarcaster failed:', error);
                       }
                       
-                      // 3. Fallback to native sharing
+                      // 2. Fallback to native sharing
                       if (navigator.share) {
                         console.log('🎯 Using navigator.share');
                         navigator.share({
@@ -690,7 +673,7 @@ export function MiniAppDashboard() {
                           alert('📋 Copied to clipboard! Share on Farcaster.');
                         });
                       } else {
-                        // 4. Final fallback - clipboard
+                        // 3. Final fallback - clipboard
                         console.log('📋 Final fallback - copying to clipboard');
                         navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
                         alert('📋 Copied to clipboard! Share on Farcaster.');
