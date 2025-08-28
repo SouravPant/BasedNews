@@ -27,11 +27,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       // Base ecosystem coins for priority inclusion
       const baseEcosystemCoins = [
-        'ethereum', 'coinbase-wrapped-staked-eth', 'usd-coin', 'aerodrome-finance', 
-        'based-brett', 'degen-base', 'degen', 'toshi', 'moca-network', 'zora', 'moonwell',
-        'base-protocol', 'seamless-protocol', 'friend-tech', 'extra-finance',
-        // Additional Base ecosystem tokens
-        'higher', 'bald', 'baseswap', 'compound-ether', 'compound-usd-coin'
+        // Core Base tokens
+        'ethereum', 'coinbase-wrapped-staked-eth', 'usd-coin', 'dai', 'wrapped-bitcoin',
+        // Base native projects
+        'aerodrome-finance', 'degen', 'moonwell', 'compound-ether', 'compound-usd-coin',
+        // DeFi on Base
+        'uniswap', 'aave', 'curve-dao-token', 'balancer', 'chainlink',
+        // Major tokens available on Base
+        'tether', 'maker', 'sushiswap', 'yearn-finance', 'convex-finance',
+        // Popular Base ecosystem
+        'based-brett', 'higher', 'bald', 'toshi', 'friend-tech', 'zora',
+        // Cross-chain tokens on Base  
+        'render-token', 'artificial-superintelligence-alliance', 'filecoin'
       ];
 
       let allCoins = [];

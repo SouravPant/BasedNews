@@ -162,7 +162,7 @@ export function MobileBaseCoins() {
     
     try {
       // Use our internal API instead of direct CoinGecko calls to avoid CORS/rate limiting
-      const response = await fetch('/api/cryptocurrencies?per_page=100&includeBaseCoins=true');
+      const response = await fetch('/api/cryptocurrencies?per_page=100&includeBaseCoins=true&includeStablecoins=true');
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -176,9 +176,14 @@ export function MobileBaseCoins() {
         throw new Error('Invalid data format received from API');
       }
       
-      // Convert to expected format and filter Base ecosystem coins
-      const formattedCoins = data
-        .filter((coin: any) => coin.isBaseEcosystem || baseEcosystemCoins.includes(coin.id))
+      // Convert to expected format - show Base ecosystem coins first, then other popular ones
+      const baseCoins = data.filter((coin: any) => coin.isBaseEcosystem || baseEcosystemCoins.includes(coin.id));
+      const otherCoins = data.filter((coin: any) => !coin.isBaseEcosystem && !baseEcosystemCoins.includes(coin.id));
+      
+      // Combine Base coins first, then top 50 other coins to ensure we have enough content
+      const allDisplayCoins = [...baseCoins, ...otherCoins.slice(0, 50)];
+      
+      const formattedCoins = allDisplayCoins
         .map((coin: any, index: number) => ({
           id: coin.id,
           name: coin.name,
