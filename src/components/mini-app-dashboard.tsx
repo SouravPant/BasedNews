@@ -38,12 +38,139 @@ interface PortfolioItem extends Coin {
   purchasePrice: number;
 }
 
-export function MiniAppDashboard() {
+// Error Boundary Component
+class DashboardErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('🚨 Dashboard Error:', error);
+    console.error('🚨 Error Info:', errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          padding: '40px',
+          textAlign: 'center',
+          backgroundColor: '#fee2e2',
+          color: '#dc2626',
+          borderRadius: '8px',
+          margin: '20px'
+        }}>
+          <h2>🚨 Dashboard Error</h2>
+          <p>Something went wrong with the dashboard component.</p>
+          <pre style={{ 
+            fontSize: '12px', 
+            overflow: 'auto', 
+            backgroundColor: '#fef2f2',
+            padding: '16px',
+            borderRadius: '4px',
+            textAlign: 'left'
+          }}>
+            {this.state.error?.toString()}
+          </pre>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#dc2626',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginTop: '16px'
+            }}
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+function DashboardContent() {
+  // Debug logging for blank screen
+  console.log('🔍 DashboardContent component rendering...');
+  
+  // Loading state
+  const [isLoading, setIsLoading] = React.useState(true);
+  
   // MiniKit Farcaster integration
-  const { shareToFarcaster } = useBaseSocial();
+  let shareToFarcaster;
+  
+  try {
+    const socialHook = useBaseSocial();
+    shareToFarcaster = socialHook.shareToFarcaster;
+    console.log('🎯 shareToFarcaster loaded:', typeof shareToFarcaster);
+  } catch (error) {
+    console.error('❌ Error loading useBaseSocial:', error);
+    return (
+      <div style={{
+        padding: '40px',
+        textAlign: 'center',
+        backgroundColor: '#fef3cd',
+        color: '#92400e',
+        borderRadius: '8px',
+        margin: '20px'
+      }}>
+        <h2>⚠️ Hook Loading Error</h2>
+        <p>Failed to load useBaseSocial hook</p>
+        <pre style={{ fontSize: '12px', overflow: 'auto' }}>
+          {error?.toString()}
+        </pre>
+      </div>
+    );
+  }
+  
+  // Early loading screen
+  React.useEffect(() => {
+    console.log('🎬 DashboardContent mounted');
+    const timer = setTimeout(() => {
+      console.log('⏰ Setting loading to false');
+      setIsLoading(false);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  if (isLoading) {
+    console.log('📦 Showing loading screen...');
+    return (
+      <div style={{
+        padding: '40px',
+        textAlign: 'center',
+        backgroundColor: '#f3f4f6',
+        borderRadius: '8px',
+        margin: '20px'
+      }}>
+        <h2>🚀 Loading Dashboard...</h2>
+        <p>BasedHub is starting up...</p>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          border: '3px solid #e5e7eb',
+          borderTop: '3px solid #0052ff',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+          margin: '20px auto'
+        }} />
+      </div>
+    );
+  }
 
   // Add CSS animations
   React.useEffect(() => {
+    console.log('🎨 Adding CSS animations...');
     const style = document.createElement('style');
     style.textContent = `
       @keyframes spin {
@@ -58,8 +185,10 @@ export function MiniAppDashboard() {
   // Cache busting for Vercel
   React.useEffect(() => {
     console.log('🚀 MiniApp Dashboard loaded at:', new Date().toISOString());
-    console.log('📦 Version: 2.0.0 - Fixed MiniKit shareToFarcaster');
+    console.log('📦 Version: 2.0.0 - Debug blank screen');
     console.log('🎯 Build timestamp:', Date.now());
+    console.log('🌐 Window location:', window.location.href);
+    console.log('📱 User agent:', navigator.userAgent);
   }, []);
   const [watchlist, setWatchlist] = React.useState<WatchlistItem[]>([]);
   const [portfolio, setPortfolio] = React.useState<PortfolioItem[]>([]);
@@ -1164,5 +1293,14 @@ export function MiniAppDashboard() {
          </a>
        </nav>
     </div>
+  );
+}
+
+// Main export with error boundary
+export function MiniAppDashboard() {
+  return (
+    <DashboardErrorBoundary>
+      <DashboardContent />
+    </DashboardErrorBoundary>
   );
 }
