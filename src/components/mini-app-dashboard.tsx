@@ -1,5 +1,17 @@
 import React from "react";
 
+// OnchainKit and wallet state
+interface WalletState {
+  address: string | null;
+  isConnected: boolean;
+  balance: string;
+  tokens: Array<{
+    symbol: string;
+    balance: string;
+    usdValue: number;
+  }>;
+}
+
 interface Coin {
   id: string;
   name: string;
@@ -27,6 +39,62 @@ export function MiniAppDashboard() {
   const [isAddingCoin, setIsAddingCoin] = React.useState(false);
   const [searchResults, setSearchResults] = React.useState<Coin[]>([]);
   const [searchQuery, setSearchQuery] = React.useState('');
+  
+  // OnchainKit wallet state
+  const [walletState, setWalletState] = React.useState<WalletState>({
+    address: null,
+    isConnected: false,
+    balance: '0',
+    tokens: []
+  });
+
+  // Fetch real wallet balances from Base chain
+  const fetchWalletBalances = async (address: string) => {
+    try {
+      // Get ETH balance using Base RPC
+      const ethBalance = await fetch('https://mainnet.base.org', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'eth_getBalance',
+          params: [address, 'latest'],
+          id: 1
+        })
+      });
+      
+      const ethResult = await ethBalance.json();
+      const ethBalanceWei = BigInt(ethResult.result || '0');
+      const ethBalanceEth = Number(ethBalanceWei) / 1e18;
+      
+      // Get current ETH price
+      const priceResponse = await fetch('/api/cryptocurrencies?ids=ethereum&per_page=1');
+      const priceData = await priceResponse.json();
+      const ethPrice = parseFloat(priceData[0]?.currentPrice || '0');
+      
+      const tokens = [
+        {
+          symbol: 'ETH',
+          balance: ethBalanceEth.toFixed(4),
+          usdValue: ethBalanceEth * ethPrice
+        }
+      ];
+      
+      const totalValue = tokens.reduce((sum, token) => sum + token.usdValue, 0);
+      
+      setWalletState({
+        address,
+        isConnected: true,
+        balance: ethBalanceEth.toFixed(4),
+        tokens
+      });
+      
+      setTotalPortfolioValue(totalValue);
+      
+    } catch (error) {
+      console.error('Failed to fetch wallet balances:', error);
+    }
+  };
 
   // Load saved data from localStorage
   React.useEffect(() => {
@@ -38,42 +106,6 @@ export function MiniAppDashboard() {
     }
     if (savedPortfolio) {
       setPortfolio(JSON.parse(savedPortfolio));
-    } else {
-      // Add some Base ecosystem tokens for demonstration
-      const demoPortfolio: PortfolioItem[] = [
-        {
-          id: 'ethereum',
-          name: 'Ethereum',
-          symbol: 'ETH',
-          currentPrice: '3800.00',
-          priceChangePercentage24h: '2.5',
-          amount: 1.2345,
-          purchasePrice: 3600.00,
-          image: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png'
-        },
-        {
-          id: 'usd-coin',
-          name: 'USD Coin',
-          symbol: 'USDC',
-          currentPrice: '1.00',
-          priceChangePercentage24h: '0.1',
-          amount: 500.00,
-          purchasePrice: 1.00,
-          image: 'https://assets.coingecko.com/coins/images/6319/thumb/USD_Coin_icon.png'
-        },
-        {
-          id: 'degen-base',
-          name: 'Degen',
-          symbol: 'DEGEN',
-          currentPrice: '0.045',
-          priceChangePercentage24h: '5.2',
-          amount: 1000.0,
-          purchasePrice: 0.040,
-          image: 'https://assets.coingecko.com/coins/images/34515/thumb/android-chrome-512x512.png'
-        }
-      ];
-      setPortfolio(demoPortfolio);
-      localStorage.setItem('basednews-portfolio', JSON.stringify(demoPortfolio));
     }
   }, []);
 
@@ -243,7 +275,8 @@ export function MiniAppDashboard() {
                     try {
                       if (window.ethereum) {
                         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                        alert('✅ Coinbase Wallet Connected!\nAddress: ' + accounts[0]);
+                        console.log('✅ Coinbase Wallet Connected:', accounts[0]);
+                        await fetchWalletBalances(accounts[0]);
                       } else {
                         window.open('https://wallet.coinbase.com/', '_blank');
                       }
@@ -287,7 +320,8 @@ export function MiniAppDashboard() {
                     try {
                       if (window.ethereum && window.ethereum.isMetaMask) {
                         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                        alert('✅ MetaMask Connected!\nAddress: ' + accounts[0]);
+                        console.log('✅ MetaMask Connected:', accounts[0]);
+                        await fetchWalletBalances(accounts[0]);
                       } else {
                         window.open('https://metamask.io/', '_blank');
                       }
@@ -331,8 +365,38 @@ export function MiniAppDashboard() {
                 margin: 0,
                 fontSize: '14px'
               }}>
-                Total Value: <strong style={{ color: 'var(--foreground)', fontSize: '18px' }}>$0.00</strong>
+                Total Value: <strong style={{ color: 'var(--foreground)', fontSize: '18px' }}>
+                  ${totalPortfolioValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </strong>
               </p>
+              {walletState.isConnected && (
+                <div style={{ marginTop: '8px' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
+                    Connected: {walletState.address?.slice(0, 6)}...{walletState.address?.slice(-4)}
+                  </div>
+                  <button
+                    onClick={() => {
+                      const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
+                      if (navigator.share) {
+                        navigator.share({ text: shareText, url: window.location.href });
+                      } else {
+                        navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
+                      }
+                    }}
+                    style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#8a63d2',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    📢 Share on Farcaster
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         
