@@ -230,8 +230,8 @@ export default function Dashboard() {
           <div>Debug: baseWallet.isConnected={JSON.stringify(baseWallet.isConnected)}, baseWallet.address={JSON.stringify(baseWallet.address)}, baseWallet.chainId={JSON.stringify(baseWallet.chainId)}, baseWallet.error={JSON.stringify(baseWallet.error)}</div>
         </div>
 
-        {/* Wallet Connection Section */}
-        {!baseWallet.isConnected && (
+        {/* Wallet Connection Section - Always Show for Testing */}
+        {true && (
           <section className="mb-8">
             <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-800">
               <div className="p-6 text-center">
@@ -285,20 +285,25 @@ export default function Dashboard() {
                   <Button 
                     variant="outline"
                     onClick={async () => {
-                      console.log('Add to Base App clicked');
+                      console.log('Simple wallet test clicked');
                       try {
-                        const result = await addToBaseApp();
-                        console.log('Add to Base App result:', result);
-                        alert('Added to Base App: ' + JSON.stringify(result));
+                        if (typeof window !== 'undefined' && window.ethereum) {
+                          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                          alert('✅ Wallet Connected!\nAddress: ' + accounts[0]);
+                          console.log('Simple wallet test success:', accounts);
+                        } else {
+                          alert('❌ No wallet found!\nPlease install MetaMask or Coinbase Wallet');
+                          console.log('No window.ethereum found');
+                        }
                       } catch (error) {
-                        console.error('Add to Base App failed:', error);
-                        alert('Failed to add to Base App: ' + (error as Error).message);
+                        console.error('Simple wallet test failed:', error);
+                        alert('❌ Wallet test failed: ' + (error as Error).message);
                       }
                     }}
-                    className="border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                    className="border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add to Base App
+                    <Wallet className="w-4 h-4 mr-2" />
+                    Simple Test
                   </Button>
                 </div>
                 <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-400">
