@@ -185,18 +185,21 @@ export function MobileBaseCoins() {
       // Show ONLY Base coins, no other tokens
       const allDisplayCoins = baseCoins;
       
-      const formattedCoins = allDisplayCoins
-        .map((coin: any, index: number) => ({
-          id: coin.id,
-          name: coin.name,
-          symbol: coin.symbol?.toLowerCase() || '',
-          current_price: parseFloat(coin.currentPrice) || 0,
-          price_change_percentage_24h: parseFloat(coin.priceChangePercentage24h) || 0,
-          market_cap: parseFloat(coin.marketCap) || 0,
-          image: coin.image || '',
-          rank: coin.marketCapRank || (index + 1)
-        }))
-        .sort((a, b) => a.rank - b.rank);
+      // First sort by market cap, then apply sequential ranking
+      const sortedCoins = allDisplayCoins.sort((a: any, b: any) => 
+        parseFloat(b.marketCap || '0') - parseFloat(a.marketCap || '0')
+      );
+      
+      const formattedCoins = sortedCoins.map((coin: any, index: number) => ({
+        id: coin.id,
+        name: coin.name,
+        symbol: coin.symbol?.toLowerCase() || '',
+        current_price: parseFloat(coin.currentPrice) || 0,
+        price_change_percentage_24h: parseFloat(coin.priceChangePercentage24h) || 0,
+        market_cap: parseFloat(coin.marketCap) || 0,
+        image: coin.image || '',
+        rank: index + 1  // Sequential ranking 1, 2, 3... based on position after sorting
+      }));
       
       setCoins(formattedCoins);
     } catch (err) {

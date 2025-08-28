@@ -39,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'sushiswap', 'yearn-finance', 'convex-finance', 'synthetix-network',
         
         // Base native tokens & memecoins
-        'degen', 'based-brett', 'higher', 'bald', 'toshi', 'friend-tech', 'zora',
+        'degen-base', 'based-brett', 'higher', 'bald', 'toshi', 'friend-tech', 'zora',
         'base-protocol', 'brett', 'normie', 'keycat', 'mochi', 'doginme',
         
         // Cross-chain tokens available on Base
@@ -57,7 +57,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         // Additional popular tokens on Base
         'lido-dao', 'rocket-pool', 'frax-share', 'cvx-crv', 'sdl',
-        'olympus', 'klima-dao', 'wonderland', 'spell-token', 'abracadabra'
+        'olympus', 'klima-dao', 'wonderland', 'spell-token', 'abracadabra',
+        
+        // More Base ecosystem tokens
+        'wrapped-bitcoin', 'dai', 'tether', 'usd-coin', 'weth',
+        'rocket-pool-eth', 'compound-ether', 'compound-usd-coin'
       ];
 
       let allCoins = [];
