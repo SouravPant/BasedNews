@@ -1,5 +1,6 @@
 import React from "react";
 import { useComposeCast } from '@coinbase/onchainkit/minikit';
+import { useMiniKit, useBaseAuth, useBaseSocial } from '../hooks/useMiniKit';
 
 // OnchainKit and wallet state
 interface WalletState {
@@ -41,6 +42,9 @@ interface PortfolioItem extends Coin {
 export function MiniAppDashboard() {
   // MiniKit Farcaster integration
   const { composeCast } = useComposeCast();
+  const { isInBaseApp, user: farcasterUser } = useMiniKit();
+  const { signInWithBase, isAuthenticated } = useBaseAuth();
+  const { shareToFarcaster } = useBaseSocial();
 
   // Add CSS animations
   React.useEffect(() => {
@@ -517,6 +521,64 @@ export function MiniAppDashboard() {
                 )}
                 {isLoadingWallet ? 'Connecting...' : 'Connect Coinbase Wallet'}
               </button>
+
+              {/* Farcaster Sign In Button - Only in Base App */}
+              {isInBaseApp && !walletState.isConnected && (
+                <button
+                  onClick={async () => {
+                    console.log('🔗 Farcaster sign-in clicked');
+                    try {
+                      const result = await signInWithBase();
+                      if (result.success && result.user) {
+                        console.log('✅ Farcaster sign-in successful:', result.user);
+                        // If user has wallet address, fetch balances
+                        if (result.user.address) {
+                          await fetchWalletBalances(result.user.address);
+                        }
+                      } else {
+                        console.error('❌ Farcaster sign-in failed:', result.error);
+                      }
+                    } catch (error) {
+                      console.error('❌ Farcaster sign-in error:', error);
+                    }
+                  }}
+                  style={{
+                    padding: '16px',
+                    backgroundColor: '#8a63d2',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    marginBottom: '16px',
+                    fontSize: '16px',
+                    width: '100%',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 8px rgba(138, 99, 210, 0.2)'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#7a52c4';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(138, 99, 210, 0.3)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = '#8a63d2';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(138, 99, 210, 0.2)';
+                  }}
+                >
+                  {/* Farcaster Icon */}
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM18 16H16L14 12L16 8H18L16 12L18 16ZM6 8H8L10 12L8 16H6L8 12L6 8Z" fill="white"/>
+                  </svg>
+                  Connect with Farcaster
+                </button>
+              )}
+
               <p style={{ 
                 color: 'var(--muted-foreground)', 
                 margin: 0,
@@ -526,14 +588,23 @@ export function MiniAppDashboard() {
                   ${totalPortfolioValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </strong>
               </p>
+              {/* Debug cache buster */}
+              <div style={{ 
+                position: 'absolute', 
+                top: '-9999px', 
+                left: '-9999px',
+                opacity: 0,
+                pointerEvents: 'none'
+              }} data-build-time={`v2.3.0-farcaster-${Date.now()}`} />
+              
               {walletState.isConnected && (
                 <div style={{ marginTop: '8px' }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px', 
-                    marginBottom: '8px',
-                    padding: '8px',
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px', 
+                  marginBottom: '8px',
+                  padding: '8px',
                     backgroundColor: 'var(--card)',
                     borderRadius: '8px',
                     border: '1px solid var(--border)'
@@ -577,31 +648,52 @@ export function MiniAppDashboard() {
                   <button
                     onClick={() => {
                       console.log('🚀 Share button clicked');
+                      console.log('📱 Environment:', { isInBaseApp, isAuthenticated, user: !!farcasterUser });
+                      
                       const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
                       
-                      try {
-                        // Use MiniKit composeCast for Farcaster sharing
-                        composeCast({
-                          text: shareText,
-                          embeds: [window.location.href]
-                        });
-                        console.log('✅ MiniKit composeCast called successfully');
-                      } catch (error) {
-                        console.error('❌ MiniKit share failed:', error);
-                        // Fallback to native sharing
-                        if (navigator.share) {
-                          navigator.share({
-                            title: 'My Base Portfolio',
+                      // 1. First try MiniKit composeCast (works in Base app and Farcaster clients)
+                      if (isInBaseApp) {
+                        try {
+                          console.log('🎯 Using MiniKit composeCast for Base app');
+                          composeCast({
                             text: shareText,
-                            url: window.location.href
-                          }).catch(() => {
-                            navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
-                            alert('📋 Copied to clipboard! Share on Farcaster.');
+                            embeds: [window.location.href]
                           });
-                        } else {
+                          console.log('✅ MiniKit composeCast called successfully');
+                          return;
+                        } catch (error) {
+                          console.error('❌ MiniKit composeCast failed:', error);
+                        }
+                      }
+                      
+                      // 2. Try custom shareToFarcaster hook (handles environment detection)
+                      try {
+                        console.log('🎯 Using shareToFarcaster hook');
+                        shareToFarcaster(shareText, [window.location.href]);
+                        console.log('✅ shareToFarcaster called successfully');
+                        return;
+                      } catch (error) {
+                        console.error('❌ shareToFarcaster failed:', error);
+                      }
+                      
+                      // 3. Fallback to native sharing
+                      if (navigator.share) {
+                        console.log('🎯 Using navigator.share');
+                        navigator.share({
+                          title: 'My Base Portfolio',
+                          text: shareText,
+                          url: window.location.href
+                        }).catch(() => {
+                          console.log('📋 Copying to clipboard');
                           navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
                           alert('📋 Copied to clipboard! Share on Farcaster.');
-                        }
+                        });
+                      } else {
+                        // 4. Final fallback - clipboard
+                        console.log('📋 Final fallback - copying to clipboard');
+                        navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
+                        alert('📋 Copied to clipboard! Share on Farcaster.');
                       }
                     }}
                     style={{
