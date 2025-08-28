@@ -171,6 +171,8 @@ export function MiniAppDashboard() {
     setIsLoadingWallet(true);
     setIsLoadingPortfolio(true);
     
+    let ethBalanceEth = 0;
+    
     try {
       // Fetch identity data in parallel
       fetchIdentityData(address);
@@ -189,11 +191,19 @@ export function MiniAppDashboard() {
       
       const ethResult = await ethBalance.json();
       const ethBalanceWei = BigInt(ethResult.result || '0');
-      const ethBalanceEth = Number(ethBalanceWei) / 1e18;
+      ethBalanceEth = Number(ethBalanceWei) / 1e18;
       
       // Get current prices for all tokens
+      console.log('🔍 Fetching token prices...');
       const priceResponse = await fetch('/api/cryptocurrencies?ids=ethereum,usd-coin,degen-base,aerodrome-finance,brett,toshi&per_page=10');
+      
+      if (!priceResponse.ok) {
+        console.error('❌ Price API failed:', priceResponse.status, priceResponse.statusText);
+        throw new Error(`API failed: ${priceResponse.status}`);
+      }
+      
       const priceData = await priceResponse.json();
+      console.log('✅ Price data received:', priceData.length, 'tokens');
       
       const prices = {
         ETH: parseFloat(priceData.find(p => p.id === 'ethereum')?.currentPrice || '0'),
@@ -244,6 +254,24 @@ export function MiniAppDashboard() {
       
     } catch (error) {
       console.error('Failed to fetch wallet balances:', error);
+      
+      // Fallback to basic ETH data without API
+      const mockTokens = [
+        {
+          symbol: 'ETH',
+          balance: ethBalanceEth?.toFixed(4) || '0.0000',
+          usdValue: 0 // No price data available
+        }
+      ];
+      
+      setWalletState({
+        address,
+        isConnected: true,
+        balance: ethBalanceEth?.toFixed(4) || '0.0000',
+        tokens: mockTokens
+      });
+      
+      setTotalPortfolioValue(0);
     } finally {
       setIsLoadingWallet(false);
       setIsLoadingPortfolio(false);
