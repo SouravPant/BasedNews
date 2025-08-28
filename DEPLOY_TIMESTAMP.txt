@@ -1,0 +1,4 @@
+Build timestamp: 2024-12-19T15:05:00.000Z
+Version: 2.0.0
+Fix: Simplified vercel.json to resolve libFiles error
+Commit: Force cache bust and clean build
