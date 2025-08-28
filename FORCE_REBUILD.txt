@@ -1,0 +1,6 @@
+FORCE VERCEL REBUILD - Portfolio Update
+Build Time: 2024-12-28T04:00:00Z
+Version: 1.2.0
+Changes: Removed connect text, added wallet options, portfolio value display
+
+This file forces Vercel to rebuild the entire project.
