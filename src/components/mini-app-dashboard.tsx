@@ -12,6 +12,12 @@ interface WalletState {
   }>;
 }
 
+interface IdentityData {
+  ensName: string | null;
+  avatar: string | null;
+  displayName: string;
+}
+
 interface Coin {
   id: string;
   name: string;
@@ -32,6 +38,18 @@ interface PortfolioItem extends Coin {
 }
 
 export function MiniAppDashboard() {
+  // Add CSS animations
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
   const [watchlist, setWatchlist] = React.useState<WatchlistItem[]>([]);
   const [portfolio, setPortfolio] = React.useState<PortfolioItem[]>([]);
   const [totalPortfolioValue, setTotalPortfolioValue] = React.useState(0);
@@ -47,10 +65,74 @@ export function MiniAppDashboard() {
     balance: '0',
     tokens: []
   });
+  
+  // Identity and loading states
+  const [identityData, setIdentityData] = React.useState<IdentityData>({
+    ensName: null,
+    avatar: null,
+    displayName: ''
+  });
+  const [isLoadingWallet, setIsLoadingWallet] = React.useState(false);
+  const [isLoadingPortfolio, setIsLoadingPortfolio] = React.useState(false);
+  
+  // Base theme colors
+  const baseTheme = {
+    primary: '#0052ff',
+    primaryHover: '#0041cc',
+    success: '#22c55e',
+    error: '#ef4444',
+    warning: '#f59e0b',
+    purple: '#8a63d2',
+    background: 'var(--background)',
+    card: 'var(--card)',
+    cardForeground: 'var(--card-foreground)',
+    foreground: 'var(--foreground)',
+    muted: 'var(--muted)',
+    mutedForeground: 'var(--muted-foreground)',
+    border: 'var(--border)'
+  };
+
+  // Fetch ENS name and avatar
+  const fetchIdentityData = async (address: string) => {
+    try {
+      // Try to resolve ENS name
+      const ensResponse = await fetch(`https://api.ensideas.com/ens/resolve/${address}`);
+      let ensName = null;
+      let avatar = null;
+      
+      if (ensResponse.ok) {
+        const ensData = await ensResponse.json();
+        ensName = ensData.name;
+        avatar = ensData.avatar;
+      }
+      
+      // Fallback: Try Base name service or use address
+      const displayName = ensName || `${address.slice(0, 6)}...${address.slice(-4)}`;
+      
+      setIdentityData({
+        ensName,
+        avatar,
+        displayName
+      });
+    } catch (error) {
+      console.error('Failed to fetch identity data:', error);
+      setIdentityData({
+        ensName: null,
+        avatar: null,
+        displayName: `${address.slice(0, 6)}...${address.slice(-4)}`
+      });
+    }
+  };
 
   // Fetch real wallet balances from Base chain
   const fetchWalletBalances = async (address: string) => {
+    setIsLoadingWallet(true);
+    setIsLoadingPortfolio(true);
+    
     try {
+      // Fetch identity data in parallel
+      fetchIdentityData(address);
+      
       // Get ETH balance using Base RPC
       const ethBalance = await fetch('https://mainnet.base.org', {
         method: 'POST',
@@ -93,6 +175,9 @@ export function MiniAppDashboard() {
       
     } catch (error) {
       console.error('Failed to fetch wallet balances:', error);
+    } finally {
+      setIsLoadingWallet(false);
+      setIsLoadingPortfolio(false);
     }
   };
 
@@ -264,43 +349,52 @@ export function MiniAppDashboard() {
               border: '1px solid var(--border)',
               textAlign: 'center'
             }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '12px',
-                marginBottom: '16px'
-              }}>
-                <button 
-                  onClick={async () => {
-                    try {
-                      if (window.ethereum) {
-                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                        console.log('✅ Coinbase Wallet Connected:', accounts[0]);
-                        await fetchWalletBalances(accounts[0]);
-                      } else {
-                        window.open('https://wallet.coinbase.com/', '_blank');
-                      }
-                    } catch (error) {
-                      console.error('Wallet connection failed:', error);
+              <button 
+                onClick={async () => {
+                  try {
+                    if (window.ethereum) {
+                      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                      console.log('✅ Wallet Connected:', accounts[0]);
+                      await fetchWalletBalances(accounts[0]);
+                    } else {
+                      window.open('https://wallet.coinbase.com/', '_blank');
                     }
-                  }}
-                  style={{
-                    padding: '12px',
-                    backgroundColor: '#0052ff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
+                  } catch (error) {
+                    console.error('Wallet connection failed:', error);
+                  }
+                }}
+                disabled={isLoadingWallet}
+                style={{
+                  padding: '16px',
+                  backgroundColor: isLoadingWallet ? baseTheme.mutedForeground : baseTheme.primary,
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: isLoadingWallet ? 'not-allowed' : 'pointer',
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginBottom: '16px',
+                  fontSize: '16px',
+                  width: '100%',
+                  opacity: isLoadingWallet ? 0.7 : 1
+                }}
+              >
+                {isLoadingWallet ? (
                   <div style={{
-                    width: '24px',
-                    height: '24px',
+                    width: '20px',
+                    height: '20px',
+                    border: '2px solid white',
+                    borderTop: '2px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }} />
+                ) : (
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
                     backgroundColor: 'white',
                     borderRadius: '50%',
                     display: 'flex',
@@ -308,58 +402,13 @@ export function MiniAppDashboard() {
                     justifyContent: 'center',
                     color: '#0052ff',
                     fontWeight: 'bold',
-                    fontSize: '12px'
+                    fontSize: '10px'
                   }}>
                     CB
                   </div>
-                  <span>Coinbase Wallet</span>
-                </button>
-                
-                <button 
-                  onClick={async () => {
-                    try {
-                      if (window.ethereum && window.ethereum.isMetaMask) {
-                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                        console.log('✅ MetaMask Connected:', accounts[0]);
-                        await fetchWalletBalances(accounts[0]);
-                      } else {
-                        window.open('https://metamask.io/', '_blank');
-                      }
-                    } catch (error) {
-                      console.error('MetaMask connection failed:', error);
-                    }
-                  }}
-                  style={{
-                    padding: '12px',
-                    backgroundColor: 'transparent',
-                    color: '#f6851b',
-                    border: '2px solid #f6851b',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  <div style={{
-                    width: '24px',
-                    height: '24px',
-                    backgroundColor: '#f6851b',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    fontSize: '12px'
-                  }}>
-                    M
-                  </div>
-                  <span>MetaMask</span>
-                </button>
-              </div>
+                )}
+                {isLoadingWallet ? 'Connecting...' : 'Connect Coinbase Wallet'}
+              </button>
               <p style={{ 
                 color: 'var(--muted-foreground)', 
                 margin: 0,
@@ -371,16 +420,77 @@ export function MiniAppDashboard() {
               </p>
               {walletState.isConnected && (
                 <div style={{ marginTop: '8px' }}>
-                  <div style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
-                    Connected: {walletState.address?.slice(0, 6)}...{walletState.address?.slice(-4)}
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px', 
+                    marginBottom: '8px',
+                    padding: '8px',
+                    backgroundColor: 'var(--card)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)'
+                  }}>
+                    {identityData.avatar ? (
+                      <img 
+                        src={identityData.avatar} 
+                        alt="Avatar"
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: '32px',
+                        height: '32px',
+                        backgroundColor: baseTheme.primary,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        fontSize: '12px',
+                        fontWeight: 'bold'
+                      }}>
+                        {walletState.address?.slice(2, 4).toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--foreground)' }}>
+                        {identityData.ensName || identityData.displayName}
+                      </div>
+                      <div style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
+                        {walletState.balance} ETH
+                      </div>
+                    </div>
                   </div>
                   <button
-                    onClick={() => {
-                      const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
-                      if (navigator.share) {
-                        navigator.share({ text: shareText, url: window.location.href });
-                      } else {
-                        navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
+                    onClick={async () => {
+                      try {
+                        const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
+                        const shareData = {
+                          title: 'My Base Portfolio',
+                          text: shareText,
+                          url: window.location.href
+                        };
+                        
+                        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                          await navigator.share(shareData);
+                        } else {
+                          await navigator.clipboard.writeText(shareText + '\n' + window.location.href);
+                          alert('📋 Copied to clipboard! Share on Farcaster or social media.');
+                        }
+                      } catch (error) {
+                        console.error('Share failed:', error);
+                        try {
+                          const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
+                          await navigator.clipboard.writeText(shareText + '\n' + window.location.href);
+                          alert('📋 Copied to clipboard! Share on Farcaster or social media.');
+                        } catch (clipboardError) {
+                          console.error('Clipboard failed:', clipboardError);
+                        }
                       }
                     }}
                     style={{
@@ -407,46 +517,150 @@ export function MiniAppDashboard() {
           padding: '20px',
           marginBottom: '20px'
         }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '12px'
-          }}>
-            <span style={{
-              fontSize: '14px',
-              color: 'var(--muted-foreground)'
-            }}>
-              Total Value
-            </span>
-            <span style={{
-              fontSize: '24px',
-              fontWeight: '700',
-              color: 'var(--card-foreground)'
-            }}>
-              {formatPrice(totalPortfolioValue)}
-            </span>
-          </div>
-          
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <span style={{
-              fontSize: '14px',
-              color: 'var(--muted-foreground)'
-            }}>
-              24h Change
-            </span>
-            <span style={{
-              fontSize: '16px',
-              fontWeight: '600',
-              color: portfolioChange24h >= 0 ? '#22c55e' : '#ef4444'
-            }}>
-              {portfolioChange24h >= 0 ? '+' : ''}{formatPrice(portfolioChange24h)}
-            </span>
-          </div>
+          {isLoadingPortfolio ? (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                border: '3px solid var(--muted)',
+                borderTop: '3px solid #0052ff',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 16px'
+              }} />
+              <div style={{ color: 'var(--muted-foreground)' }}>Loading portfolio...</div>
+            </div>
+          ) : (
+            <>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '12px'
+              }}>
+                <span style={{
+                  fontSize: '14px',
+                  color: 'var(--muted-foreground)'
+                }}>
+                  Total Value
+                </span>
+                <span style={{
+                  fontSize: '24px',
+                  fontWeight: '700',
+                  color: 'var(--card-foreground)'
+                }}>
+                  {formatPrice(totalPortfolioValue)}
+                </span>
+              </div>
+              
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: walletState.isConnected && walletState.tokens.length > 0 ? '20px' : '0'
+              }}>
+                <span style={{
+                  fontSize: '14px',
+                  color: 'var(--muted-foreground)'
+                }}>
+                  24h Change
+                </span>
+                <span style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: portfolioChange24h >= 0 ? '#22c55e' : '#ef4444'
+                }}>
+                  {portfolioChange24h >= 0 ? '+' : ''}{formatPrice(portfolioChange24h)}
+                </span>
+              </div>
+
+              {/* Portfolio Analytics */}
+              {walletState.isConnected && walletState.tokens.length > 0 && (
+                <div>
+                  <h4 style={{ 
+                    margin: '0 0 12px 0', 
+                    color: 'var(--foreground)',
+                    fontSize: '16px',
+                    fontWeight: '600'
+                  }}>
+                    🔍 Portfolio Breakdown
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                    {walletState.tokens.map((token, index) => {
+                      const percentage = totalPortfolioValue > 0 ? (token.usdValue / totalPortfolioValue) * 100 : 0;
+                      const colors = ['#0052ff', '#22c55e', '#8a63d2', '#f59e0b'];
+                      const color = colors[index % colors.length];
+                      
+                      return (
+                        <div key={token.symbol} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '12px',
+                          backgroundColor: 'var(--muted)',
+                          borderRadius: '8px',
+                          border: '1px solid var(--border)'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{
+                              width: '16px',
+                              height: '16px',
+                              backgroundColor: color,
+                              borderRadius: '50%'
+                            }} />
+                            <div>
+                              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--foreground)' }}>
+                                {token.symbol}
+                              </div>
+                              <div style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
+                                {token.balance} tokens
+                              </div>
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--foreground)' }}>
+                              ${token.usdValue.toFixed(2)}
+                            </div>
+                            <div style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
+                              {percentage.toFixed(1)}%
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Visual Portfolio Chart */}
+                  <div style={{
+                    display: 'flex',
+                    height: '12px',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    backgroundColor: 'var(--muted)',
+                    border: '1px solid var(--border)'
+                  }}>
+                    {walletState.tokens.map((token, index) => {
+                      const percentage = totalPortfolioValue > 0 ? (token.usdValue / totalPortfolioValue) * 100 : 0;
+                      const colors = ['#0052ff', '#22c55e', '#8a63d2', '#f59e0b'];
+                      const color = colors[index % colors.length];
+                      
+                      return (
+                        <div
+                          key={token.symbol}
+                          style={{
+                            flex: `0 0 ${percentage}%`,
+                            backgroundColor: color,
+                            height: '100%'
+                          }}
+                          title={`${token.symbol}: ${percentage.toFixed(1)}%`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {/* Portfolio Holdings */}
