@@ -224,9 +224,10 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Debug info - remove later */}
-        <div className="mb-4 p-2 bg-red-100 text-xs">
-          Debug: baseWallet.isConnected={JSON.stringify(baseWallet.isConnected)}, baseWallet.address={JSON.stringify(baseWallet.address)}, baseWallet.chainId={JSON.stringify(baseWallet.chainId)}, baseWallet.error={JSON.stringify(baseWallet.error)}
+        {/* Cache Bust & Debug info */}
+        <div className="mb-4 p-2 bg-red-100 text-xs space-y-1">
+          <div>🔄 Build: {new Date().toISOString()} | Version: 1.1.0</div>
+          <div>Debug: baseWallet.isConnected={JSON.stringify(baseWallet.isConnected)}, baseWallet.address={JSON.stringify(baseWallet.address)}, baseWallet.chainId={JSON.stringify(baseWallet.chainId)}, baseWallet.error={JSON.stringify(baseWallet.error)}</div>
         </div>
 
         {/* Wallet Connection Section */}
