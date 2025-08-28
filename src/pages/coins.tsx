@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CryptoChartModal } from '@/components/crypto-chart-modal';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -78,8 +79,13 @@ export function Coins() {
   });
 
   const handleCryptoClick = (crypto: Cryptocurrency) => {
-    setSelectedCrypto(crypto);
-    setIsChartModalOpen(true);
+    try {
+      setSelectedCrypto(crypto);
+      setIsChartModalOpen(true);
+    } catch (error) {
+      console.error('Error opening crypto modal:', error);
+      // Don't crash the whole page if modal fails
+    }
   };
 
 
@@ -349,11 +355,13 @@ export function Coins() {
       </main>
 
       {/* Chart Modal */}
-      <CryptoChartModal 
-        isOpen={isChartModalOpen}
-        onClose={() => setIsChartModalOpen(false)}
-        cryptocurrency={selectedCrypto}
-      />
+      <ErrorBoundary>
+        <CryptoChartModal 
+          isOpen={isChartModalOpen}
+          onClose={() => setIsChartModalOpen(false)}
+          cryptocurrency={selectedCrypto}
+        />
+      </ErrorBoundary>
     </div>
   );
 }

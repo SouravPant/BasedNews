@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Chart from 'react-apexcharts';
@@ -38,13 +38,41 @@ export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChang
   const priceChangePercentage = firstPrice > 0 ? ((priceChange / firstPrice) * 100) : 0;
   const isPositive = priceChange >= 0;
 
-  // Prepare chart data
-  const chartData = data.map(point => ({
-    x: new Date(point.time).getTime(),
-    y: point.price
-  }));
+  // Safely prepare chart data with error handling
+  const chartData = React.useMemo(() => {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      return [];
+    }
+    return data.map(point => {
+      const time = point?.time ? new Date(point.time).getTime() : Date.now();
+      const price = typeof point?.price === 'number' && !isNaN(point.price) ? point.price : 0;
+      return { x: time, y: price };
+    }).filter(point => point.y > 0); // Filter out invalid prices
+  }, [data]);
 
-  const isDarkMode = document.documentElement.classList.contains('dark');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Safely check dark mode
+    const checkDarkMode = () => {
+      if (typeof document !== 'undefined' && document.documentElement) {
+        setIsDarkMode(document.documentElement.classList.contains('dark'));
+      }
+    };
+    
+    checkDarkMode();
+    
+    // Listen for theme changes
+    const observer = new MutationObserver(checkDarkMode);
+    if (typeof document !== 'undefined' && document.documentElement) {
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+    }
+    
+    return () => observer.disconnect();
+  }, []);
 
   const chartOptions = {
     chart: {
@@ -164,13 +192,20 @@ export function CryptoChart({ data, coinName, coinSymbol, days, onTimeframeChang
       </div>
       
       <div className="w-full h-72 sm:h-96">
-        <Chart
-          options={chartOptions}
-          series={series}
-          type={chartType}
-          height={isMobile ? 280 : 400}
-          width="100%"
-        />
+        {chartData.length > 0 ? (
+          <Chart
+            options={chartOptions}
+            series={series}
+            type={chartType}
+            height={isMobile ? 280 : 400}
+            width="100%"
+            key={`chart-${coinName}-${days}`} // Force re-render on data change
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            <p>No chart data available</p>
+          </div>
+        )}
       </div>
     </div>
   );

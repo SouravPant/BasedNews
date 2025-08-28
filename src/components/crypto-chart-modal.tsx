@@ -27,10 +27,30 @@ export function CryptoChartModal({ isOpen, onClose, cryptocurrency }: CryptoChar
 
   const { data: chartData, isLoading, error } = useQuery<ChartData>({
     queryKey: ['/api/cryptocurrencies', cryptocurrency?.id, 'chart', selectedDays],
-    queryFn: () => 
-      fetch(`/api/cryptocurrencies/${cryptocurrency?.id}/chart?days=${selectedDays}`)
-        .then(res => res.json()),
+    queryFn: async () => {
+      try {
+        const response = await fetch(`/api/cryptocurrencies/${cryptocurrency?.id}/chart?days=${selectedDays}`);
+        if (!response.ok) {
+          throw new Error(`Chart API error: ${response.status}`);
+        }
+        const data = await response.json();
+        if (!data || !Array.isArray(data.data)) {
+          throw new Error('Invalid chart data format');
+        }
+        return data;
+      } catch (error) {
+        console.error('Chart data fetch error:', error);
+        // Return fallback data instead of crashing
+        return {
+          coinId: cryptocurrency?.id || 'unknown',
+          days: selectedDays,
+          data: []
+        };
+      }
+    },
     enabled: isOpen && !!cryptocurrency?.id,
+    retry: 1, // Limit retries to prevent infinite loops
+    staleTime: 60000, // Cache for 1 minute
   });
 
   const timeRangeOptions = [
