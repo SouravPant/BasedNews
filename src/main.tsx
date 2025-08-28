@@ -4,6 +4,7 @@ import "./index.css";
 import { MobileBaseCoins } from "./pages/mobile-base-coins";
 import { BaseNews } from "./components/base-news";
 import { MiniAppDashboard } from "./components/mini-app-dashboard";
+import { TestDashboard } from "./components/test-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 import { BaseWalletProvider } from "./providers/BaseWalletProvider";
 import { MiniKitProvider } from "./providers/MiniKitProvider";
@@ -588,7 +589,7 @@ function App() {
     return (
       <>
         <ThemeToggleSimple />
-        <MiniAppDashboard />
+        <TestDashboard />
       </>
     );
   }
