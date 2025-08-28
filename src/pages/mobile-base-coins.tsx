@@ -1,5 +1,6 @@
 import React from "react";
 import { CryptoChartModalSimple } from "../components/crypto-chart-modal-simple";
+import { ErrorBoundary } from "../components/ErrorBoundary";
 import { TrendingUp, Newspaper, BarChart3, Coins } from 'lucide-react';
 
 interface Coin {
@@ -160,29 +161,35 @@ export function MobileBaseCoins() {
     setError(null);
     
     try {
-      // Fetch specific Base ecosystem coins
-      const coinIds = baseEcosystemCoins.join(',');
-      const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinIds}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`
-      );
+      // Use our internal API instead of direct CoinGecko calls to avoid CORS/rate limiting
+      const response = await fetch('/api/cryptocurrencies?per_page=100&includeBaseCoins=true');
       
       if (!response.ok) {
-        throw new Error('Failed to fetch cryptocurrency data');
+        const errorText = await response.text();
+        console.error('API Error:', response.status, errorText);
+        throw new Error(`Failed to fetch cryptocurrency data: ${response.status}`);
       }
       
       const data = await response.json();
       
-      // Add rank based on market cap order and format data
-      const formattedCoins = data.map((coin: any, index: number) => ({
-        id: coin.id,
-        name: coin.name,
-        symbol: coin.symbol,
-        current_price: coin.current_price,
-        price_change_percentage_24h: coin.price_change_percentage_24h,
-        market_cap: coin.market_cap,
-        image: coin.image,
-        rank: index + 1
-      }));
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid data format received from API');
+      }
+      
+      // Convert to expected format and filter Base ecosystem coins
+      const formattedCoins = data
+        .filter((coin: any) => coin.isBaseEcosystem || baseEcosystemCoins.includes(coin.id))
+        .map((coin: any, index: number) => ({
+          id: coin.id,
+          name: coin.name,
+          symbol: coin.symbol?.toLowerCase() || '',
+          current_price: parseFloat(coin.currentPrice) || 0,
+          price_change_percentage_24h: parseFloat(coin.priceChangePercentage24h) || 0,
+          market_cap: parseFloat(coin.marketCap) || 0,
+          image: coin.image || '',
+          rank: coin.marketCapRank || (index + 1)
+        }))
+        .sort((a, b) => a.rank - b.rank);
       
       setCoins(formattedCoins);
     } catch (err) {
@@ -271,7 +278,8 @@ export function MobileBaseCoins() {
   };
 
   return (
-    <div style={{
+    <ErrorBoundary>
+      <div style={{
       minHeight: '100vh',
       backgroundColor: 'var(--background)',
       color: 'var(--foreground)',
@@ -645,6 +653,7 @@ export function MobileBaseCoins() {
           }
         }
       `}</style>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
