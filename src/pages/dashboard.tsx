@@ -15,6 +15,8 @@ import { NewsArticle } from "@/components/news-article";
 import { RedditPost } from "@/components/reddit-post";
 import { TwitterPost } from "@/components/twitter-post";
 import { StatusBar } from "@/components/status-bar";
+import { WalletPortfolio } from "@/components/wallet-portfolio";
+import { BaseFeatures } from "@/components/base-features";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -23,11 +25,14 @@ import { Star, Plus, Eye, Wallet, Bell, Activity, TrendingUp, Users, Settings, B
 import { Cryptocurrency, NewsArticle as NewsArticleType, RedditPost as RedditPostType } from "@shared/schema";
 import { SearchBar } from "@/components/search-bar";
 import { NewsFilter } from "@/components/news-filter";
-import { useMiniKit } from "@/hooks/useMiniKit";
+import { useMiniKit, useWallet, useBaseSocial, useBaseApp } from "@/hooks/useMiniKit";
 
 export default function Dashboard() {
   const { isAuthenticated, user } = useAuth();
   const { user: miniKitUser, wallet: miniKitWallet } = useMiniKit();
+  const { wallet, connectWallet, disconnectWallet, isConnected } = useWallet();
+  const { sharePortfolio, shareWatchlist, shareNewsArticle } = useBaseSocial();
+  const { addToBaseApp, sendPriceAlert } = useBaseApp();
   const [, setLocation] = useLocation();
   const [selectedCrypto, setSelectedCrypto] = useState<Cryptocurrency | null>(null);
   const [isChartModalOpen, setIsChartModalOpen] = useState(false);
@@ -216,6 +221,52 @@ export default function Dashboard() {
             />
           </div>
         </section>
+
+        {/* Wallet Connection Section */}
+        {!isConnected && (
+          <section className="mb-8">
+            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-800">
+              <div className="p-6 text-center">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full">
+                    <Wallet className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  🔗 Connect your wallet to view portfolio
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md mx-auto">
+                  Connect your Base wallet to track your portfolio, get personalized insights, and access advanced features.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button 
+                    onClick={connectWallet}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+                  >
+                    <Wallet className="w-4 h-4 mr-2" />
+                    Connect Wallet
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => addToBaseApp()}
+                    className="border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add to Base App
+                  </Button>
+                </div>
+                <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                  <span className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    Base Mainnet
+                  </span>
+                  <span>•</span>
+                  <span>Secure & Decentralized</span>
+                </div>
+              </div>
+            </Card>
+          </section>
+        )}
 
         {/* Price Grid Section */}
         <section className="mb-8">
@@ -408,16 +459,39 @@ export default function Dashboard() {
                     {miniKitUser?.displayName || (user as any)?.firstName || (user as any)?.email || 'User'}
                   </span>
                 </Badge>
-                {miniKitWallet && (
+                {(miniKitWallet || wallet) && (
                   <Badge variant="secondary" className="flex items-center space-x-1">
                     <Wallet className="w-3 h-3" />
-                    <span>{miniKitWallet.address.slice(0, 6)}...{miniKitWallet.address.slice(-4)}</span>
+                    <span>
+                      {(miniKitWallet?.address || wallet?.address)?.slice(0, 6)}...
+                      {(miniKitWallet?.address || wallet?.address)?.slice(-4)}
+                    </span>
                   </Badge>
+                )}
+                {isConnected && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={disconnectWallet}
+                    className="text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    Disconnect
+                  </Button>
                 )}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Live Wallet Portfolio - Only show when wallet is connected */}
+              {isConnected && (miniKitWallet?.address || wallet?.address) && (
+                <div className="lg:col-span-2">
+                  <WalletPortfolio 
+                    walletAddress={miniKitWallet?.address || wallet?.address || ''} 
+                    cryptocurrencies={cryptocurrencies || []}
+                  />
+                </div>
+              )}
+              
               {/* Personal Watchlist */}
               <Card className="bg-based-surface border-border">
                 <div className="p-6">
@@ -426,7 +500,25 @@ export default function Dashboard() {
                       <Star className="w-5 h-5 text-yellow-500" />
                       <h3 className="text-lg font-semibold text-foreground">My Watchlist</h3>
                     </div>
-                    <Badge variant="secondary">{(watchlist as any[])?.length || 0}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">{(watchlist as any[])?.length || 0}</Badge>
+                      {(watchlist as any[])?.length > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const cryptoNames = (watchlist as any[]).map((item: any) => {
+                              const crypto = cryptocurrencies?.find(c => c.id === item.cryptocurrencyId);
+                              return crypto?.symbol?.toUpperCase() || '';
+                            }).filter(Boolean);
+                            shareWatchlist(cryptoNames);
+                          }}
+                          className="p-1"
+                        >
+                          <Users className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="space-y-3">
@@ -506,7 +598,26 @@ export default function Dashboard() {
                       <Wallet className="w-5 h-5 text-blue-500" />
                       <h3 className="text-lg font-semibold text-foreground">Portfolio</h3>
                     </div>
-                    <Badge variant="secondary">{(portfolio as any[])?.length || 0}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">{(portfolio as any[])?.length || 0}</Badge>
+                      {isConnected && (portfolio as any[])?.length > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const totalValue = (portfolio as any[]).reduce((total: number, holding: any) => {
+                              const crypto = cryptocurrencies?.find(c => c.id === holding.cryptocurrencyId);
+                              const currentPrice = parseFloat(crypto?.currentPrice || "0");
+                              return total + (currentPrice * holding.amount);
+                            }, 0);
+                            sharePortfolio(`$${totalValue.toFixed(2)}`);
+                          }}
+                          className="p-1"
+                        >
+                          <Users className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="space-y-4">
@@ -667,6 +778,17 @@ export default function Dashboard() {
                   </div>
                 </div>
               </Card>
+            </div>
+
+            {/* Base Features Section */}
+            <div className="mt-8">
+              <BaseFeatures 
+                userStats={{
+                  watchlistCount: (watchlist as any[])?.length || 0,
+                  portfolioCount: (portfolio as any[])?.length || 0,
+                  alertsCount: userAlerts?.length || 0
+                }}
+              />
             </div>
           </div>
         )}
