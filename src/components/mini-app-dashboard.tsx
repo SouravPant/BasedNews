@@ -1,5 +1,7 @@
 import React from "react";
 import { useMiniKit, useBaseAuth, useBaseSocial } from '../hooks/useMiniKit';
+import { sdk } from '@farcaster/miniapp-sdk';
+import { useAuthenticate } from '@coinbase/onchainkit/minikit';
 
 // OnchainKit and wallet state
 interface WalletState {
@@ -43,6 +45,7 @@ export function MiniAppDashboard() {
   const { isInBaseApp, user: farcasterUser } = useMiniKit();
   const { signInWithBase, isAuthenticated } = useBaseAuth();
   const { shareToFarcaster } = useBaseSocial();
+  const { signIn: authenticateWithFarcaster } = useAuthenticate();
 
   // Add CSS animations
   React.useEffect(() => {
@@ -521,23 +524,42 @@ export function MiniAppDashboard() {
               </button>
 
               {/* Farcaster Sign In Button - Only in Base App */}
-              {isInBaseApp && !walletState.isConnected && (
+              {isInBaseApp && !walletState.isConnected && !farcasterUser && (
                 <button
                   onClick={async () => {
-                    console.log('🔗 Farcaster sign-in clicked');
+                    console.log('🔗 Farcaster authenticate clicked');
                     try {
-                      const result = await signInWithBase();
-                      if (result.success && result.user) {
-                        console.log('✅ Farcaster sign-in successful:', result.user);
-                        // If user has wallet address, fetch balances
-                        if (result.user.address) {
-                          await fetchWalletBalances(result.user.address);
+                      console.log('🎯 Using MiniKit useAuthenticate');
+                      const result = await authenticateWithFarcaster({
+                        domain: window.location.hostname,
+                        siweUri: `${window.location.origin}/login`
+                      });
+                      
+                      if (result) {
+                        console.log('✅ Farcaster authentication successful:', result);
+                        // Try to get wallet info and fetch balances
+                        if (result.address) {
+                          await fetchWalletBalances(result.address);
                         }
                       } else {
-                        console.error('❌ Farcaster sign-in failed:', result.error);
+                        console.log('ℹ️ User canceled Farcaster authentication');
                       }
                     } catch (error) {
-                      console.error('❌ Farcaster sign-in error:', error);
+                      console.error('❌ Farcaster authentication error:', error);
+                      
+                      // Fallback to our custom signInWithBase
+                      try {
+                        console.log('🔄 Falling back to custom signInWithBase');
+                        const fallbackResult = await signInWithBase();
+                        if (fallbackResult.success && fallbackResult.user) {
+                          console.log('✅ Fallback Farcaster sign-in successful:', fallbackResult.user);
+                          if (fallbackResult.user.address) {
+                            await fetchWalletBalances(fallbackResult.user.address);
+                          }
+                        }
+                      } catch (fallbackError) {
+                        console.error('❌ Fallback sign-in also failed:', fallbackError);
+                      }
                     }
                   }}
                   style={{
@@ -575,6 +597,36 @@ export function MiniAppDashboard() {
                   </svg>
                   Connect with Farcaster
                 </button>
+              )}
+
+              {/* Show Farcaster User Info if connected */}
+              {farcasterUser && (
+                <div style={{
+                  padding: '12px',
+                  backgroundColor: '#f3f2ff',
+                  borderRadius: '8px',
+                  border: '1px solid #8a63d2',
+                  marginBottom: '16px',
+                  textAlign: 'left'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {farcasterUser.pfpUrl && (
+                      <img 
+                        src={farcasterUser.pfpUrl} 
+                        alt="Profile" 
+                        style={{ width: '24px', height: '24px', borderRadius: '50%' }}
+                      />
+                    )}
+                    <div>
+                      <div style={{ fontWeight: '600', color: '#8a63d2' }}>
+                        {farcasterUser.displayName || farcasterUser.username || `FID: ${farcasterUser.fid}`}
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#666' }}>
+                        Connected via Farcaster
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
 
               <p style={{ 
@@ -644,15 +696,34 @@ export function MiniAppDashboard() {
                     </div>
                   </div>
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       console.log('🚀 Share button clicked');
                       console.log('📱 Environment:', { isInBaseApp, isAuthenticated, user: !!farcasterUser });
                       
                       const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
                       
-                      // 1. Try custom shareToFarcaster hook (handles environment detection)
+                      // 1. Try Farcaster SDK composeCast (works in Base app and Farcaster clients)
                       try {
-                        console.log('🎯 Using shareToFarcaster hook');
+                        console.log('🎯 Using Farcaster SDK composeCast');
+                        const result = await sdk.actions.composeCast({
+                          text: shareText,
+                          embeds: [window.location.href]
+                        });
+                        console.log('✅ SDK composeCast result:', result);
+                        
+                        if (result?.cast) {
+                          console.log('✅ Cast successful:', result.cast.hash);
+                          return;
+                        } else {
+                          console.log('ℹ️ User canceled the cast');
+                        }
+                      } catch (error) {
+                        console.error('❌ SDK composeCast failed:', error);
+                      }
+                      
+                      // 2. Fallback to custom shareToFarcaster hook
+                      try {
+                        console.log('🎯 Using shareToFarcaster hook fallback');
                         shareToFarcaster(shareText, [window.location.href]);
                         console.log('✅ shareToFarcaster called successfully');
                         return;
@@ -660,7 +731,7 @@ export function MiniAppDashboard() {
                         console.error('❌ shareToFarcaster failed:', error);
                       }
                       
-                      // 2. Fallback to native sharing
+                      // 3. Fallback to native sharing
                       if (navigator.share) {
                         console.log('🎯 Using navigator.share');
                         navigator.share({
@@ -673,7 +744,7 @@ export function MiniAppDashboard() {
                           alert('📋 Copied to clipboard! Share on Farcaster.');
                         });
                       } else {
-                        // 3. Final fallback - clipboard
+                        // 4. Final fallback - clipboard
                         console.log('📋 Final fallback - copying to clipboard');
                         navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
                         alert('📋 Copied to clipboard! Share on Farcaster.');
