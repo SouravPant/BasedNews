@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "rm -rf dist && rm -rf .vercel && vite build --config vite.config.simple.ts",
+  "buildCommand": "vite build --config vite.config.simple.ts",
   "outputDirectory": "dist",
 
   "headers": [
@@ -29,7 +29,7 @@
         },
         {
           "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0, proxy-revalidate"
+          "value": "no-cache, no-store, must-revalidate, max-age=0"
         },
         {
           "key": "Pragma",
@@ -38,14 +38,6 @@
         {
           "key": "Expires",
           "value": "0"
-        },
-        {
-          "key": "Surrogate-Control",
-          "value": "no-store"
-        },
-        {
-          "key": "Clear-Site-Data",
-          "value": "\"cache\", \"storage\""
         }
       ]
     }
