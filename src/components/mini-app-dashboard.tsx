@@ -43,22 +43,19 @@ interface PortfolioItem extends Coin {
 function DashboardContent() {
   // Debug logging for blank screen
   console.log('🔍 DashboardContent component rendering...');
+  console.log('📦 Build timestamp:', Date.now());
+  console.log('🎯 Component version: SIMPLIFIED-NO-MINIKIT');
   
-  // Loading state - ALWAYS call hooks unconditionally
+  // Simple state without MiniKit hooks for testing
   const [isLoading, setIsLoading] = React.useState(true);
   
-  // MiniKit Farcaster integration - ALWAYS call hooks unconditionally
-  const socialHook = useBaseSocial();
-  const shareToFarcaster = socialHook?.shareToFarcaster;
-  console.log('🎯 shareToFarcaster loaded:', typeof shareToFarcaster);
-  
-  // Early loading screen
+  // Simple loading timer
   React.useEffect(() => {
     console.log('🎬 DashboardContent mounted');
     const timer = setTimeout(() => {
       console.log('⏰ Setting loading to false');
       setIsLoading(false);
-    }, 100);
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
   
@@ -74,8 +71,11 @@ function DashboardContent() {
         borderRadius: '8px',
         margin: '20px'
       }}>
-        <h2>🚀 Loading Dashboard...</h2>
-        <p>BasedHub is starting up...</p>
+                  <h2>🚀 Loading Dashboard...</h2>
+          <p>BasedHub v2.1.0-SIMPLIFIED is starting up...</p>
+          <p style={{ fontSize: '12px', color: '#666' }}>
+            Build: {Date.now()} | No MiniKit hooks for testing
+          </p>
         <div style={{
           width: '40px',
           height: '40px',
@@ -600,19 +600,18 @@ function DashboardContent() {
                   <button
                     onClick={() => {
                       console.log('🚀 Share button clicked');
-                      console.log('📱 User agent:', navigator.userAgent);
-                      console.log('🌐 Current URL:', window.location.href);
+                      const shareText = `🚀 My Base portfolio: $0.00 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
                       
-                      const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
-                      
-                      // Use MiniKit shareToFarcaster
-                      try {
-                        console.log('🎯 Using MiniKit shareToFarcaster...');
-                        shareToFarcaster(shareText, [window.location.href]);
-                        console.log('✅ shareToFarcaster called successfully');
-                      } catch (error) {
-                        console.error('❌ Farcaster share failed:', error);
-                        // This shouldn't happen with the existing implementation
+                      // Simple share without MiniKit for testing
+                      if (navigator.share) {
+                        navigator.share({
+                          title: 'My Base Portfolio',
+                          text: shareText,
+                          url: window.location.href
+                        });
+                      } else {
+                        navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
+                        alert('📋 Copied to clipboard!');
                       }
                     }}
                     style={{

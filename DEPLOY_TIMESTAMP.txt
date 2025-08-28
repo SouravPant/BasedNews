@@ -1,4 +1,5 @@
-Build timestamp: 2024-12-19T15:05:00.000Z
-Version: 2.0.0
-Fix: Simplified vercel.json to resolve libFiles error
-Commit: Force cache bust and clean build
+Build timestamp: 2024-12-19T15:30:00.000Z
+Version: 2.1.0-SIMPLIFIED
+Fix: Removed all MiniKit hooks to test basic rendering
+Commit: AGGRESSIVE CACHE BUST - Simplified dashboard
+Random ID: 7f8a9b2c4d5e6f1a
