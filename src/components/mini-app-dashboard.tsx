@@ -38,6 +38,42 @@ export function MiniAppDashboard() {
     }
     if (savedPortfolio) {
       setPortfolio(JSON.parse(savedPortfolio));
+    } else {
+      // Add some Base ecosystem tokens for demonstration
+      const demoPortfolio: PortfolioItem[] = [
+        {
+          id: 'ethereum',
+          name: 'Ethereum',
+          symbol: 'ETH',
+          currentPrice: '3800.00',
+          priceChangePercentage24h: '2.5',
+          amount: 1.2345,
+          purchasePrice: 3600.00,
+          image: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png'
+        },
+        {
+          id: 'usd-coin',
+          name: 'USD Coin',
+          symbol: 'USDC',
+          currentPrice: '1.00',
+          priceChangePercentage24h: '0.1',
+          amount: 500.00,
+          purchasePrice: 1.00,
+          image: 'https://assets.coingecko.com/coins/images/6319/thumb/USD_Coin_icon.png'
+        },
+        {
+          id: 'degen-base',
+          name: 'Degen',
+          symbol: 'DEGEN',
+          currentPrice: '0.045',
+          priceChangePercentage24h: '5.2',
+          amount: 1000.0,
+          purchasePrice: 0.040,
+          image: 'https://assets.coingecko.com/coins/images/34515/thumb/android-chrome-512x512.png'
+        }
+      ];
+      setPortfolio(demoPortfolio);
+      localStorage.setItem('basednews-portfolio', JSON.stringify(demoPortfolio));
     }
   }, []);
 
@@ -196,8 +232,106 @@ export function MiniAppDashboard() {
               border: '1px solid var(--border)',
               textAlign: 'center'
             }}>
-              <p style={{ color: 'var(--muted-foreground)', margin: 0 }}>
-                🔗 Connect your wallet to view portfolio
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '12px',
+                marginBottom: '16px'
+              }}>
+                <button 
+                  onClick={async () => {
+                    try {
+                      if (window.ethereum) {
+                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        alert('✅ Coinbase Wallet Connected!\nAddress: ' + accounts[0]);
+                      } else {
+                        window.open('https://wallet.coinbase.com/', '_blank');
+                      }
+                    } catch (error) {
+                      console.error('Wallet connection failed:', error);
+                    }
+                  }}
+                  style={{
+                    padding: '12px',
+                    backgroundColor: '#0052ff',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    backgroundColor: 'white',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#0052ff',
+                    fontWeight: 'bold',
+                    fontSize: '12px'
+                  }}>
+                    CB
+                  </div>
+                  <span>Coinbase Wallet</span>
+                </button>
+                
+                <button 
+                  onClick={async () => {
+                    try {
+                      if (window.ethereum && window.ethereum.isMetaMask) {
+                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        alert('✅ MetaMask Connected!\nAddress: ' + accounts[0]);
+                      } else {
+                        window.open('https://metamask.io/', '_blank');
+                      }
+                    } catch (error) {
+                      console.error('MetaMask connection failed:', error);
+                    }
+                  }}
+                  style={{
+                    padding: '12px',
+                    backgroundColor: 'transparent',
+                    color: '#f6851b',
+                    border: '2px solid #f6851b',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    backgroundColor: '#f6851b',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: '12px'
+                  }}>
+                    M
+                  </div>
+                  <span>MetaMask</span>
+                </button>
+              </div>
+              <p style={{ 
+                color: 'var(--muted-foreground)', 
+                margin: 0,
+                fontSize: '14px'
+              }}>
+                Total Value: <strong style={{ color: 'var(--foreground)', fontSize: '18px' }}>$0.00</strong>
               </p>
             </div>
           </div>
