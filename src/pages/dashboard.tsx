@@ -26,11 +26,13 @@ import { Cryptocurrency, NewsArticle as NewsArticleType, RedditPost as RedditPos
 import { SearchBar } from "@/components/search-bar";
 import { NewsFilter } from "@/components/news-filter";
 import { useMiniKit, useWallet, useBaseSocial, useBaseApp } from "@/hooks/useMiniKit";
+import { useBaseWallet } from "@/hooks/useBaseWallet";
 
 export default function Dashboard() {
   const { isAuthenticated, user } = useAuth();
   const { user: miniKitUser, wallet: miniKitWallet } = useMiniKit();
   const { wallet, connectWallet, disconnectWallet, isConnected } = useWallet();
+  const { wallet: baseWallet, connectWallet: connectBaseWallet, disconnectWallet: disconnectBaseWallet, switchToBase } = useBaseWallet();
   const { sharePortfolio, shareWatchlist, shareNewsArticle } = useBaseSocial();
   const { addToBaseApp, sendPriceAlert } = useBaseApp();
   const [, setLocation] = useLocation();
@@ -222,8 +224,13 @@ export default function Dashboard() {
           </div>
         </section>
 
+        {/* Debug info - remove later */}
+        <div className="mb-4 p-2 bg-red-100 text-xs">
+          Debug: baseWallet.isConnected={JSON.stringify(baseWallet.isConnected)}, baseWallet.address={JSON.stringify(baseWallet.address)}, baseWallet.chainId={JSON.stringify(baseWallet.chainId)}, baseWallet.error={JSON.stringify(baseWallet.error)}
+        </div>
+
         {/* Wallet Connection Section */}
-        {!isConnected && (
+        {!baseWallet.isConnected && (
           <section className="mb-8">
             <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-800">
               <div className="p-6 text-center">
@@ -240,15 +247,53 @@ export default function Dashboard() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button 
-                    onClick={connectWallet}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+                    onClick={async () => {
+                      console.log('Connect Base wallet clicked');
+                      try {
+                        await connectBaseWallet();
+                        console.log('Base wallet connected successfully');
+                      } catch (error) {
+                        console.error('Base wallet connection failed:', error);
+                        alert('Failed to connect wallet: ' + (error as Error).message);
+                      }
+                    }}
+                    disabled={baseWallet.isConnecting}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 disabled:opacity-50"
                   >
                     <Wallet className="w-4 h-4 mr-2" />
-                    Connect Wallet
+                    {baseWallet.isConnecting ? 'Connecting...' : 'Connect Wallet'}
                   </Button>
                   <Button 
                     variant="outline"
-                    onClick={() => addToBaseApp()}
+                    onClick={async () => {
+                      console.log('Switch to Base clicked');
+                      try {
+                        await switchToBase();
+                        console.log('Switched to Base network');
+                        alert('Switched to Base network successfully!');
+                      } catch (error) {
+                        console.error('Switch to Base failed:', error);
+                        alert('Failed to switch to Base: ' + (error as Error).message);
+                      }
+                    }}
+                    className="border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+                  >
+                    <Activity className="w-4 h-4 mr-2" />
+                    Switch to Base
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={async () => {
+                      console.log('Add to Base App clicked');
+                      try {
+                        const result = await addToBaseApp();
+                        console.log('Add to Base App result:', result);
+                        alert('Added to Base App: ' + JSON.stringify(result));
+                      } catch (error) {
+                        console.error('Add to Base App failed:', error);
+                        alert('Failed to add to Base App: ' + (error as Error).message);
+                      }
+                    }}
                     className="border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -459,20 +504,28 @@ export default function Dashboard() {
                     {miniKitUser?.displayName || (user as any)?.firstName || (user as any)?.email || 'User'}
                   </span>
                 </Badge>
-                {(miniKitWallet || wallet) && (
+                {(miniKitWallet || baseWallet.address) && (
                   <Badge variant="secondary" className="flex items-center space-x-1">
                     <Wallet className="w-3 h-3" />
                     <span>
-                      {(miniKitWallet?.address || wallet?.address)?.slice(0, 6)}...
-                      {(miniKitWallet?.address || wallet?.address)?.slice(-4)}
+                      {(miniKitWallet?.address || baseWallet.address)?.slice(0, 6)}...
+                      {(miniKitWallet?.address || baseWallet.address)?.slice(-4)}
                     </span>
                   </Badge>
                 )}
-                {isConnected && (
+                {baseWallet.chainId && (
+                  <Badge variant={baseWallet.chainId === 8453 ? "default" : "destructive"} className="flex items-center space-x-1">
+                    <Activity className="w-3 h-3" />
+                    <span>
+                      {baseWallet.chainId === 8453 ? 'Base' : `Chain ${baseWallet.chainId}`}
+                    </span>
+                  </Badge>
+                )}
+                {baseWallet.isConnected && (
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={disconnectWallet}
+                    onClick={disconnectBaseWallet}
                     className="text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
                     Disconnect
@@ -483,10 +536,10 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Live Wallet Portfolio - Only show when wallet is connected */}
-              {isConnected && (miniKitWallet?.address || wallet?.address) && (
+              {baseWallet.isConnected && baseWallet.address && (
                 <div className="lg:col-span-2">
                   <WalletPortfolio 
-                    walletAddress={miniKitWallet?.address || wallet?.address || ''} 
+                    walletAddress={baseWallet.address} 
                     cryptocurrencies={cryptocurrencies || []}
                   />
                 </div>
@@ -600,7 +653,7 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">{(portfolio as any[])?.length || 0}</Badge>
-                      {isConnected && (portfolio as any[])?.length > 0 && (
+                      {baseWallet.isConnected && (portfolio as any[])?.length > 0 && (
                         <Button
                           variant="ghost"
                           size="sm"
