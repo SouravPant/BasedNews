@@ -2,6 +2,8 @@ import React from "react";
 import { BaseHeader, BaseStatusBadge, BaseNetworkBadge } from "./base-header";
 import { NewsSummaryModal } from "./news-summary-modal";
 import { ThemeToggleSimple } from "./theme-toggle-simple";
+import { sdk } from '@farcaster/miniapp-sdk';
+import { useBaseSocial } from '../hooks/useMiniKit';
 
 export function BaseNews() {
   const [news, setNews] = React.useState([]);
@@ -9,6 +11,9 @@ export function BaseNews() {
   const [status, setStatus] = React.useState('Loading news...');
   const [selectedArticle, setSelectedArticle] = React.useState(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  
+  // Farcaster sharing hook
+  const { shareToFarcaster } = useBaseSocial();
   
   // Filter and sort states
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -142,6 +147,46 @@ export function BaseNews() {
     event.stopPropagation();
     if (article.url) {
       window.open(article.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const handleShareArticle = async (article, event) => {
+    event.stopPropagation();
+    console.log('📢 Share button clicked for article:', article.title);
+    
+    // Extract the main title without extra text (like "Derivatives Average, Tops ETH and SOL Liquidity in CoinDesk Report")
+    const mainTitle = article.title || 'Check out this article';
+    const shareText = `${mainTitle}\n\nSee more at ${window.location.origin}`;
+    
+    try {
+      console.log('🎯 Using Farcaster SDK composeCast for article sharing');
+      const result = await sdk.actions.composeCast({
+        text: shareText,
+        embeds: [window.location.origin]
+      });
+      
+      if (result?.cast) {
+        console.log('✅ Article shared successfully:', result.cast.hash);
+      } else {
+        console.log('ℹ️ User canceled article sharing');
+      }
+    } catch (error) {
+      console.error('❌ SDK composeCast failed, using fallback:', error);
+      
+      // Fallback to shareToFarcaster hook
+      try {
+        const shareResult = await shareToFarcaster(shareText, [window.location.origin]);
+        console.log('✅ Fallback share result:', shareResult);
+      } catch (fallbackError) {
+        console.error('❌ All sharing methods failed:', fallbackError);
+        // Final fallback - clipboard
+        try {
+          await navigator.clipboard.writeText(shareText);
+          alert('📋 Article text copied to clipboard!');
+        } catch (clipboardError) {
+          console.error('❌ Even clipboard failed:', clipboardError);
+        }
+      }
     }
   };
 
@@ -495,6 +540,39 @@ export function BaseNews() {
                     }}
                   >
                     📖 Read Article
+                  </button>
+                  <button
+                    onClick={(e) => handleShareArticle(article, e)}
+                    className="base-button-share"
+                    style={{
+                      padding: '12px',
+                      background: '#8a63d2',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      minWidth: '48px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 4px rgba(138, 99, 210, 0.2)'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = '#7a52c4';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 8px rgba(138, 99, 210, 0.3)';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = '#8a63d2';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 4px rgba(138, 99, 210, 0.2)';
+                    }}
+                    title="Share on Farcaster"
+                  >
+                    📢
                   </button>
                   <button
                     onClick={() => handleArticleClick(article)}
