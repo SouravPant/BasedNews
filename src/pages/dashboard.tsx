@@ -26,14 +26,11 @@ import { Star, Plus, Eye, Wallet, Bell, Activity, TrendingUp, Users, Settings, B
 import { Cryptocurrency, NewsArticle as NewsArticleType, RedditPost as RedditPostType } from "@shared/schema";
 import { SearchBar } from "@/components/search-bar";
 import { NewsFilter } from "@/components/news-filter";
-import { useMiniKit, useWallet, useBaseSocial, useBaseApp } from "@/hooks/useMiniKit";
-import { useBaseWallet } from "@/hooks/useBaseWallet";
+import { useMiniKit, useBaseSocial, useBaseApp } from "@/hooks/useMiniKit";
 
 export default function Dashboard() {
   const { isAuthenticated, user } = useAuth();
-  const { user: miniKitUser, wallet: miniKitWallet } = useMiniKit();
-  const { wallet, connectWallet, disconnectWallet, isConnected } = useWallet();
-  const { wallet: baseWallet, connectWallet: connectBaseWallet, disconnectWallet: disconnectBaseWallet, switchToBase } = useBaseWallet();
+  const { user: miniKitUser, wallet: miniKitWallet, connectWallet, disconnectWallet } = useMiniKit();
   const { sharePortfolio, shareWatchlist, shareNewsArticle } = useBaseSocial();
   const { addToBaseApp, sendPriceAlert } = useBaseApp();
   const [, setLocation] = useLocation();
@@ -225,11 +222,7 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Cache Bust & Debug info */}
-        <div className="mb-4 p-2 bg-red-100 text-xs space-y-1">
-          <div>🔄 Build: {new Date().toISOString()} | Version: 1.1.0 | Simple Wallet Test</div>
-          <div>Debug: baseWallet.isConnected={JSON.stringify(baseWallet.isConnected)}, baseWallet.address={JSON.stringify(baseWallet.address)}, baseWallet.chainId={JSON.stringify(baseWallet.chainId)}, baseWallet.error={JSON.stringify(baseWallet.error)}</div>
-        </div>
+
 
         {/* Base OnchainKit Wallet Connection */}
         <section className="mb-8">
@@ -427,28 +420,27 @@ export default function Dashboard() {
                     {miniKitUser?.displayName || (user as any)?.firstName || (user as any)?.email || 'User'}
                   </span>
                 </Badge>
-                {(miniKitWallet || baseWallet.address) && (
+                {miniKitWallet?.address && (
                   <Badge variant="secondary" className="flex items-center space-x-1">
                     <Wallet className="w-3 h-3" />
                     <span>
-                      {(miniKitWallet?.address || baseWallet.address)?.slice(0, 6)}...
-                      {(miniKitWallet?.address || baseWallet.address)?.slice(-4)}
+                      {miniKitWallet.address.slice(0, 6)}...{miniKitWallet.address.slice(-4)}
                     </span>
                   </Badge>
                 )}
-                {baseWallet.chainId && (
-                  <Badge variant={baseWallet.chainId === 8453 ? "default" : "destructive"} className="flex items-center space-x-1">
+                {miniKitWallet?.chainId && (
+                  <Badge variant={miniKitWallet.chainId === 8453 ? "default" : "destructive"} className="flex items-center space-x-1">
                     <Activity className="w-3 h-3" />
                     <span>
-                      {baseWallet.chainId === 8453 ? 'Base' : `Chain ${baseWallet.chainId}`}
+                      {miniKitWallet.chainId === 8453 ? 'Base' : `Chain ${miniKitWallet.chainId}`}
                     </span>
                   </Badge>
                 )}
-                {baseWallet.isConnected && (
+                {miniKitWallet?.isConnected && (
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={disconnectBaseWallet}
+                    onClick={disconnectWallet}
                     className="text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
                     Disconnect
@@ -459,10 +451,10 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Live Wallet Portfolio - Only show when wallet is connected */}
-              {baseWallet.isConnected && baseWallet.address && (
+              {miniKitWallet?.isConnected && miniKitWallet.address && (
                 <div className="lg:col-span-2">
                   <WalletPortfolio 
-                    walletAddress={baseWallet.address} 
+                    walletAddress={miniKitWallet.address} 
                     cryptocurrencies={cryptocurrencies || []}
                   />
                 </div>
@@ -576,7 +568,7 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">{(portfolio as any[])?.length || 0}</Badge>
-                      {baseWallet.isConnected && (portfolio as any[])?.length > 0 && (
+                      {miniKitWallet?.isConnected && (portfolio as any[])?.length > 0 && (
                         <Button
                           variant="ghost"
                           size="sm"
