@@ -58,59 +58,25 @@ export function useBaseSocial() {
   const { isInBaseApp } = useMiniKitContext();
   
   const shareToFarcaster = (text: string, embeds?: string[]) => {
-    console.log('🎯 shareToFarcaster called with:', { text, embeds, isInBaseApp });
-    
-    // Try Base app environment first
-    if (isInBaseApp || window.parent !== window) {
-      console.log('📱 In Base app environment, trying Farcaster composer...');
-      
-      // Try to post message to parent frame (Base app)
-      try {
-        window.parent.postMessage({
-          type: 'FARCASTER_COMPOSER',
-          data: { text, embeds }
-        }, '*');
-        console.log('✅ Posted message to Base app parent frame');
-        return;
-      } catch (error) {
-        console.error('❌ Failed to post to parent frame:', error);
+    if (!isInBaseApp) {
+      // Fallback to traditional sharing
+      if (navigator.share) {
+        navigator.share({
+          title: 'BasedHub',
+          text,
+          url: embeds?.[0] || window.location.href
+        });
+      } else {
+        // Copy to clipboard or open in new window
+        const url = embeds?.[0] || window.location.href;
+        const shareText = `${text} ${url}`;
+        navigator.clipboard?.writeText(shareText);
       }
-    }
-    
-    // Try native sharing API
-    if (navigator.share) {
-      console.log('📤 Using native share API...');
-      navigator.share({
-        title: 'BasedHub Portfolio',
-        text,
-        url: embeds?.[0] || window.location.href
-      }).then(() => {
-        console.log('✅ Native share completed');
-      }).catch((error) => {
-        console.error('❌ Native share failed:', error);
-        fallbackToClipboard();
-      });
       return;
     }
     
-    // Fallback to clipboard
-    function fallbackToClipboard() {
-      console.log('📋 Falling back to clipboard...');
-      const url = embeds?.[0] || window.location.href;
-      const shareText = `${text}\n\n${url}`;
-      
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(shareText).then(() => {
-          alert('📋 Copied to clipboard! Open Farcaster app to paste and share.');
-        }).catch(() => {
-          prompt('Copy this text to share on Farcaster:', shareText);
-        });
-      } else {
-        prompt('Copy this text to share on Farcaster:', shareText);
-      }
-    }
-    
-    fallbackToClipboard();
+    // In real implementation, this would use the actual SDK
+    console.log('Sharing to Farcaster:', { text, embeds });
   };
   
   const sharePortfolio = (performance: string) => {
