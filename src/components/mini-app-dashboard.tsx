@@ -1,5 +1,4 @@
 import React from "react";
-import { useComposeCast } from '@coinbase/onchainkit/minikit';
 
 // OnchainKit and wallet state
 interface WalletState {
@@ -39,8 +38,6 @@ interface PortfolioItem extends Coin {
 }
 
 export function MiniAppDashboard() {
-  // MiniKit Farcaster integration
-  const { composeCast } = useComposeCast();
 
   // Add CSS animations
   React.useEffect(() => {
@@ -549,37 +546,23 @@ export function MiniAppDashboard() {
                   <button
                     onClick={() => {
                       console.log('🚀 Share button clicked');
-                      console.log('📱 User agent:', navigator.userAgent);
-                      console.log('🌐 Current URL:', window.location.href);
-                      console.log('🎯 MiniKit composeCast available:', typeof composeCast);
-                      
                       const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
                       
-                      // Detect Base app environment
-                      const isBaseApp = navigator.userAgent.includes('Base') || window.location.href.includes('base.org');
-                      const isFarcasterFrame = window.parent !== window || navigator.userAgent.includes('farcaster');
-                      
-                      console.log('🔍 Environment - Base app:', isBaseApp, 'Farcaster frame:', isFarcasterFrame);
-                      
-                      try {
-                        console.log('🎯 Attempting composeCast...');
-                        composeCast({
+                      // Simple sharing fallback
+                      if (navigator.share) {
+                        navigator.share({
+                          title: 'My Base Portfolio',
                           text: shareText,
-                          embeds: [window.location.href]
+                          url: window.location.href
+                        }).catch(() => {
+                          // Fallback to clipboard
+                          navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
+                          alert('📋 Copied to clipboard! Share on Farcaster.');
                         });
-                        console.log('✅ composeCast called successfully');
-                      } catch (error) {
-                        console.error('❌ Farcaster share failed:', error);
-                        console.log('📋 Falling back to clipboard');
-                        
-                        // Fallback to clipboard with better messaging
-                        navigator.clipboard?.writeText(shareText + '\n' + window.location.href)
-                          .then(() => {
-                            alert('📋 Copied to clipboard! Open Farcaster to paste and share.');
-                          })
-                          .catch(() => {
-                            alert('Share text: ' + shareText + '\n' + window.location.href);
-                          });
+                      } else {
+                        // Fallback to clipboard
+                        navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
+                        alert('📋 Copied to clipboard! Share on Farcaster.');
                       }
                     }}
                     style={{
