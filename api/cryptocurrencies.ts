@@ -25,20 +25,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       console.log('API called with params:', { page, per_page, includeStablecoins, includeBaseCoins, idsParam, searchQuery });
       
-      // Base ecosystem coins for priority inclusion
+      // Comprehensive Base ecosystem coins - ONLY Base chain tokens
       const baseEcosystemCoins = [
-        // Core Base tokens
-        'ethereum', 'coinbase-wrapped-staked-eth', 'usd-coin', 'dai', 'wrapped-bitcoin',
-        // Base native projects
-        'aerodrome-finance', 'degen', 'moonwell', 'compound-ether', 'compound-usd-coin',
-        // DeFi on Base
-        'uniswap', 'aave', 'curve-dao-token', 'balancer', 'chainlink',
-        // Major tokens available on Base
-        'tether', 'maker', 'sushiswap', 'yearn-finance', 'convex-finance',
-        // Popular Base ecosystem
-        'based-brett', 'higher', 'bald', 'toshi', 'friend-tech', 'zora',
-        // Cross-chain tokens on Base  
-        'render-token', 'artificial-superintelligence-alliance', 'filecoin'
+        // Core Base infrastructure
+        'ethereum', 'coinbase-wrapped-staked-eth', 'usd-coin', 'dai', 'wrapped-bitcoin', 'tether',
+        
+        // Base native DeFi protocols
+        'aerodrome-finance', 'moonwell', 'compound-ether', 'compound-usd-coin', 'baseswap',
+        'seamless-protocol', 'extra-finance', 'beefy-finance', 'overnight-finance',
+        
+        // Major DeFi available on Base
+        'uniswap', 'aave', 'curve-dao-token', 'balancer', 'chainlink', 'maker',
+        'sushiswap', 'yearn-finance', 'convex-finance', 'synthetix-network',
+        
+        // Base native tokens & memecoins
+        'degen', 'based-brett', 'higher', 'bald', 'toshi', 'friend-tech', 'zora',
+        'base-protocol', 'brett', 'normie', 'keycat', 'mochi', 'doginme',
+        
+        // Cross-chain tokens available on Base
+        'render-token', 'artificial-superintelligence-alliance', 'filecoin', 'optimism',
+        'polygon-ecosystem-token', 'arbitrum', 'the-graph', 'livepeer', 'enjincoin',
+        
+        // Stablecoins on Base
+        'frax', 'liquity-usd', 'alchemix-usd', 'magic-internet-money', 'terraclassicusd',
+        
+        // Gaming & NFT tokens on Base
+        'immutable-x', 'enjincoin', 'the-sandbox', 'decentraland', 'gala',
+        
+        // Infrastructure tokens on Base
+        'the-graph', 'livepeer', 'arweave', 'helium', 'storj',
+        
+        // Additional popular tokens on Base
+        'lido-dao', 'rocket-pool', 'frax-share', 'cvx-crv', 'sdl',
+        'olympus', 'klima-dao', 'wonderland', 'spell-token', 'abracadabra'
       ];
 
       let allCoins = [];
@@ -54,7 +73,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 vs_currency: "usd",
                 ids: baseEcosystemCoins.join(','),
                 order: "market_cap_desc",
-                per_page: 50,
+                per_page: 100,
                 page: 1,
                 sparkline: false,
                 price_change_percentage: "24h"

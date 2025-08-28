@@ -161,8 +161,8 @@ export function MobileBaseCoins() {
     setError(null);
     
     try {
-      // Use our internal API instead of direct CoinGecko calls to avoid CORS/rate limiting
-      const response = await fetch('/api/cryptocurrencies?per_page=100&includeBaseCoins=true&includeStablecoins=true');
+      // Use our internal API to fetch ONLY Base ecosystem coins
+      const response = await fetch('/api/cryptocurrencies?per_page=200&includeBaseCoins=true&includeStablecoins=true');
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -176,15 +176,14 @@ export function MobileBaseCoins() {
         throw new Error('Invalid data format received from API');
       }
       
-      // Separate Base ecosystem coins from other coins
+      // ONLY show Base ecosystem coins - filter out all non-Base tokens
       const baseCoins = data.filter((coin: any) => coin.isBaseEcosystem === true);
-      const otherCoins = data.filter((coin: any) => coin.isBaseEcosystem !== true);
       
       console.log('Base ecosystem coins found:', baseCoins.length, baseCoins.map(c => c.name));
-      console.log('Other coins found:', otherCoins.length);
+      console.log('Showing ONLY Base ecosystem tokens - no other coins');
       
-      // Combine Base coins first, then other popular coins
-      const allDisplayCoins = [...baseCoins, ...otherCoins.slice(0, 80)];
+      // Show ONLY Base coins, no other tokens
+      const allDisplayCoins = baseCoins;
       
       const formattedCoins = allDisplayCoins
         .map((coin: any, index: number) => ({
@@ -366,7 +365,7 @@ export function MobileBaseCoins() {
         {/* Search Bar */}
         <input
           type="text"
-          placeholder="🔍 Search Base coins..."
+          placeholder="🔍 Search Base chain tokens..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
@@ -400,7 +399,7 @@ export function MobileBaseCoins() {
               animation: 'spin 1s linear infinite',
               margin: '0 auto 16px'
             }}></div>
-            <p style={{ margin: 0, fontSize: '16px' }}>Loading Base ecosystem...</p>
+            <p style={{ margin: 0, fontSize: '16px' }}>Loading Base chain tokens...</p>
           </div>
         ) : error ? (
           <div style={{
