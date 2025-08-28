@@ -54,6 +54,12 @@ export function MiniAppDashboard() {
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, []);
+  
+  // Cache busting for Vercel
+  React.useEffect(() => {
+    console.log('🚀 MiniApp Dashboard loaded at:', new Date().toISOString());
+    console.log('📦 Version: 2.0.0 - MiniKit Integration');
+  }, []);
   const [watchlist, setWatchlist] = React.useState<WatchlistItem[]>([]);
   const [portfolio, setPortfolio] = React.useState<PortfolioItem[]>([]);
   const [totalPortfolioValue, setTotalPortfolioValue] = React.useState(0);
@@ -542,19 +548,38 @@ export function MiniAppDashboard() {
                   </div>
                   <button
                     onClick={() => {
+                      console.log('🚀 Share button clicked');
+                      console.log('📱 User agent:', navigator.userAgent);
+                      console.log('🌐 Current URL:', window.location.href);
+                      console.log('🎯 MiniKit composeCast available:', typeof composeCast);
+                      
+                      const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
+                      
+                      // Detect Base app environment
+                      const isBaseApp = navigator.userAgent.includes('Base') || window.location.href.includes('base.org');
+                      const isFarcasterFrame = window.parent !== window || navigator.userAgent.includes('farcaster');
+                      
+                      console.log('🔍 Environment - Base app:', isBaseApp, 'Farcaster frame:', isFarcasterFrame);
+                      
                       try {
-                        const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
-                        
+                        console.log('🎯 Attempting composeCast...');
                         composeCast({
                           text: shareText,
                           embeds: [window.location.href]
                         });
+                        console.log('✅ composeCast called successfully');
                       } catch (error) {
-                        console.error('Farcaster share failed:', error);
-                        // Fallback to clipboard
-                        const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
-                        navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
-                        alert('📋 Copied to clipboard! Share on Farcaster.');
+                        console.error('❌ Farcaster share failed:', error);
+                        console.log('📋 Falling back to clipboard');
+                        
+                        // Fallback to clipboard with better messaging
+                        navigator.clipboard?.writeText(shareText + '\n' + window.location.href)
+                          .then(() => {
+                            alert('📋 Copied to clipboard! Open Farcaster to paste and share.');
+                          })
+                          .catch(() => {
+                            alert('Share text: ' + shareText + '\n' + window.location.href);
+                          });
                       }
                     }}
                     style={{
