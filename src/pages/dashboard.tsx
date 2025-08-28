@@ -17,6 +17,7 @@ import { TwitterPost } from "@/components/twitter-post";
 import { StatusBar } from "@/components/status-bar";
 import { WalletPortfolio } from "@/components/wallet-portfolio";
 import { BaseFeatures } from "@/components/base-features";
+import { BaseWalletConnect } from "@/components/BaseWalletConnect";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -27,12 +28,14 @@ import { SearchBar } from "@/components/search-bar";
 import { NewsFilter } from "@/components/news-filter";
 import { useMiniKit, useWallet, useBaseSocial, useBaseApp } from "@/hooks/useMiniKit";
 import { useBaseWallet } from "@/hooks/useBaseWallet";
+import { useAccount } from 'wagmi';
 
 export default function Dashboard() {
   const { isAuthenticated, user } = useAuth();
   const { user: miniKitUser, wallet: miniKitWallet } = useMiniKit();
   const { wallet, connectWallet, disconnectWallet, isConnected } = useWallet();
   const { wallet: baseWallet, connectWallet: connectBaseWallet, disconnectWallet: disconnectBaseWallet, switchToBase } = useBaseWallet();
+  const { address: wagmiAddress, isConnected: wagmiIsConnected, chain } = useAccount();
   const { sharePortfolio, shareWatchlist, shareNewsArticle } = useBaseSocial();
   const { addToBaseApp, sendPriceAlert } = useBaseApp();
   const [, setLocation] = useLocation();
@@ -226,98 +229,15 @@ export default function Dashboard() {
 
         {/* Cache Bust & Debug info */}
         <div className="mb-4 p-2 bg-red-100 text-xs space-y-1">
-          <div>🔄 Build: {new Date().toISOString()} | Version: 1.1.0</div>
+          <div>🔄 Build: {new Date().toISOString()} | Version: 1.1.0 | OnchainKit + Wagmi</div>
+          <div>Wagmi: isConnected={JSON.stringify(wagmiIsConnected)}, address={JSON.stringify(wagmiAddress)}, chain={JSON.stringify(chain?.id)}</div>
           <div>Debug: baseWallet.isConnected={JSON.stringify(baseWallet.isConnected)}, baseWallet.address={JSON.stringify(baseWallet.address)}, baseWallet.chainId={JSON.stringify(baseWallet.chainId)}, baseWallet.error={JSON.stringify(baseWallet.error)}</div>
         </div>
 
-        {/* Wallet Connection Section - Always Show for Testing */}
-        {true && (
-          <section className="mb-8">
-            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-800">
-              <div className="p-6 text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full">
-                    <Wallet className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  🔗 Connect your wallet to view portfolio
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md mx-auto">
-                  Connect your Base wallet to track your portfolio, get personalized insights, and access advanced features.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button 
-                    onClick={async () => {
-                      console.log('Connect Base wallet clicked');
-                      try {
-                        await connectBaseWallet();
-                        console.log('Base wallet connected successfully');
-                      } catch (error) {
-                        console.error('Base wallet connection failed:', error);
-                        alert('Failed to connect wallet: ' + (error as Error).message);
-                      }
-                    }}
-                    disabled={baseWallet.isConnecting}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 disabled:opacity-50"
-                  >
-                    <Wallet className="w-4 h-4 mr-2" />
-                    {baseWallet.isConnecting ? 'Connecting...' : 'Connect Wallet'}
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={async () => {
-                      console.log('Switch to Base clicked');
-                      try {
-                        await switchToBase();
-                        console.log('Switched to Base network');
-                        alert('Switched to Base network successfully!');
-                      } catch (error) {
-                        console.error('Switch to Base failed:', error);
-                        alert('Failed to switch to Base: ' + (error as Error).message);
-                      }
-                    }}
-                    className="border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
-                  >
-                    <Activity className="w-4 h-4 mr-2" />
-                    Switch to Base
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={async () => {
-                      console.log('Simple wallet test clicked');
-                      try {
-                        if (typeof window !== 'undefined' && window.ethereum) {
-                          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                          alert('✅ Wallet Connected!\nAddress: ' + accounts[0]);
-                          console.log('Simple wallet test success:', accounts);
-                        } else {
-                          alert('❌ No wallet found!\nPlease install MetaMask or Coinbase Wallet');
-                          console.log('No window.ethereum found');
-                        }
-                      } catch (error) {
-                        console.error('Simple wallet test failed:', error);
-                        alert('❌ Wallet test failed: ' + (error as Error).message);
-                      }
-                    }}
-                    className="border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
-                  >
-                    <Wallet className="w-4 h-4 mr-2" />
-                    Simple Test
-                  </Button>
-                </div>
-                <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                  <span className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    Base Mainnet
-                  </span>
-                  <span>•</span>
-                  <span>Secure & Decentralized</span>
-                </div>
-              </div>
-            </Card>
-          </section>
-        )}
+        {/* Base OnchainKit Wallet Connection */}
+        <section className="mb-8">
+          <BaseWalletConnect />
+        </section>
 
         {/* Price Grid Section */}
         <section className="mb-8">
