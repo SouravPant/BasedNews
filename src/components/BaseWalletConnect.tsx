@@ -1,19 +1,4 @@
 import React from 'react';
-import { 
-  Wallet,
-  ConnectWallet,
-  WalletDropdown,
-  WalletDropdownLink,
-  WalletDropdownDisconnect,
-} from '@coinbase/onchainkit/wallet';
-import {
-  Avatar,
-  Name,
-  Identity,
-  EthBalance,
-} from '@coinbase/onchainkit/identity';
-import { color } from '@coinbase/onchainkit/theme';
-import { useAccount, useDisconnect } from 'wagmi';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,9 +10,25 @@ import {
   Activity
 } from 'lucide-react';
 
+// Simple wallet connector for testing
+async function connectSimpleWallet() {
+  if (typeof window !== 'undefined' && (window as any).ethereum) {
+    try {
+      const accounts = await (window as any).ethereum.request({ 
+        method: 'eth_requestAccounts' 
+      });
+      return accounts[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+  throw new Error('No wallet found');
+}
+
 export function BaseWalletConnect() {
-  const { address, isConnected, chain } = useAccount();
-  const { disconnect } = useDisconnect();
+  const [isConnected, setIsConnected] = React.useState(false);
+  const [address, setAddress] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   // If wallet is not connected, show connection UI
   if (!isConnected) {
@@ -46,15 +47,33 @@ export function BaseWalletConnect() {
             Connect your Base wallet to track your portfolio, get personalized insights, and access advanced features.
           </p>
           
-          {/* OnchainKit Wallet Component */}
+          {/* Simple Wallet Connection */}
           <div className="flex justify-center mb-4">
-            <Wallet>
-              <ConnectWallet className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
-                <WalletIcon className="w-4 h-4 mr-2" />
-                Connect Wallet
-              </ConnectWallet>
-            </Wallet>
+            <Button 
+              onClick={async () => {
+                setError(null);
+                try {
+                  const account = await connectSimpleWallet();
+                  setAddress(account);
+                  setIsConnected(true);
+                  alert('✅ Wallet Connected!\nAddress: ' + account);
+                } catch (err: any) {
+                  setError(err.message);
+                  alert('❌ Connection failed: ' + err.message);
+                }
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
+            >
+              <WalletIcon className="w-4 h-4 mr-2" />
+              Connect Wallet
+            </Button>
           </div>
+          
+          {error && (
+            <div className="text-red-500 text-sm text-center mb-4">
+              {error}
+            </div>
+          )}
           
           <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">
@@ -83,11 +102,11 @@ export function BaseWalletConnect() {
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="font-medium text-gray-900 dark:text-white">
-                    Wallet Connected
+                    ✅ Wallet Connected
                   </span>
-                  <Badge variant={chain?.id === 8453 ? "default" : "destructive"} className="text-xs">
+                  <Badge variant="default" className="text-xs">
                     <Activity className="w-3 h-3 mr-1" />
-                    {chain?.id === 8453 ? 'Base' : chain?.name || 'Unknown'}
+                    Base Ready
                   </Badge>
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -96,63 +115,19 @@ export function BaseWalletConnect() {
               </div>
             </div>
             
-            {/* OnchainKit Wallet Dropdown */}
-            <Wallet>
-              <Identity 
-                address={address}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Avatar className="w-8 h-8" />
-                <Name />
-                <EthBalance />
-              </Identity>
-              <WalletDropdown>
-                <Identity 
-                  address={address}
-                  hasCopyAddressOnClick={true}
-                  className="p-4 border-b border-gray-200 dark:border-gray-700"
-                >
-                  <Avatar className="w-10 h-10" />
-                  <div className="ml-3">
-                    <Name className="font-medium text-gray-900 dark:text-white" />
-                    <EthBalance className="text-sm text-gray-600 dark:text-gray-400" />
-                  </div>
-                </Identity>
-                
-                <div className="p-2 space-y-1">
-                  <WalletDropdownLink
-                    icon="wallet"
-                    href="https://wallet.coinbase.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="flex items-center">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Wallet Dashboard
-                    </div>
-                  </WalletDropdownLink>
-                  
-                  <WalletDropdownLink
-                    icon="settings"
-                    href={`https://basescan.org/address/${address}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="flex items-center">
-                      <Settings className="w-4 h-4 mr-2" />
-                      View on BaseScan
-                    </div>
-                  </WalletDropdownLink>
-                  
-                  <WalletDropdownDisconnect className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20">
-                    <div className="flex items-center">
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Disconnect
-                    </div>
-                  </WalletDropdownDisconnect>
-                </div>
-              </WalletDropdown>
-            </Wallet>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsConnected(false);
+                setAddress(null);
+                setError(null);
+              }}
+              className="text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Disconnect
+            </Button>
           </div>
         </div>
       </Card>

@@ -28,14 +28,12 @@ import { SearchBar } from "@/components/search-bar";
 import { NewsFilter } from "@/components/news-filter";
 import { useMiniKit, useWallet, useBaseSocial, useBaseApp } from "@/hooks/useMiniKit";
 import { useBaseWallet } from "@/hooks/useBaseWallet";
-import { useAccount } from 'wagmi';
 
 export default function Dashboard() {
   const { isAuthenticated, user } = useAuth();
   const { user: miniKitUser, wallet: miniKitWallet } = useMiniKit();
   const { wallet, connectWallet, disconnectWallet, isConnected } = useWallet();
   const { wallet: baseWallet, connectWallet: connectBaseWallet, disconnectWallet: disconnectBaseWallet, switchToBase } = useBaseWallet();
-  const { address: wagmiAddress, isConnected: wagmiIsConnected, chain } = useAccount();
   const { sharePortfolio, shareWatchlist, shareNewsArticle } = useBaseSocial();
   const { addToBaseApp, sendPriceAlert } = useBaseApp();
   const [, setLocation] = useLocation();
@@ -229,8 +227,7 @@ export default function Dashboard() {
 
         {/* Cache Bust & Debug info */}
         <div className="mb-4 p-2 bg-red-100 text-xs space-y-1">
-          <div>🔄 Build: {new Date().toISOString()} | Version: 1.1.0 | OnchainKit + Wagmi</div>
-          <div>Wagmi: isConnected={JSON.stringify(wagmiIsConnected)}, address={JSON.stringify(wagmiAddress)}, chain={JSON.stringify(chain?.id)}</div>
+          <div>🔄 Build: {new Date().toISOString()} | Version: 1.1.0 | Simple Wallet Test</div>
           <div>Debug: baseWallet.isConnected={JSON.stringify(baseWallet.isConnected)}, baseWallet.address={JSON.stringify(baseWallet.address)}, baseWallet.chainId={JSON.stringify(baseWallet.chainId)}, baseWallet.error={JSON.stringify(baseWallet.error)}</div>
         </div>
 
