@@ -38,19 +38,100 @@ interface PortfolioItem extends Coin {
   purchasePrice: number;
 }
 
+// Error Boundary Component
+class DashboardErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
 
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('🚨 Dashboard Error:', error);
+    console.error('🚨 Error Info:', errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          padding: '40px',
+          textAlign: 'center',
+          backgroundColor: '#fee2e2',
+          color: '#dc2626',
+          borderRadius: '8px',
+          margin: '20px'
+        }}>
+          <h2>🚨 Dashboard Error</h2>
+          <p>Something went wrong with the dashboard component.</p>
+          <pre style={{ 
+            fontSize: '12px', 
+            overflow: 'auto', 
+            backgroundColor: '#fef2f2',
+            padding: '16px',
+            borderRadius: '4px',
+            textAlign: 'left'
+          }}>
+            {this.state.error?.toString()}
+          </pre>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#dc2626',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginTop: '16px'
+            }}
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 function DashboardContent() {
   // Debug logging for blank screen
   console.log('🔍 DashboardContent component rendering...');
   
-  // Loading state - ALWAYS call hooks unconditionally
+  // Loading state
   const [isLoading, setIsLoading] = React.useState(true);
   
-  // MiniKit Farcaster integration - ALWAYS call hooks unconditionally
-  const socialHook = useBaseSocial();
-  const shareToFarcaster = socialHook?.shareToFarcaster;
-  console.log('🎯 shareToFarcaster loaded:', typeof shareToFarcaster);
+  // MiniKit Farcaster integration
+  let shareToFarcaster;
+  
+  try {
+    const socialHook = useBaseSocial();
+    shareToFarcaster = socialHook.shareToFarcaster;
+    console.log('🎯 shareToFarcaster loaded:', typeof shareToFarcaster);
+  } catch (error) {
+    console.error('❌ Error loading useBaseSocial:', error);
+    return (
+      <div style={{
+        padding: '40px',
+        textAlign: 'center',
+        backgroundColor: '#fef3cd',
+        color: '#92400e',
+        borderRadius: '8px',
+        margin: '20px'
+      }}>
+        <h2>⚠️ Hook Loading Error</h2>
+        <p>Failed to load useBaseSocial hook</p>
+        <pre style={{ fontSize: '12px', overflow: 'auto' }}>
+          {error?.toString()}
+        </pre>
+      </div>
+    );
+  }
   
   // Early loading screen
   React.useEffect(() => {
@@ -61,8 +142,6 @@ function DashboardContent() {
     }, 100);
     return () => clearTimeout(timer);
   }, []);
-  
-
   
   if (isLoading) {
     console.log('📦 Showing loading screen...');
@@ -1217,7 +1296,11 @@ function DashboardContent() {
   );
 }
 
-// Main export - simplified without complex error boundary
+// Main export with error boundary
 export function MiniAppDashboard() {
-  return <DashboardContent />;
+  return (
+    <DashboardErrorBoundary>
+      <DashboardContent />
+    </DashboardErrorBoundary>
+  );
 }
