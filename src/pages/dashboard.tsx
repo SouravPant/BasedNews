@@ -224,6 +224,9 @@ export default function Dashboard() {
 
 
 
+        {/* Cache Buster */}
+        <div className="hidden" data-build-time={Date.now()}></div>
+        
         {/* Base OnchainKit Wallet Connection */}
         <section className="mb-8">
           <BaseWalletConnect />
