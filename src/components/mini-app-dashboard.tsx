@@ -1,7 +1,6 @@
 import React from "react";
 import { useMiniKit, useBaseAuth, useBaseSocial } from '../hooks/useMiniKit';
 import { sdk } from '@farcaster/miniapp-sdk';
-import { useAuthenticate } from '@coinbase/onchainkit/minikit';
 
 // OnchainKit and wallet state
 interface WalletState {
@@ -45,7 +44,6 @@ export function MiniAppDashboard() {
   const { isInBaseApp, user: farcasterUser } = useMiniKit();
   const { signInWithBase, isAuthenticated } = useBaseAuth();
   const { shareToFarcaster } = useBaseSocial();
-  const { signIn: authenticateWithFarcaster } = useAuthenticate();
 
   // Add CSS animations
   React.useEffect(() => {
@@ -529,37 +527,19 @@ export function MiniAppDashboard() {
                   onClick={async () => {
                     console.log('🔗 Farcaster authenticate clicked');
                     try {
-                      console.log('🎯 Using MiniKit useAuthenticate');
-                      const result = await authenticateWithFarcaster({
-                        domain: window.location.hostname,
-                        siweUri: `${window.location.origin}/login`
-                      });
-                      
-                      if (result) {
-                        console.log('✅ Farcaster authentication successful:', result);
-                        // Try to get wallet info and fetch balances
-                        if (result.address) {
-                          await fetchWalletBalances(result.address);
+                      console.log('🎯 Using signInWithBase');
+                      const result = await signInWithBase();
+                      if (result.success && result.user) {
+                        console.log('✅ Farcaster sign-in successful:', result.user);
+                        // If user has wallet address, fetch balances
+                        if (result.user.address) {
+                          await fetchWalletBalances(result.user.address);
                         }
                       } else {
-                        console.log('ℹ️ User canceled Farcaster authentication');
+                        console.error('❌ Farcaster sign-in failed:', result.error);
                       }
                     } catch (error) {
-                      console.error('❌ Farcaster authentication error:', error);
-                      
-                      // Fallback to our custom signInWithBase
-                      try {
-                        console.log('🔄 Falling back to custom signInWithBase');
-                        const fallbackResult = await signInWithBase();
-                        if (fallbackResult.success && fallbackResult.user) {
-                          console.log('✅ Fallback Farcaster sign-in successful:', fallbackResult.user);
-                          if (fallbackResult.user.address) {
-                            await fetchWalletBalances(fallbackResult.user.address);
-                          }
-                        }
-                      } catch (fallbackError) {
-                        console.error('❌ Fallback sign-in also failed:', fallbackError);
-                      }
+                      console.error('❌ Farcaster sign-in error:', error);
                     }
                   }}
                   style={{
@@ -724,9 +704,11 @@ export function MiniAppDashboard() {
                       // 2. Fallback to custom shareToFarcaster hook
                       try {
                         console.log('🎯 Using shareToFarcaster hook fallback');
-                        shareToFarcaster(shareText, [window.location.href]);
-                        console.log('✅ shareToFarcaster called successfully');
-                        return;
+                        const shareResult = await shareToFarcaster(shareText, [window.location.href]);
+                        console.log('✅ shareToFarcaster result:', shareResult);
+                        if (shareResult?.success) {
+                          return;
+                        }
                       } catch (error) {
                         console.error('❌ shareToFarcaster failed:', error);
                       }

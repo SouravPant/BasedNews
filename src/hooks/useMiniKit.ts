@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useMiniKitContext } from '../providers/MiniKitProvider';
+import { sdk } from '@farcaster/miniapp-sdk';
 
 export function useMiniKit() {
   const { 
@@ -57,26 +58,51 @@ export function useWallet() {
 export function useBaseSocial() {
   const { isInBaseApp } = useMiniKitContext();
   
-  const shareToFarcaster = (text: string, embeds?: string[]) => {
-    if (!isInBaseApp) {
-      // Fallback to traditional sharing
-      if (navigator.share) {
-        navigator.share({
+  const shareToFarcaster = async (text: string, embeds?: string[]) => {
+    // 1. Try Farcaster SDK composeCast (works in Base app and Farcaster clients)
+    try {
+      console.log('🎯 Using Farcaster SDK in shareToFarcaster');
+      const result = await sdk.actions.composeCast({
+        text,
+        embeds: embeds || [window.location.href]
+      });
+      console.log('✅ SDK composeCast result:', result);
+      
+      if (result?.cast) {
+        console.log('✅ Cast successful:', result.cast.hash);
+        return { success: true, cast: result.cast };
+      } else {
+        console.log('ℹ️ User canceled the cast');
+        return { success: false, canceled: true };
+      }
+    } catch (error) {
+      console.error('❌ SDK composeCast failed:', error);
+    }
+    
+    // 2. Fallback to traditional sharing
+    if (navigator.share) {
+      try {
+        await navigator.share({
           title: 'BasedHub',
           text,
           url: embeds?.[0] || window.location.href
         });
-      } else {
-        // Copy to clipboard or open in new window
-        const url = embeds?.[0] || window.location.href;
-        const shareText = `${text} ${url}`;
-        navigator.clipboard?.writeText(shareText);
+        return { success: true, method: 'navigator.share' };
+      } catch (shareError) {
+        console.log('User canceled native share');
       }
-      return;
     }
     
-    // In real implementation, this would use the actual SDK
-    console.log('Sharing to Farcaster:', { text, embeds });
+    // 3. Final fallback - clipboard
+    const url = embeds?.[0] || window.location.href;
+    const shareText = `${text} ${url}`;
+    try {
+      await navigator.clipboard?.writeText(shareText);
+      return { success: true, method: 'clipboard' };
+    } catch (clipboardError) {
+      console.error('Failed to copy to clipboard:', clipboardError);
+      return { success: false, error: 'All sharing methods failed' };
+    }
   };
   
   const sharePortfolio = (performance: string) => {
