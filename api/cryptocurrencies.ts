@@ -40,7 +40,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         // Base native tokens & memecoins
         'degen-base', 'based-brett', 'higher', 'bald', 'toshi', 'friend-tech', 'zora',
-        'base-protocol', 'brett', 'normie', 'keycat', 'mochi', 'doginme',
+        'base-protocol', 'brett', 'normie-2', 'keycat', 'mochi', 'doginme', 'base-god',
+        
+        // More Base memecoins and community tokens
+        'pepe-2', 'wojak', 'floki', 'baby-doge-coin', 'shiba-predator', 'safe-moon',
+        'bonk1', 'samoyedcoin', 'catcoin', 'dogelon-mars', 'hoge-finance',
         
         // Cross-chain tokens available on Base
         'render-token', 'artificial-superintelligence-alliance', 'filecoin', 'optimism',
@@ -59,9 +63,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'lido-dao', 'rocket-pool', 'frax-share', 'cvx-crv', 'sdl',
         'olympus', 'klima-dao', 'wonderland', 'spell-token', 'abracadabra',
         
-        // More Base ecosystem tokens
+        // More Base ecosystem tokens  
         'wrapped-bitcoin', 'dai', 'tether', 'usd-coin', 'weth',
-        'rocket-pool-eth', 'compound-ether', 'compound-usd-coin'
+        'rocket-pool-eth', 'compound-ether', 'compound-usd-coin',
+        
+        // Additional Base DeFi and infrastructure
+        'polyswap', 'swapbased', 'basedai', 'scale', 'mint-club', 'well',
+        'bvm', 'onchain', 'superbase', 'basedtools', 'basefi', 'basex',
+        'based-finance', 'base-terminal', 'based-management', 'base-carbon',
+        
+        // More Base memecoins and experimental tokens
+        'pepecoin-on-base', 'shib-2', 'wojak-2', 'pepe-unchained', 'doge-2',
+        'babydoge-2', 'floki-2', 'safemoon-2', 'cult-dao', 'copium',
+        'hopium', 'wen', 'omg', 'gm', 'wagmi', 'ngmi', 'few', 'iykyk'
       ];
 
       let allCoins = [];
@@ -77,7 +91,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 vs_currency: "usd",
                 ids: baseEcosystemCoins.join(','),
                 order: "market_cap_desc",
-                per_page: 100,
+                per_page: 250,
                 page: 1,
                 sparkline: false,
                 price_change_percentage: "24h"
