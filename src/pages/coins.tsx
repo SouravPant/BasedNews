@@ -30,13 +30,21 @@ export function Coins() {
         page: currentPage.toString(),
         includeStablecoins: 'true'
       });
-      const response = await fetch(`/api/cryptocurrencies?${params}`);
+      const response = await fetch(`/api/cryptocurrencies?${params}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!response.ok) {
-        throw new Error('Failed to fetch cryptocurrencies');
+        const text = await response.text();
+        console.error('API Error:', response.status, text);
+        throw new Error(`Failed to fetch cryptocurrencies: ${response.status} ${text}`);
       }
       return response.json();
     },
     refetchInterval: 30000, // Refresh every 30 seconds
+    retry: 3, // Retry failed requests
   });
 
   // Filter cryptocurrencies based on search
