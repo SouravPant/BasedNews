@@ -176,12 +176,15 @@ export function MobileBaseCoins() {
         throw new Error('Invalid data format received from API');
       }
       
-      // Convert to expected format - show Base ecosystem coins first, then other popular ones
-      const baseCoins = data.filter((coin: any) => coin.isBaseEcosystem || baseEcosystemCoins.includes(coin.id));
-      const otherCoins = data.filter((coin: any) => !coin.isBaseEcosystem && !baseEcosystemCoins.includes(coin.id));
+      // Separate Base ecosystem coins from other coins
+      const baseCoins = data.filter((coin: any) => coin.isBaseEcosystem === true);
+      const otherCoins = data.filter((coin: any) => coin.isBaseEcosystem !== true);
       
-      // Combine Base coins first, then top 50 other coins to ensure we have enough content
-      const allDisplayCoins = [...baseCoins, ...otherCoins.slice(0, 50)];
+      console.log('Base ecosystem coins found:', baseCoins.length, baseCoins.map(c => c.name));
+      console.log('Other coins found:', otherCoins.length);
+      
+      // Combine Base coins first, then other popular coins
+      const allDisplayCoins = [...baseCoins, ...otherCoins.slice(0, 80)];
       
       const formattedCoins = allDisplayCoins
         .map((coin: any, index: number) => ({

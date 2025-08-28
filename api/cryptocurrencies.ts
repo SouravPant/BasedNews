@@ -43,7 +43,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       let allCoins = [];
 
-      // If specific IDs are requested, fetch them first
+      // Always fetch Base ecosystem coins first if includeBaseCoins is true
+      if (includeBaseCoins) {
+        try {
+          console.log('Fetching Base ecosystem coins first...');
+          const baseCoinsResponse = await axios.get(
+            "https://api.coingecko.com/api/v3/coins/markets",
+            {
+              params: {
+                vs_currency: "usd",
+                ids: baseEcosystemCoins.join(','),
+                order: "market_cap_desc",
+                per_page: 50,
+                page: 1,
+                sparkline: false,
+                price_change_percentage: "24h"
+              },
+              timeout: 10000
+            }
+          );
+          allCoins = [...baseCoinsResponse.data];
+          console.log('Fetched Base ecosystem coins:', allCoins.length);
+        } catch (error) {
+          console.error('Error fetching Base ecosystem coins:', error);
+        }
+      }
+
+      // If specific IDs are requested, fetch them next
       if (idsParam && idsParam.trim()) {
         const requestedIds = idsParam.split(',').map(id => id.trim()).filter(Boolean);
         console.log('Fetching specific coins:', requestedIds);
