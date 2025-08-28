@@ -1,4 +1,5 @@
 import React from "react";
+import { useComposeCast } from '@coinbase/onchainkit/minikit';
 
 // OnchainKit and wallet state
 interface WalletState {
@@ -38,6 +39,9 @@ interface PortfolioItem extends Coin {
 }
 
 export function MiniAppDashboard() {
+  // MiniKit Farcaster integration
+  const { composeCast } = useComposeCast();
+
   // Add CSS animations
   React.useEffect(() => {
     const style = document.createElement('style');
@@ -124,6 +128,41 @@ export function MiniAppDashboard() {
     }
   };
 
+  // Base ecosystem token contracts
+  const baseTokens = {
+    USDC: { address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', decimals: 6 },
+    DEGEN: { address: '0x4ed4E862860beD51a9570b96d89aF5E1B0Eff918', decimals: 18 },
+    AERO: { address: '0x940181a94A35A4569E4529A3CDfB74287c58C93F', decimals: 18 },
+    BRETT: { address: '0x532f27101965dd16442E59d40670FaF5eBB142E4', decimals: 18 },
+    TOSHI: { address: '0xAC1Bd2486aAf3B5C0fc3Fd868558b082a531B2B4', decimals: 18 }
+  };
+
+  // Fetch ERC20 token balance
+  const fetchTokenBalance = async (address: string, tokenAddress: string, decimals: number) => {
+    try {
+      const response = await fetch('https://mainnet.base.org', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'eth_call',
+          params: [{
+            to: tokenAddress,
+            data: `0x70a08231000000000000000000000000${address.slice(2)}`
+          }, 'latest'],
+          id: 1
+        })
+      });
+      
+      const result = await response.json();
+      const balance = BigInt(result.result || '0');
+      return Number(balance) / Math.pow(10, decimals);
+    } catch (error) {
+      console.error(`Failed to fetch token balance:`, error);
+      return 0;
+    }
+  };
+
   // Fetch real wallet balances from Base chain
   const fetchWalletBalances = async (address: string) => {
     setIsLoadingWallet(true);
@@ -149,20 +188,46 @@ export function MiniAppDashboard() {
       const ethBalanceWei = BigInt(ethResult.result || '0');
       const ethBalanceEth = Number(ethBalanceWei) / 1e18;
       
-      // Get current ETH price
-      const priceResponse = await fetch('/api/cryptocurrencies?ids=ethereum&per_page=1');
+      // Get current prices for all tokens
+      const priceResponse = await fetch('/api/cryptocurrencies?ids=ethereum,usd-coin,degen-base,aerodrome-finance,brett,toshi&per_page=10');
       const priceData = await priceResponse.json();
-      const ethPrice = parseFloat(priceData[0]?.currentPrice || '0');
       
+      const prices = {
+        ETH: parseFloat(priceData.find(p => p.id === 'ethereum')?.currentPrice || '0'),
+        USDC: parseFloat(priceData.find(p => p.id === 'usd-coin')?.currentPrice || '1'),
+        DEGEN: parseFloat(priceData.find(p => p.id === 'degen-base')?.currentPrice || '0'),
+        AERO: parseFloat(priceData.find(p => p.id === 'aerodrome-finance')?.currentPrice || '0'),
+        BRETT: parseFloat(priceData.find(p => p.id === 'brett')?.currentPrice || '0'),
+        TOSHI: parseFloat(priceData.find(p => p.id === 'toshi')?.currentPrice || '0')
+      };
+      
+      // Fetch all token balances in parallel
+      const tokenBalancePromises = Object.entries(baseTokens).map(async ([symbol, token]) => {
+        const balance = await fetchTokenBalance(address, token.address, token.decimals);
+        return {
+          symbol,
+          balance: balance.toFixed(symbol === 'USDC' ? 2 : 4),
+          usdValue: balance * (prices[symbol as keyof typeof prices] || 0),
+          rawBalance: balance
+        };
+      });
+      
+      const tokenBalances = await Promise.all(tokenBalancePromises);
+      
+      // Add ETH to tokens list
       const tokens = [
         {
           symbol: 'ETH',
           balance: ethBalanceEth.toFixed(4),
-          usdValue: ethBalanceEth * ethPrice
-        }
+          usdValue: ethBalanceEth * prices.ETH,
+          rawBalance: ethBalanceEth
+        },
+        ...tokenBalances.filter(token => token.rawBalance > 0) // Only show tokens with balance
       ];
       
       const totalValue = tokens.reduce((sum, token) => sum + token.usdValue, 0);
+      const yesterday24hValue = totalValue * 0.98; // Mock 24h change for demo
+      const change24h = totalValue - yesterday24hValue;
       
       setWalletState({
         address,
@@ -172,6 +237,7 @@ export function MiniAppDashboard() {
       });
       
       setTotalPortfolioValue(totalValue);
+      setPortfolioChange24h(change24h);
       
     } catch (error) {
       console.error('Failed to fetch wallet balances:', error);
@@ -384,28 +450,36 @@ export function MiniAppDashboard() {
               >
                 {isLoadingWallet ? (
                   <div style={{
-                    width: '20px',
-                    height: '20px',
+                    width: '24px',
+                    height: '24px',
                     border: '2px solid white',
                     borderTop: '2px solid transparent',
                     borderRadius: '50%',
                     animation: 'spin 1s linear infinite'
                   }} />
                 ) : (
-                  <div style={{
-                    width: '20px',
-                    height: '20px',
-                    backgroundColor: 'white',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#0052ff',
-                    fontWeight: 'bold',
-                    fontSize: '10px'
-                  }}>
-                    CB
-                  </div>
+                  // Professional Coinbase Wallet SVG Icon
+                  <svg 
+                    width="24" 
+                    height="24" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle cx="12" cy="12" r="12" fill="white"/>
+                    <path 
+                      d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 16c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z" 
+                      fill="#0052ff"
+                    />
+                    <rect 
+                      x="9" 
+                      y="9" 
+                      width="6" 
+                      height="6" 
+                      rx="1" 
+                      fill="#0052ff"
+                    />
+                  </svg>
                 )}
                 {isLoadingWallet ? 'Connecting...' : 'Connect Coinbase Wallet'}
               </button>
@@ -467,30 +541,20 @@ export function MiniAppDashboard() {
                     </div>
                   </div>
                   <button
-                    onClick={async () => {
+                    onClick={() => {
                       try {
                         const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
-                        const shareData = {
-                          title: 'My Base Portfolio',
-                          text: shareText,
-                          url: window.location.href
-                        };
                         
-                        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-                          await navigator.share(shareData);
-                        } else {
-                          await navigator.clipboard.writeText(shareText + '\n' + window.location.href);
-                          alert('📋 Copied to clipboard! Share on Farcaster or social media.');
-                        }
+                        composeCast({
+                          text: shareText,
+                          embeds: [window.location.href]
+                        });
                       } catch (error) {
-                        console.error('Share failed:', error);
-                        try {
-                          const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
-                          await navigator.clipboard.writeText(shareText + '\n' + window.location.href);
-                          alert('📋 Copied to clipboard! Share on Farcaster or social media.');
-                        } catch (clipboardError) {
-                          console.error('Clipboard failed:', clipboardError);
-                        }
+                        console.error('Farcaster share failed:', error);
+                        // Fallback to clipboard
+                        const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
+                        navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
+                        alert('📋 Copied to clipboard! Share on Farcaster.');
                       }
                     }}
                     style={{
@@ -588,8 +652,18 @@ export function MiniAppDashboard() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
                     {walletState.tokens.map((token, index) => {
                       const percentage = totalPortfolioValue > 0 ? (token.usdValue / totalPortfolioValue) * 100 : 0;
-                      const colors = ['#0052ff', '#22c55e', '#8a63d2', '#f59e0b'];
+                      const colors = ['#0052ff', '#22c55e', '#8a63d2', '#f59e0b', '#ef4444', '#06d6a0'];
                       const color = colors[index % colors.length];
+                      
+                      // Token icons
+                      const tokenIcons = {
+                        ETH: '🔷',
+                        USDC: '💵',
+                        DEGEN: '🎩',
+                        AERO: '💨',
+                        BRETT: '🟢',
+                        TOSHI: '🟡'
+                      };
                       
                       return (
                         <div key={token.symbol} style={{
@@ -599,30 +673,37 @@ export function MiniAppDashboard() {
                           padding: '12px',
                           backgroundColor: 'var(--muted)',
                           borderRadius: '8px',
-                          border: '1px solid var(--border)'
+                          border: '1px solid var(--border)',
+                          transition: 'all 0.2s ease'
                         }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <div style={{
-                              width: '16px',
-                              height: '16px',
+                              width: '32px',
+                              height: '32px',
                               backgroundColor: color,
-                              borderRadius: '50%'
-                            }} />
+                              borderRadius: '50%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '16px'
+                            }}>
+                              {tokenIcons[token.symbol as keyof typeof tokenIcons] || '💎'}
+                            </div>
                             <div>
-                              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--foreground)' }}>
+                              <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--foreground)' }}>
                                 {token.symbol}
                               </div>
                               <div style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
-                                {token.balance} tokens
+                                {token.balance} {token.symbol}
                               </div>
                             </div>
                           </div>
                           <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--foreground)' }}>
+                            <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--foreground)' }}>
                               ${token.usdValue.toFixed(2)}
                             </div>
                             <div style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
-                              {percentage.toFixed(1)}%
+                              {percentage.toFixed(1)}% of portfolio
                             </div>
                           </div>
                         </div>
