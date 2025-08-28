@@ -1,4 +1,5 @@
 import React from "react";
+import { useComposeCast } from '@coinbase/onchainkit/minikit';
 
 // OnchainKit and wallet state
 interface WalletState {
@@ -38,6 +39,8 @@ interface PortfolioItem extends Coin {
 }
 
 export function MiniAppDashboard() {
+  // MiniKit Farcaster integration
+  const { composeCast } = useComposeCast();
 
   // Add CSS animations
   React.useEffect(() => {
@@ -576,34 +579,55 @@ export function MiniAppDashboard() {
                       console.log('🚀 Share button clicked');
                       const shareText = `🚀 My Base portfolio: $${totalPortfolioValue.toFixed(2)} 📊\n\nBuilding on @base with real on-chain data! 💙\n\nTrack yours at BasedHub ⚡`;
                       
-                      // Simple sharing fallback
-                      if (navigator.share) {
-                        navigator.share({
-                          title: 'My Base Portfolio',
+                      try {
+                        // Use MiniKit composeCast for Farcaster sharing
+                        composeCast({
                           text: shareText,
-                          url: window.location.href
-                        }).catch(() => {
-                          // Fallback to clipboard
+                          embeds: [window.location.href]
+                        });
+                        console.log('✅ MiniKit composeCast called successfully');
+                      } catch (error) {
+                        console.error('❌ MiniKit share failed:', error);
+                        // Fallback to native sharing
+                        if (navigator.share) {
+                          navigator.share({
+                            title: 'My Base Portfolio',
+                            text: shareText,
+                            url: window.location.href
+                          }).catch(() => {
+                            navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
+                            alert('📋 Copied to clipboard! Share on Farcaster.');
+                          });
+                        } else {
                           navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
                           alert('📋 Copied to clipboard! Share on Farcaster.');
-                        });
-                      } else {
-                        // Fallback to clipboard
-                        navigator.clipboard?.writeText(shareText + '\n' + window.location.href);
-                        alert('📋 Copied to clipboard! Share on Farcaster.');
+                        }
                       }
                     }}
                     style={{
-                      padding: '6px 12px',
-                      backgroundColor: '#8a63d2',
+                      padding: '8px 16px',
+                      backgroundColor: '#0052ff',
                       color: 'white',
                       border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 4px rgba(0, 82, 255, 0.2)'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = '#0041cc';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 82, 255, 0.3)';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = '#0052ff';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 82, 255, 0.2)';
                     }}
                   >
-                    📢 Share on Farcaster
+                    Share
                   </button>
                 </div>
               )}
