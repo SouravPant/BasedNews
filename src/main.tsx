@@ -6,6 +6,7 @@ import { BaseNews } from "./components/base-news";
 import { MiniAppDashboard } from "./components/mini-app-dashboard";
 import { ThemeToggleSimple } from "./components/theme-toggle-simple";
 import { BaseWalletProvider } from "./providers/BaseWalletProvider";
+import { MiniKitProvider } from "./providers/MiniKitProvider";
 import { sdk } from '@farcaster/miniapp-sdk';
 import { useBatchRelativeTime } from './lib/timeUtils';
 
@@ -602,9 +603,11 @@ function App() {
 console.log('Starting App...');
 const root = createRoot(document.getElementById("root")!);
 root.render(
-  <BaseWalletProvider>
-    <App />
-  </BaseWalletProvider>
+  <MiniKitProvider>
+    <BaseWalletProvider>
+      <App />
+    </BaseWalletProvider>
+  </MiniKitProvider>
 );
 console.log('App rendered!');
 // Farcaster SDK integration complete
