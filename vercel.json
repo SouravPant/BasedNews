@@ -48,7 +48,7 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/(?!.well-known)(.+)",
       "destination": "/index.html"
     }
   ],
